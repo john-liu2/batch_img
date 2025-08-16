@@ -8,35 +8,76 @@ from datetime import datetime
 
 from loguru import logger
 
-from batch_img.common import Common
-from batch_img.const import PKG_NAME
-
-TS_FORMAT = "%Y-%m-%d_%H-%M-%S"
+from batch_img.const import PKG_NAME, TS_FORMAT
 
 
 class Main:
     @staticmethod
-    def run(options: dict) -> str:
-        """
-        Check options and run
-        """
-        cur_ver = Common.get_version()
-        if options.get("version"):
-            return cur_ver
+    def init_log_file() -> str:
+        """Set up the unique name log file for each run
 
-        logger.info(f"{json.dumps(options, indent=2)}")
+        Returns:
+            str: log file path
+        """
         log_file = f"run_{PKG_NAME}_{datetime.now().strftime(TS_FORMAT)}.log"
         logger.add(
             f"{os.getcwd()}/{log_file}", backtrace=True, diagnose=True, enqueue=True
         )
-        if options.get("resize"):
-            max_width = int(options.get("resize"))
-            # To-do
-            return f"Resized image file(s) to {max_width}"
-
-        if options.get("rotate"):
-            degree = int(options.get("rotate"))
-            # To-do
-            return f"Rotated image file(s) to {degree}-degree clock-wise"
-
         return log_file
+
+    @staticmethod
+    def resize(options: dict) -> bool:
+        """Resize the image file(s)
+
+        Args:
+            options: input options dict
+
+        Returns:
+            bool: True - Success. False - Error
+        """
+        logger.info(f"{json.dumps(options, indent=2)}")
+        Main.init_log_file()
+        # To-do
+        return True
+
+    @staticmethod
+    def add_border(options: dict) -> bool:
+        """Add border to the image file(s)
+
+        Args:
+            options: input options dict
+
+        Returns:
+            bool: True - Success. False - Error
+        """
+        logger.info(f"{json.dumps(options, indent=2)}")
+        Main.init_log_file()
+        # To-do
+        return True
+
+    @staticmethod
+    def rotate(options: dict) -> bool:
+        """Rotate the image file(s)
+
+        Args:
+            options: input options dict
+
+        Returns:
+            bool: True - Success. False - Error
+        """
+        logger.info(f"{json.dumps(options, indent=2)}")
+        Main.init_log_file()
+        # To-do
+        return True
+
+    @staticmethod
+    def default_run(options: dict) -> bool:
+        """Do the default action on the image file(s):
+        1) Resize to 1280 pixels as the max width
+        2) Add a border: 5 pixel width, gray color
+        3) Not rotate
+        """
+        logger.info(f"{json.dumps(options, indent=2)}")
+        Main.init_log_file()
+        # To-do
+        return True

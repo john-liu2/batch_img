@@ -9,30 +9,92 @@ import pytest
 from click.testing import CliRunner
 
 from batch_img.const import MSG_OK, MSG_BAD
-from batch_img.interface import action
+from batch_img.interface import border, defaults, resize, rotate
 
 
 @pytest.fixture(
     params=[
-        ("src_path --add_border 3 'blue'", True, MSG_OK),
-        ("img/file --add_border 6 'red'", False, MSG_BAD),
-        ("src_path --resize 0", True, MSG_OK),
-        ("src_path --resize 1024", False, MSG_BAD),
-        ("img/file --rotate 90", True, MSG_OK),
-        ("src_path --rotate 180", False, MSG_BAD),
+        ("src_path -bw 3 --border_color #AABBCC", True, MSG_OK),
+        ("img/file --border_width 9 -bc blue", False, MSG_BAD),
     ]
 )
-def action_data(request):
+def data_border(request):
     return request.param
 
 
-@patch("batch_img.main.Main.run")
-def test_action(mock_run, action_data):
-    _input, ret, expected = action_data
-    mock_run.return_value = ret
+@patch("batch_img.main.Main.add_border")
+def test_border(mock_add_border, data_border):
+    _input, res, expected = data_border
+    mock_add_border.return_value = res
     expected += "\n"
     runner = CliRunner()
-    result = runner.invoke(action, args=_input.split())
+    result = runner.invoke(border, args=_input.split())
+    print(result.output)
+    assert not result.exception
+    assert result.output == expected
+
+
+@pytest.fixture(
+    params=[
+        ("src_path", True, MSG_OK),
+        ("img/file", False, MSG_BAD),
+    ]
+)
+def data_defaults(request):
+    return request.param
+
+
+@patch("batch_img.main.Main.default_run")
+def test_defaults(mock_run, data_defaults):
+    _input, res, expected = data_defaults
+    mock_run.return_value = res
+    expected += "\n"
+    runner = CliRunner()
+    result = runner.invoke(defaults, args=_input.split())
+    print(result.output)
+    assert not result.exception
+    assert result.output == expected
+
+
+@pytest.fixture(
+    params=[
+        ("src_path -w 1234", True, MSG_OK),
+        ("img/file --width 9876", False, MSG_BAD),
+    ]
+)
+def data_resize(request):
+    return request.param
+
+
+@patch("batch_img.main.Main.resize")
+def test_resize(mock_resize, data_resize):
+    _input, res, expected = data_resize
+    mock_resize.return_value = res
+    expected += "\n"
+    runner = CliRunner()
+    result = runner.invoke(resize, args=_input.split())
+    print(result.output)
+    assert not result.exception
+    assert result.output == expected
+
+
+@pytest.fixture(
+    params=[
+        ("src_path -d 90", True, MSG_OK),
+        ("img/file --degree 270", False, MSG_BAD),
+    ]
+)
+def data_rotate(request):
+    return request.param
+
+
+@patch("batch_img.main.Main.rotate")
+def test_rotate(mock_rotate, data_rotate):
+    _input, res, expected = data_rotate
+    mock_rotate.return_value = res
+    expected += "\n"
+    runner = CliRunner()
+    result = runner.invoke(rotate, args=_input.split())
     print(result.output)
     assert not result.exception
     assert result.output == expected
