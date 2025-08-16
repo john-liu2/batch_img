@@ -1,4 +1,6 @@
-"""class Main: the entry point of the tool"""
+"""class Main: the entry point of the tool
+Copyright © 2025 John Liu
+"""
 
 import os
 from datetime import datetime

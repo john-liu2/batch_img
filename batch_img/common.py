@@ -1,4 +1,6 @@
-"""class Common: common utilities"""
+"""class Common: common utilities
+Copyright © 2025 John Liu
+"""
 
 import subprocess
 import tomllib
