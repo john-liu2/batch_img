@@ -9,7 +9,7 @@ import pytest
 from click.testing import CliRunner
 
 from batch_img.const import MSG_OK, MSG_BAD
-from batch_img.interface import resize, border, rotate, defaults
+from batch_img.interface import border, defaults, resize, rotate
 
 
 @pytest.fixture(

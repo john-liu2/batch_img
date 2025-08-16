@@ -8,9 +8,7 @@ from datetime import datetime
 
 from loguru import logger
 
-from batch_img.const import PKG_NAME
-
-TS_FORMAT = "%Y-%m-%d_%H-%M-%S"
+from batch_img.const import PKG_NAME, TS_FORMAT
 
 
 class Main:
