@@ -18,9 +18,13 @@ classifiers = [
 ]
 requires-python = ">=3.12"
 dependencies = [
+    "click",
+    "loguru",
     "pillow",
-    "typer",
 ]
+[project.scripts]
+batch_img = "batch_img.interface:cli"
+
 [project.urls]
 Download = "https://artifacts.some.where"
 Homepage = "https://github.com/john-liu2/batch_img"
@@ -34,7 +38,7 @@ include = ["*"]
 # uv pip install -e '.[dev]'
 dev = [
     "pytest-cov", # also install pytest
-    "black",
+    "black>=25.1.0",
     "ruff",
     "pre-commit", # rules are in .pre-commit-config.yaml
     "pylint",
@@ -53,7 +57,6 @@ lint.select = [
     "PL", # pylint
     "C416", # Unnecessary comprehension (R1721 from Pylint)
 ]
-preview = true
 lint.ignore = [
     "RET504",
     "PLR0913",
@@ -68,6 +71,7 @@ lint.ignore = [
     "E266", # Too many leading `#` before block comment
 ]
 lint.fixable = ["E", "F", "I", "UP"]
+preview = true
 exclude = [
     "**/venv/",
     "**/__pycache__/",

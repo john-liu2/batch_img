@@ -10,7 +10,7 @@ repos:
       - id: check-merge-conflict  # checks for files that contain merge conflict strings
       - id: check-toml
       - id: check-yaml  # Instead of loading the files, simply parse them for syntax.
-        args: [--unsafe]
+        args: [ --unsafe ]
       - id: trailing-whitespace
       - id: end-of-file-fixer  # ensures files end with a newline
       - id: mixed-line-ending  # replaces or checks mixed line ending
@@ -22,30 +22,20 @@ repos:
         entry: pylint
         # system for local dev env. For isolated env, use language: python with additional_dependencies
         language: system
-        types: [python]
-        args: ["--output-format=colorized"]
-#        additional_dependencies: [pylint, setuptools, click, textual, loguru]
+        types: [ python ]
+        args: [ "--output-format=colorized" ]
+  #        additional_dependencies: [pylint, setuptools, click, textual, loguru]
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.12.8  # the latest ruff version
     hooks:
       # Run the linter
       - id: ruff-check
-        types_or: [python, pyi]
-        args: [--fix, --exit-non-zero-on-fix]
+        types_or: [ python, pyi ]
+        args: [ --fix, --exit-non-zero-on-fix ]
       # Run the formatter
       - id: ruff-format
-        types_or: [python, pyi]
-        args: [--diff, --check]
-
-  - repo: local
-    hooks:
-      - id: pytest
-        name: Run Pytest
-        entry: pytest
-        # system for local dev env
-        language: system
-        types: [python]
-        args: ["--cov-report=term --cov=batch_img tests"]
+        types_or: [ python, pyi ]
+        args: [ --diff, --check ]
 
 exclude: ^tests
