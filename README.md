@@ -10,9 +10,9 @@ Batch processing image files by utilizing **[Pillow / PIL](https://github.com/py
 ✗ batch_img --version
 0.0.7
 
-✗ batch_img action ~/Downloads/IMG_0070.HEIC --rotate 180
+✗ batch_img rotate --degree 90 ~/Downloads/IMG_0070.HEIC
+...
 ✅ Processed the image file(s)
-
 ```
 
 ### Help
@@ -28,25 +28,65 @@ Options:
   --help     Show this message and exit.
 
 Commands:
-  action  Batch processing a image file or all image files in a folder path
+  border    Add border to image file(s)
+  defaults  Process image file(s) with default actions: 1) resize to...
+  resize    Resize image file(s)
+  rotate    Rotate image file(s)
 ```
 
-#### The `action` command CLI options:
+#### The `border` sub-command CLI options:
 
 ```
-✗ batch_img action --help
-Usage: batch_img action [OPTIONS] SRC_PATH
+✗ batch_img border --help
+Usage: batch_img border [OPTIONS] SRC_PATH
 
-  Batch processing a image file or all image files in a folder path
+  Add border to image file(s)
 
 Options:
-  --add_border <INTEGER TEXT>...  Add border to the image file(s) with
-                                  'border_width  border_color'.  [default: 0,
-                                  red]
-  --resize INTEGER                Resize the image file(s) on current aspect
-                                  ratio to the width. 0 - no resize  [default:
-                                  0]
-  --rotate INTEGER                Rotate the image file(s) to the given degree
-                                  clock-wise. 0 - no rotate  [default: 0]
-  --help                          Show this message and exit.
+  -bw, --border_width INTEGER  Add border to image file(s) with the
+                               border_width. 0 - no border  [default: 5]
+  -bc, --border_color TEXT     Add border to image file(s) with the
+                               border_color string  [default: gray]
+  --help                       Show this message and exit.
+```
+
+#### The `defaults` sub-command CLI options:
+
+```
+✗ batch_img defaults --help
+Usage: batch_img defaults [OPTIONS] SRC_PATH
+
+  Process image file(s) with default actions: 1) resize to 1280; 2) add
+  5-pixel gray color border; 3) no rotate
+
+Options:
+  --help  Show this message and exit.
+```
+
+#### The `resize` sub-command CLI options:
+
+```
+✗ batch_img resize --help
+Usage: batch_img resize [OPTIONS] SRC_PATH
+
+  Resize image file(s)
+
+Options:
+  -w, --width INTEGER  Resize image file(s) on current aspect ratio to the
+                       width. 0 - no resize  [default: 0]
+  --help               Show this message and exit.
+```
+
+#### The `rotate` sub-command CLI options:
+
+```
+✗ batch_img rotate --help
+Usage: batch_img rotate [OPTIONS] SRC_PATH
+
+  Rotate image file(s)
+
+Options:
+  -d, --degree INTEGER  Rotate image file(s) to the degree clock-wise. 0 - no
+                        rotate  [default: 0]
+  --help                Show this message and exit.
 ```
