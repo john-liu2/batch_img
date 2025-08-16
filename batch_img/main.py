@@ -2,6 +2,7 @@
 Copyright © 2025 John Liu
 """
 
+import json
 import os
 from datetime import datetime
 
@@ -23,6 +24,7 @@ class Main:
         if options.get("version"):
             return cur_ver
 
+        logger.info(f"{json.dumps(options, indent=2)}")
         log_file = f"run_{PKG_NAME}_{datetime.now().strftime(TS_FORMAT)}.log"
         logger.add(
             f"{os.getcwd()}/{log_file}", backtrace=True, diagnose=True, enqueue=True

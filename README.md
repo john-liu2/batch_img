@@ -41,8 +41,8 @@ Usage: batch_img action [OPTIONS] SRC_PATH
 
 Options:
   --add_border <INTEGER TEXT>...  Add border to the image file(s) with
-                                  'border_width  border_color'. Default is '5
-                                  gray'  [default: 5, gray]
+                                  'border_width  border_color'.  [default: 0,
+                                  red]
   --resize INTEGER                Resize the image file(s) on current aspect
                                   ratio to the width. 0 - no resize  [default:
                                   0]

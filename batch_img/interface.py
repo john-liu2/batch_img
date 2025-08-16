@@ -1,4 +1,4 @@
-"""CLI interface
+"""interface.py - define CLI interface
 Copyright © 2025 John Liu
 """
 
@@ -26,11 +26,10 @@ def cli(ctx, version):  # pragma: no cover
 @click.option(
     "--add_border",
     nargs=2,
-    default=(5, "gray"),
+    default=(0, "red"),
     show_default=True,
     type=(int, str),
-    help="Add border to the image file(s) with 'border_width  border_color'."
-    " Default is '5 gray'",
+    help="Add border to the image file(s) with 'border_width  border_color'.",
 )
 @click.option(
     "--resize",
