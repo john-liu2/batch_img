@@ -1,0 +1,22 @@
+[FORMAT]
+max-line-length=120
+
+[MAIN]
+ignore=tests, data, venv
+ignore-paths=^(.*/)?tests?(/.*)?$
+
+[MESSAGES CONTROL]
+# Missing function or method docstring
+# Missing class docstring
+# Attribute name "..." doesn't conform to snake_case naming style
+# Too few public methods
+# Consider using enumerate instead of iterating with range and len
+# Too many lines in module
+# String statement has no effect (pointless-string-statement)
+# Too many arguments, Too many positional arguments
+# Too many public methods (37/20)
+# Unused variable
+# Too many nested blocks
+# Similar lines in 2 files
+# Use lazy % formatting in logging functions
+disable=C0116,C0115,C0103,R0903,C0200,C0302,W0105,R0913,R0917,R0904,W0612,R1702,R0801,W1203
