@@ -19,8 +19,12 @@ classifiers = [
 requires-python = ">=3.12"
 dependencies = [
     "pillow",
-    "typer",
+    "click",
+    "loguru",
 ]
+[project.scripts]
+batch_img = "batch_img.interface:cli"
+
 [project.urls]
 Download = "https://artifacts.some.where"
 Homepage = "https://github.com/john-liu2/batch_img"

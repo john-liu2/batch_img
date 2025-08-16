@@ -1,0 +1,38 @@
+"""class Main: the entry point of the tool"""
+
+import os
+from datetime import datetime
+
+from loguru import logger
+
+from batch_img.common import Common
+from batch_img.const import PKG_NAME
+
+TS_FORMAT = "%Y-%m-%d_%H-%M-%S"
+
+
+class Main:
+    @staticmethod
+    def run(options: dict) -> str:
+        """
+        Check options and run
+        """
+        cur_ver = Common.get_version()
+        if options.get("version"):
+            return cur_ver
+
+        log_file = f"run_{PKG_NAME}_{datetime.now().strftime(TS_FORMAT)}.log"
+        logger.add(
+            f"{os.getcwd()}/{log_file}", backtrace=True, diagnose=True, enqueue=True
+        )
+        if options.get("resize"):
+            max_width = int(options.get("resize"))
+            # To-do
+            return "Resized image file(s)"
+
+        if options.get("rotate"):
+            degree = int(options.get("rotate"))
+            # To-do
+            return f"Rotated image file(s) to {degree}-degree clock-wise"
+
+        return log_file
