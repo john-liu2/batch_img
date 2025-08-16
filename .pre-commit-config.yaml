@@ -1,5 +1,5 @@
 # See https://pre-commit.com for more information
-# See https://pre-commit.com/hooks.html for more hooks
+
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v5.0.0  # Use the ref you want to point at
@@ -20,11 +20,10 @@ repos:
       - id: pylint
         name: Run pylint
         entry: pylint
-        # system for local dev env. For isolated env, use language: python with additional_dependencies
+        # system - pylint is in the venv. Use language: python for new env
         language: system
         types: [ python ]
         args: [ "--output-format=colorized" ]
-  #        additional_dependencies: [pylint, setuptools, click, textual, loguru]
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.12.8  # the latest ruff version
@@ -37,5 +36,14 @@ repos:
       - id: ruff-format
         types_or: [ python, pyi ]
         args: [ --diff, --check ]
+
+  - repo: local
+    hooks:
+      - id: run-pytest
+        name: Run Pytest
+        entry: pytest
+        language: system  # pytest is in the venv
+        types: [ python ]
+        pass_filenames: false
 
 exclude: ^tests

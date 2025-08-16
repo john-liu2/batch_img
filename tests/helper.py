@@ -1,4 +1,6 @@
-"""helper.py - utilities supporting tests"""
+"""helper.py - utilities supporting tests
+Copyright © 2025 John Liu
+"""
 
 
 class DotDict(dict):

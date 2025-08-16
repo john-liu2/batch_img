@@ -1,4 +1,6 @@
-"""const.py - define constants"""
+"""const.py - define constants
+Copyright © 2025 John Liu
+"""
 
 PKG_NAME = "batch_img"
 VER = "version"

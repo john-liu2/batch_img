@@ -1,5 +1,6 @@
 """Test interface.py
 pytest -sv tests/test_interface.py
+Copyright © 2025 John Liu
 """
 
 from unittest.mock import patch

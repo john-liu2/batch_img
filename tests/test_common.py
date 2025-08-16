@@ -1,5 +1,6 @@
 """Test common.py
 pytest -sv tests/test_common.py
+Copyright © 2025 John Liu
 """
 
 from unittest.mock import MagicMock, patch
