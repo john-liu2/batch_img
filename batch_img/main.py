@@ -28,7 +28,7 @@ class Main:
         if options.get("resize"):
             max_width = int(options.get("resize"))
             # To-do
-            return "Resized image file(s)"
+            return f"Resized image file(s) to {max_width}"
 
         if options.get("rotate"):
             degree = int(options.get("rotate"))

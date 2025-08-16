@@ -3,7 +3,7 @@
 import click
 
 from batch_img.common import Common
-from batch_img.const import MSG_OK, MSG_BAD
+from batch_img.const import MSG_BAD, MSG_OK
 from batch_img.main import Main
 
 
@@ -29,7 +29,8 @@ def cli(ctx, version):  # pragma: no cover
     default=(5, "gray"),
     show_default=True,
     type=(int, str),
-    help="Add border to the image file(s) with (border_width, border_color). Default is (5, 'gray')",
+    help="Add border to the image file(s) with (border_width, border_color)."
+    " Default is (5 'gray')",
 )
 @click.option(
     "--resize",
@@ -37,7 +38,8 @@ def cli(ctx, version):  # pragma: no cover
     default=0,
     show_default=True,
     type=int,
-    help="Resize the image file(s) on current aspect ratio to the width. Default 0 - no resize action",
+    help="Resize the image file(s) on current aspect ratio to the width."
+    " Default 0 - no resize",
 )
 @click.option(
     "--rotate",
@@ -45,7 +47,8 @@ def cli(ctx, version):  # pragma: no cover
     default=0,
     show_default=True,
     type=int,
-    help="Rotate the image file(s) to the given degree clock-wise. Default 0 - no rotate action",
+    help="Rotate the image file(s) to the given degree clock-wise."
+    " Default 0 - no rotate",
 )
 def action(src_path, add_border, resize, rotate):
     options = {

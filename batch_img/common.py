@@ -11,7 +11,6 @@ from batch_img.const import PKG_NAME, VER
 
 
 class Common:
-
     @staticmethod
     def get_version() -> str:
         """

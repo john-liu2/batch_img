@@ -18,9 +18,9 @@ classifiers = [
 ]
 requires-python = ">=3.12"
 dependencies = [
-    "pillow",
     "click",
     "loguru",
+    "pillow",
 ]
 [project.scripts]
 batch_img = "batch_img.interface:cli"
