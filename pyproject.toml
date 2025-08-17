@@ -20,7 +20,9 @@ requires-python = ">=3.12"
 dependencies = [
     "click",
     "loguru",
+    "piexif",
     "pillow",
+    "pillow-heif",
 ]
 [project.scripts]
 batch_img = "batch_img.interface:cli"
