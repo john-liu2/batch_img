@@ -58,8 +58,8 @@ def test_defaults(mock_run, data_defaults):
 
 @pytest.fixture(
     params=[
-        ("src_path -w 1234", True, MSG_OK),
-        ("img/file --width 9876", False, MSG_BAD),
+        ("src_path -l 1234", True, MSG_OK),
+        ("img/file --length 9876", False, MSG_BAD),
     ]
 )
 def data_resize(request):

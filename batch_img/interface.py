@@ -58,7 +58,7 @@ def border(src_path, border_width, border_color):
 )
 def defaults(src_path):
     """Do the default action on the image file(s):
-    * Resize to 1280 pixels as the max width
+    * Resize to 1280 pixels as the max length
     * Add a border: 5 pixel width, gray color
     * No rotate
     """
@@ -76,18 +76,18 @@ def defaults(src_path):
     required=True,
 )
 @click.option(
-    "-w",
-    "--width",
+    "-l",
+    "--length",
     is_flag=False,
     default=0,
     show_default=True,
     type=int,
-    help="Resize image file(s) on current aspect ratio to the width. 0 - no resize",
+    help="Resize image file(s) on current aspect ratio to the length. 0 - no resize",
 )
-def resize(src_path, width):
+def resize(src_path, length):
     options = {
         "src_path": src_path,
-        "width": width,
+        "length": length,
     }
     res = Main.resize(options)
     msg = MSG_OK if res else MSG_BAD
