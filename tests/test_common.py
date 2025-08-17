@@ -182,7 +182,29 @@ def test_decode_exif(data_decode_exif):
                 },
                 "exif": {"ExifTag": 90, "Orientation": 1},
             },
-        )
+        ),
+        (
+            Path(f"{dirname(__file__)}/data/HEIC/Cartoon_180cw.heic"),
+            {
+                "file_size": "42.4 KB",
+                "file_ts": "2025-08-17_11-05-21",
+                "format": "HEIF",
+                "mode": "RGB",
+                "size": (758, 758),
+                "info": {
+                    "aux": {},
+                    "bit_depth": 8,
+                    "chroma": 420,
+                    "depth_images": [],
+                    "icc_profile_type": "prof",
+                    "metadata": [],
+                    "original_orientation": None,
+                    "primary": True,
+                    "thumbnails": [],
+                },
+                "exif": {"ExifTag": 114, "Orientation": 1},
+            },
+        ),
     ]
 )
 def data_get_image(request):

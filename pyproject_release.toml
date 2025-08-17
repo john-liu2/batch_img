@@ -24,6 +24,8 @@ dependencies = [
     "pillow",
     "pillow-heif",
     "tqdm",
+    "numpy",
+    "opencv-python",
 ]
 [project.scripts]
 batch_img = "batch_img.interface:cli"

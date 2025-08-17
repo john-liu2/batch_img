@@ -51,7 +51,7 @@ def border(src_path, border_width, border_color):
 
 @cli.command(
     help="Process image file(s) with default actions:\n"
-    "1) resize to 1280; 2) add 5-pixel gray color border; 3) no rotate"
+    "1) resize to 1280; 2) add 5-pixel gray color border; 3) auto-rotate if needed"
 )
 @click.argument(
     "src_path",
@@ -61,7 +61,7 @@ def defaults(src_path):
     """Do the default action on the image file(s):
     * Resize to 1280 pixels as the max length
     * Add a border: 5 pixel width, gray color
-    * No rotate
+    * Auto-rotate if upside down or sideways
     """
     options = {
         "src_path": src_path,

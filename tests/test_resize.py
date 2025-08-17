@@ -9,7 +9,6 @@ from unittest.mock import patch
 
 import pytest
 
-from batch_img.common import Common
 from batch_img.resize import Resize
 
 
