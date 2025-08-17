@@ -41,12 +41,12 @@ class Main:
         Main.init_log_file()
         # Resize one file
         in_path = Path(options["src_path"])
-        length = options["length"]
+        length = options.get("length")
         if not length:
             logger.warning(f"No resize due to bad {length=}")
             return False
-        Resize.resize_an_image(in_path, Path(os.getcwd()), length)
-        return True
+        ok, _ = Resize.resize_an_image(in_path, Path(os.getcwd()), length)
+        return ok
 
     @staticmethod
     def add_border(options: dict) -> bool:

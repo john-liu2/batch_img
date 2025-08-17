@@ -23,6 +23,7 @@ dependencies = [
     "piexif",
     "pillow",
     "pillow-heif",
+    "tqdm",
 ]
 [project.scripts]
 batch_img = "batch_img.interface:cli"

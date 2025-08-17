@@ -19,8 +19,14 @@ from batch_img.resize import Resize
             Path(f"{dirname(__file__)}/data/HEIC/IMG_0070.HEIC"),
             Path(f"{dirname(__file__)}/.out/"),
             1024,
-            Path(f"{dirname(__file__)}/.out/IMG_0070_1024.HEIC"),
-        )
+            (True, Path(f"{dirname(__file__)}/.out/IMG_0070_1024.HEIC")),
+        ),
+        (
+            Path(f"{dirname(__file__)}/data/PNG/Checkmark.PNG"),
+            Path(f"{dirname(__file__)}/.out/"),
+            1024,
+            (True, Path(f"{dirname(__file__)}/.out/Checkmark_1024.PNG")),
+        ),
     ]
 )
 def data_resize_an_image(request):
@@ -35,7 +41,27 @@ def test_resize_an_image(data_resize_an_image):
 
 
 @patch("PIL.Image.open")
-def test_resize_an_image_error(mock_open):
+def test_error_resize_an_image(mock_open):
     mock_open.side_effect = ValueError("VE")
-    with pytest.raises(ValueError):
-        Resize.resize_an_image(Path("in/file"), Path("out/file"), 800)
+    actual = Resize.resize_an_image(Path("in/file"), Path("out/file"), 800)
+    assert actual[0] is False
+
+
+@pytest.fixture(
+    params=[
+        (
+            Path(f"{dirname(__file__)}/data/mixed"),
+            Path(f"{dirname(__file__)}/.out/"),
+            1024,
+            True,
+        )
+    ]
+)
+def data_resize_all_progress_bar(request):
+    return request.param
+
+
+def test_resize_all_progress_bar(data_resize_all_progress_bar):
+    in_path, out_path, length, expected = data_resize_all_progress_bar
+    actual = Resize.resize_all_progress_bar(in_path, out_path, length)
+    assert actual == expected
