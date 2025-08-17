@@ -61,7 +61,7 @@ Options:
 Usage: batch_img defaults [OPTIONS] SRC_PATH
 
   Process image file(s) with default actions: 1) resize to 1280; 2) add
-  5-pixel gray color border; 3) no rotate
+  5-pixel gray color border; 3) auto-rotate if needed
 
 Options:
   --help  Show this message and exit.
