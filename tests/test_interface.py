@@ -78,6 +78,16 @@ def test_resize(mock_resize, data_resize):
     assert result.output == expected
 
 
+@patch("batch_img.main.Main.resize")
+def test_error_resize(mock_resize):
+    _input = "img/file --length -9"
+    mock_resize.return_value = True
+    runner = CliRunner()
+    result = runner.invoke(resize, args=_input.split())
+    print(result.output)
+    assert result.exception
+
+
 @pytest.fixture(
     params=[
         ("src_path -d 90", True, MSG_OK),
@@ -98,3 +108,13 @@ def test_rotate(mock_rotate, data_rotate):
     print(result.output)
     assert not result.exception
     assert result.output == expected
+
+
+@patch("batch_img.main.Main.rotate")
+def test_error_rotate(mock_rotate):
+    _input = "img/file --degree -90"
+    mock_rotate.return_value = True
+    runner = CliRunner()
+    result = runner.invoke(rotate, args=_input.split())
+    print(result.output)
+    assert result.exception

@@ -28,6 +28,7 @@ def cli(ctx, version):  # pragma: no cover
     "--border_width",
     default=5,
     show_default=True,
+    type=click.IntRange(min=0),
     help="Add border to image file(s) with the border_width. 0 - no border",
 )
 @click.option(
@@ -81,8 +82,8 @@ def defaults(src_path):
     is_flag=False,
     default=0,
     show_default=True,
-    type=int,
-    help="Resize image file(s) on current aspect ratio to the length. 0 - no resize",
+    type=click.IntRange(min=0),
+    help="Resize image file(s) on original aspect ratio to the length. 0 - no resize",
 )
 def resize(src_path, length):
     options = {
@@ -105,7 +106,7 @@ def resize(src_path, length):
     is_flag=False,
     default=0,
     show_default=True,
-    type=int,
+    type=click.IntRange(min=0),
     help="Rotate image file(s) to the degree clock-wise. 0 - no rotate",
 )
 def rotate(src_path, degree):

@@ -1,6 +1,8 @@
 ## batch_img
 
 Batch processing image files by utilizing **[Pillow / PIL](https://github.com/python-pillow/Pillow)** library.
+Resize, rotate, add border or do default actions on a single image file or all image files in a folder.
+Tested these image file formats (**HEIC, JPG, PNG**) on macOS.
 
 ### Usage
 
@@ -43,11 +45,13 @@ Usage: batch_img border [OPTIONS] SRC_PATH
   Add border to image file(s)
 
 Options:
-  -bw, --border_width INTEGER  Add border to image file(s) with the
-                               border_width. 0 - no border  [default: 5]
-  -bc, --border_color TEXT     Add border to image file(s) with the
-                               border_color string  [default: gray]
-  --help                       Show this message and exit.
+  -bw, --border_width INTEGER RANGE
+                                  Add border to image file(s) with the
+                                  border_width. 0 - no border  [default: 5;
+                                  x>=0]
+  -bc, --border_color TEXT        Add border to image file(s) with the
+                                  border_color string  [default: gray]
+  --help                          Show this message and exit.
 ```
 
 #### The `defaults` sub-command CLI options:
@@ -72,9 +76,9 @@ Usage: batch_img resize [OPTIONS] SRC_PATH
   Resize image file(s)
 
 Options:
-  -l, --length INTEGER  Resize image file(s) on current aspect ratio to the
-                        length. 0 - no resize  [default: 0]
-  --help                Show this message and exit.
+  -l, --length INTEGER RANGE  Resize image file(s) on original aspect ratio to
+                              the length. 0 - no resize  [default: 0; x>=0]
+  --help                      Show this message and exit.
 ```
 
 #### The `rotate` sub-command CLI options:
@@ -86,7 +90,7 @@ Usage: batch_img rotate [OPTIONS] SRC_PATH
   Rotate image file(s)
 
 Options:
-  -d, --degree INTEGER  Rotate image file(s) to the degree clock-wise. 0 - no
-                        rotate  [default: 0]
-  --help                Show this message and exit.
+  -d, --degree INTEGER RANGE  Rotate image file(s) to the degree clock-wise. 0
+                              - no rotate  [default: 0; x>=0]
+  --help                      Show this message and exit.
 ```

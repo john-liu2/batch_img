@@ -46,9 +46,9 @@ class Resize:
                 # Save to the same format: HEIF, JPEG, PNG, etc.
                 if exif_dict:
                     exif_bytes = piexif.dump(exif_dict)
-                    img.save(out_file, format=img.format, exif=exif_bytes)
+                    img.save(out_file, img.format, optimize=True, exif=exif_bytes)
                 else:
-                    img.save(out_file, format=img.format)
+                    img.save(out_file, img.format, optimize=True)
             logger.info(f"Saved {out_file}")
             return True, out_file
         except (AttributeError, FileNotFoundError, ValueError) as e:

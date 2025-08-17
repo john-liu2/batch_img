@@ -14,6 +14,7 @@ import piexif
 import pillow_heif
 from loguru import logger
 from PIL import Image, ImageChops
+from PIL.TiffImagePlugin import IFDRational
 
 from batch_img.const import PKG_NAME, TS_FORMAT, VER
 
@@ -90,7 +91,9 @@ class Common:
         exif_dict = piexif.load(exif_data)
         _dict = {}
         for ifd_name, val in exif_dict.items():
-            if not val:
+            # Canon EOS 5D Mark II 'thumbnail': : b'\xff\xd8\xff\xdb...
+            # 'utf-8' codec can't decode byte 0xff in position 0: invalid start byte
+            if not val or ifd_name == "thumbnail":
                 continue
             for tag_id, value in val.items():
                 tag_name = piexif.TAGS[ifd_name].get(tag_id, {}).get("name", tag_id)
@@ -103,6 +106,7 @@ class Common:
             "SubjectArea",
             "Software",
             "HostComputer",
+            "UserComment",
         ):
             if key in _dict:
                 _dict.pop(key)
@@ -128,7 +132,49 @@ class Common:
         return _res
 
     @staticmethod
-    def are_images_equal(path1: Path | str, path2: Path | str) -> bool:
+    def get_image_data(file: Path) -> tuple:
+        """Get image file data
+
+        Args:
+            file: image file path
+
+        Returns:
+            tuple: data, info
+        """
+        size = getsize(file)
+        m_ts = datetime.fromtimestamp(getmtime(file)).strftime(TS_FORMAT)
+        with Image.open(file) as img:
+            data = img.convert("RGB")
+            d_info = {
+                "file_size": Common.readable_file_size(size),
+                "file_ts": m_ts,
+                "format": img.format,
+                "mode": img.mode,
+                "size": img.size,
+                "info": img.info,
+            }
+            for key in ("icc_profile", "xmp"):
+                if key in img.info:
+                    img.info.pop(key)
+            if "exif" in img.info:
+                exif_data = img.info.pop("exif")
+                d_info["exif"] = Common.decode_exif(exif_data)
+
+        return data, d_info
+
+    @staticmethod
+    def jsn_serial(obj):
+        """JSON serializer for objects not serializable by default json code"""
+        if isinstance(obj, IFDRational):
+            return float(obj)
+        if isinstance(obj, bytes):
+            return obj.decode()
+        raise TypeError(
+            f"Object of type {obj.__class__.__name__} is not JSON serializable"
+        )
+
+    @staticmethod
+    def are_images_equal(path1: Path, path2: Path) -> bool:
         """Check if two image files are visually equal pixel-wise
 
         Args:
@@ -138,36 +184,13 @@ class Common:
         Returns:
             bool: True - visually equal, False - not visually equal
         """
-        size1 = getsize(path1)
-        m_ts1 = datetime.fromtimestamp(getmtime(path1)).strftime(TS_FORMAT)
-        with Image.open(path1) as img1:
-            data1 = img1.convert("RGB")
-            meta1 = {
-                "file_size": Common.readable_file_size(size1),
-                "file_ts": m_ts1,
-                "format": img1.format,
-                "size": img1.size,
-                "mode": img1.mode,
-                "info": img1.info,
-            }
-            if "exif" in img1.info:
-                meta1["info"] = Common.decode_exif(img1.info["exif"])
+        data1, meta1 = Common.get_image_data(path1)
+        data2, meta2 = Common.get_image_data(path2)
 
-        size2 = getsize(path2)
-        m_ts2 = datetime.fromtimestamp(getmtime(path2)).strftime(TS_FORMAT)
-        with Image.open(path2) as img2:
-            data2 = img2.convert("RGB")
-            meta2 = {
-                "file_size": Common.readable_file_size(size2),
-                "file_ts": m_ts2,
-                "format": img2.format,
-                "size": img2.size,
-                "mode": img2.mode,
-                "info": img2.info,
-            }
-            if "exif" in img2.info:
-                meta2["info"] = Common.decode_exif(img2.info["exif"])
-
-        logger.info(f"Meta of {path1}:\n{json.dumps(meta1, indent=2)}")
-        logger.info(f"Meta of {path2}:\n{json.dumps(meta2, indent=2)}")
+        logger.info(
+            f"{path1}:\n{json.dumps(meta1, indent=2, default=Common.jsn_serial)}"
+        )
+        logger.info(
+            f"{path2}:\n{json.dumps(meta2, indent=2, default=Common.jsn_serial)}"
+        )
         return ImageChops.difference(data1, data2).getbbox() is None

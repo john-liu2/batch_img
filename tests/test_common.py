@@ -4,6 +4,8 @@ Copyright © 2025 John Liu
 """
 
 import json
+from os.path import dirname
+from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -144,7 +146,7 @@ def test_json_dump():
                 "WhiteBalance": 0,
                 "FocalLengthIn35mmFilm": 24,
             },
-        )
+        ),
     ]
 )
 def data_decode_exif(request):
@@ -154,4 +156,69 @@ def data_decode_exif(request):
 def test_decode_exif(data_decode_exif):
     exif_data, expected = data_decode_exif
     actual = Common.decode_exif(exif_data)
+    assert actual == expected
+
+
+@pytest.fixture(
+    params=[
+        (
+            Path(f"{dirname(__file__)}/data/HEIC/Cartoon.heic"),
+            {
+                "file_size": "44.6 KB",
+                "file_ts": "2025-08-16_23-44-21",
+                "format": "HEIF",
+                "mode": "RGB",
+                "size": (758, 758),
+                "info": {
+                    "aux": {},
+                    "bit_depth": 8,
+                    "chroma": 420,
+                    "depth_images": [],
+                    "icc_profile_type": "prof",
+                    "metadata": [],
+                    "original_orientation": None,
+                    "primary": True,
+                    "thumbnails": [],
+                },
+                "exif": {"ExifTag": 90, "Orientation": 1},
+            },
+        )
+    ]
+)
+def data_get_image(request):
+    return request.param
+
+
+def test_get_image_data(data_get_image):
+    file, expected = data_get_image
+    actual = Common.get_image_data(file)
+    assert actual[1] == expected
+
+
+@pytest.fixture(
+    params=[
+        (
+            Path(f"{dirname(__file__)}/data/HEIC/IMG_0070.HEIC"),
+            Path(f"{dirname(__file__)}/data/HEIC/IMG_0070.HEIC"),
+            True,
+        ),
+        (
+            Path(f"{dirname(__file__)}/data/PNG/Checkmark.PNG"),
+            Path(f"{dirname(__file__)}/data/PNG/LagrangePoints.png"),
+            False,
+        ),
+        (
+            Path(f"{dirname(__file__)}/data/JPG/152.JPG"),
+            Path(f"{dirname(__file__)}/data/JPG/P1040566.jpeg"),
+            False,
+        ),
+    ]
+)
+def data_are_images_equal(request):
+    return request.param
+
+
+def test_are_images_equal(data_are_images_equal):
+    path1, path2, expected = data_are_images_equal
+    actual = Common.are_images_equal(path1, path2)
     assert actual == expected
