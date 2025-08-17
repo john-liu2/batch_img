@@ -14,15 +14,13 @@ pillow_heif.register_heif_opener()  # allow Pillow to open HEIC files
 
 class Resize:
     @staticmethod
-    def resize_an_image(
-        in_path: Path | str, out_path: Path | str, max_side: int
-    ) -> Path:
+    def resize_an_image(in_path: Path | str, out_path: Path | str, length: int) -> Path:
         """Resize one image file
 
         Args:
             in_path: input file path
             out_path: output dir path
-            max_side: max side (width or height) in pixels
+            length: max length (width or height) in pixels
 
         Returns:
             Path: output file path
@@ -38,9 +36,9 @@ class Resize:
 
             # Calculate max_size by max_side and aspect_ratio
             if aspect_ratio > 1:
-                max_size = (max_side, int(max_side / aspect_ratio))
+                max_size = (length, int(length / aspect_ratio))
             else:
-                max_size = (int(max_side * aspect_ratio), max_side)
+                max_size = (int(length * aspect_ratio), length)
 
             # Keep the aspect ratio. Use LANCZOS for high-quality downsampling
             img.thumbnail(max_size, Image.Resampling.LANCZOS)
@@ -49,7 +47,7 @@ class Resize:
             out_path.mkdir(exist_ok=True)
             out_file = out_path
             if out_path.is_dir():
-                filename = f"{in_path.stem}_{max_side}{in_path.suffix}"
+                filename = f"{in_path.stem}_{length}{in_path.suffix}"
                 out_file = Path(f"{out_path}/{filename}")
             if exif_dict:
                 exif_bytes = piexif.dump(exif_dict)

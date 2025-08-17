@@ -72,9 +72,9 @@ Usage: batch_img resize [OPTIONS] SRC_PATH
   Resize image file(s)
 
 Options:
-  -w, --width INTEGER  Resize image file(s) on current aspect ratio to the
-                       width. 0 - no resize  [default: 0]
-  --help               Show this message and exit.
+  -l, --length INTEGER  Resize image file(s) on current aspect ratio to the
+                        length. 0 - no resize  [default: 0]
+  --help                Show this message and exit.
 ```
 
 #### The `rotate` sub-command CLI options:

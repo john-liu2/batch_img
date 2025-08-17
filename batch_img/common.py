@@ -168,6 +168,6 @@ class Common:
             if "exif" in img2.info:
                 meta2["info"] = Common.decode_exif(img2.info["exif"])
 
-        print(f"Meta of {path1}:\n{json.dumps(meta1, indent=2)}")
-        print(f"Meta of {path2}:\n{json.dumps(meta2, indent=2)}")
+        logger.info(f"Meta of {path1}:\n{json.dumps(meta1, indent=2)}")
+        logger.info(f"Meta of {path2}:\n{json.dumps(meta2, indent=2)}")
         return ImageChops.difference(data1, data2).getbbox() is None
