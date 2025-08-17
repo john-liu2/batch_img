@@ -4,7 +4,7 @@
 PYTHON_FILES = batch_img
 
 clean:
-	rm -fr build .eggs batch_img.egg-info run_*.log .out dist wheels
+	rm -fr build .eggs batch_img.egg-info run_*.log .out dist wheels tests/data/.DS_Store
 	find . -name '*.pyc' -exec rm -f {} +
 	find . -name '__pycache__' -exec rm -fr {} +
 	rm -fr tests/.out tests/.DS_Store .coverage htmlcov .pytest_cache uv.lock
