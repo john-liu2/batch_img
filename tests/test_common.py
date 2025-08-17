@@ -192,6 +192,9 @@ def data_get_image(request):
 def test_get_image_data(data_get_image):
     file, expected = data_get_image
     actual = Common.get_image_data(file)
+    # Cloud CI runs get different ts
+    expected.pop("file_ts")
+    actual[1].pop("file_ts")
     assert actual[1] == expected
 
 
