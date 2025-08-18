@@ -42,13 +42,13 @@ Commands:
 ✗ batch_img border --help
 Usage: batch_img border [OPTIONS] SRC_PATH
 
-  Add border to image file(s)
+  Add internal border to image file(s), not expand the size
 
 Options:
   -bw, --border_width INTEGER RANGE
                                   Add border to image file(s) with the
                                   border_width. 0 - no border  [default: 5;
-                                  x>=0]
+                                  0<=x<=20]
   -bc, --border_color TEXT        Add border to image file(s) with the
                                   border_color string  [default: gray]
   -o, --output TEXT               Output file path. If skipped, use the

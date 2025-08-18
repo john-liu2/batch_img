@@ -78,17 +78,10 @@ class Rotate:
         if not image_files:
             logger.error(f"No image files at {in_path}")
             return False
-        tasks = [
-            (
-                f,
-                out_path,
-                angle_cw,
-            )
-            for f in image_files
-        ]
+        tasks = [(f, out_path, angle_cw) for f in image_files]
         files_cnt = len(tasks)
 
-        logger.info(f"Rotate {files_cnt} image files with multiprocess ...")
+        logger.info(f"Rotate {files_cnt} image files in multiprocess ...")
         success_cnt = Common.multiprocess_progress_bar(
             Rotate.rotate_1_image_file, "Rotate image files", tasks
         )

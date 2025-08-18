@@ -42,7 +42,6 @@ class Resize:
                 exif_dict = None
                 if "exif" in img.info:
                     exif_dict = piexif.load(img.info["exif"])
-                # Save to the same format: HEIF, JPEG, PNG, etc.
                 if exif_dict:
                     exif_bytes = piexif.dump(exif_dict)
                     img.save(out_file, img.format, optimize=True, exif=exif_bytes)
@@ -69,17 +68,10 @@ class Resize:
         if not image_files:
             logger.error(f"No image files at {in_path}")
             return False
-        tasks = [
-            (
-                f,
-                out_path,
-                length,
-            )
-            for f in image_files
-        ]
+        tasks = [(f, out_path, length) for f in image_files]
         files_cnt = len(tasks)
 
-        logger.info(f"Resize {files_cnt} image files with multiprocess ...")
+        logger.info(f"Resize {files_cnt} image files in multiprocess ...")
         success_cnt = Common.multiprocess_progress_bar(
             Resize.resize_an_image, "Resize image files", tasks
         )
