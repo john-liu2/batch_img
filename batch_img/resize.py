@@ -18,7 +18,7 @@ pillow_heif.register_heif_opener()  # allow Pillow to open HEIC files
 class Resize:
     @staticmethod
     def resize_an_image(in_path: Path, out_path: Path, length: int) -> tuple:
-        """Resize one image file
+        """Resize an image file and save to the output dir
 
         Args:
             in_path: input file path
