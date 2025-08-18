@@ -31,7 +31,7 @@ dependencies = [
 batch_img = "batch_img.interface:cli"
 
 [project.urls]
-Download = "https://artifacts.some.where"
+Download = "https://pypi.org/project/batch-img/"
 Homepage = "https://github.com/john-liu2/batch_img"
 
 [tool.setuptools.packages.find]
