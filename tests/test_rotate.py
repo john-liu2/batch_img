@@ -9,50 +9,69 @@ from unittest.mock import patch
 
 import pytest
 
-from batch_img.rotate import Rotate, ORIENTATION_MAP, UNKNOWN
+from batch_img.rotate import Rotate
 
 
 @pytest.fixture(
     params=[
-        (Path(f"{dirname(__file__)}/data/PNG/Checkmark.PNG"), ORIENTATION_MAP[1]),
-        (Path(f"{dirname(__file__)}/data/JPG/P1040566.jpeg"), UNKNOWN),
-        (Path(f"{dirname(__file__)}/data/PNG/LagrangePoints.png"), UNKNOWN),
-        (Path(f"{dirname(__file__)}/data/HEIC/Cartoon.heic"), ORIENTATION_MAP[1]),
+        (
+            Path(f"{dirname(__file__)}/data/HEIC/IMG_0070.HEIC"),
+            Path(f"{dirname(__file__)}/.out/"),
+            90,
+            (True, Path(f"{dirname(__file__)}/.out/IMG_0070_90cw.HEIC")),
+        ),
+        (
+            Path(f"{dirname(__file__)}/data/PNG/Checkmark.PNG"),
+            Path(f"{dirname(__file__)}/.out/"),
+            180,
+            (True, Path(f"{dirname(__file__)}/.out/Checkmark_180cw.PNG")),
+        ),
+        (
+            Path(f"{dirname(__file__)}/data/JPG/152.JPG"),
+            Path(f"{dirname(__file__)}/.out/"),
+            270,
+            (True, Path(f"{dirname(__file__)}/.out/152_270cw.JPG")),
+        ),
     ]
 )
-def data_get_image_orientation(request):
+def data_rotate_1_image_file(request):
     return request.param
 
 
-def test_get_image_orientation(data_get_image_orientation):
-    file, expected = data_get_image_orientation
-    actual = Rotate.get_image_orientation(file)
+def test_rotate_1_image_file(data_rotate_1_image_file):
+    in_path, out_path, angle, expected = data_rotate_1_image_file
+    actual = Rotate.rotate_1_image_file(in_path, out_path, angle)
     assert actual == expected
 
 
 @patch("PIL.Image.open")
-def test_error_get_image_orientation(mock_open):
+def test_error_rotate_1_image_file(mock_open):
     mock_open.side_effect = ValueError("VE")
-    actual = Rotate.get_image_orientation(Path("img/file"))
-    assert "img/file" in actual
+    actual = Rotate.rotate_1_image_file(Path("img/file"), Path("out/path"), 90)
+    assert "img/file" in actual[1]
 
 
 @pytest.fixture(
     params=[
-        (Path(f"{dirname(__file__)}/data/HEIC/Cartoon.heic"), 0),
-        (Path(f"{dirname(__file__)}/data/HEIC/Cartoon_180cw.heic"), 180),
-        (Path(f"{dirname(__file__)}/data/HEIC/Cartoon_270cw.heic"), 90),
-        (Path(f"{dirname(__file__)}/data/HEIC/Cartoon_90cw.heic"), 270),
-        (Path(f"{dirname(__file__)}/data/HEIC/IMG_0070.HEIC"), -1),
-        (Path(f"{dirname(__file__)}/data/PNG/LagrangePoints.png"), -1),
-        (Path(f"{dirname(__file__)}/data/JPG/152.JPG"), -1),
+        (
+            Path(f"{dirname(__file__)}/data/mixed"),
+            Path(f"{dirname(__file__)}/.out/"),
+            90,
+            True,
+        ),
+        (
+            Path(f"{dirname(__file__)}/data/mixed"),
+            Path(f"{dirname(__file__)}/.out/"),
+            180,
+            True,
+        ),
     ]
 )
-def data_detect_by_face(request):
+def data_rotate_all_in_dir(request):
     return request.param
 
 
-def test_detect_by_face(data_detect_by_face):
-    file, expected = data_detect_by_face
-    actual = Rotate.detect_by_face(file)
+def test_rotate_all_in_dir(data_rotate_all_in_dir):
+    in_path, out_path, angle_cw, expected = data_rotate_all_in_dir
+    actual = Rotate.rotate_all_in_dir(in_path, out_path, angle_cw)
     assert actual == expected

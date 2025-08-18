@@ -2,15 +2,14 @@
 Copyright © 2025 John Liu
 """
 
-import itertools
-from multiprocessing import Pool, cpu_count
 from pathlib import Path
 
 import piexif
 import pillow_heif
 from loguru import logger
 from PIL import Image
-from tqdm import tqdm
+
+from batch_img.common import Common
 
 pillow_heif.register_heif_opener()  # allow Pillow to open HEIC files
 
@@ -18,7 +17,7 @@ pillow_heif.register_heif_opener()  # allow Pillow to open HEIC files
 class Resize:
     @staticmethod
     def resize_an_image(in_path: Path, out_path: Path, length: int) -> tuple:
-        """Resize one image file
+        """Resize an image file and save to the output dir
 
         Args:
             in_path: input file path
@@ -66,42 +65,23 @@ class Resize:
         Returns:
             bool: True - Success. False - Error
         """
-        out_path.mkdir(parents=True, exist_ok=True)
-        patterns = (
-            "*.HEIC",
-            "*.heic",
-            "*.JPG",
-            "*.jpg",
-            "*.JPEG",
-            "*.jpeg",
-            "*.PNG",
-            "*.png",
-        )
-        image_files = itertools.chain.from_iterable(in_path.glob(p) for p in patterns)
+        image_files = Common.prepare_all_files(in_path, out_path)
         if not image_files:
             logger.error(f"No image files at {in_path}")
             return False
         tasks = [
             (
-                in_path / f,
+                f,
                 out_path,
                 length,
             )
             for f in image_files
         ]
-        success_cnt = 0
         files_cnt = len(tasks)
-        # Limit to 4 workers if cpu cores cnt > 4
-        workers = min(cpu_count(), 4)
 
-        logger.info(f"Resize {files_cnt} image files with {workers} workers...")
-        with Pool(workers) as pool:
-            with tqdm(total=files_cnt, desc="Resize image files") as pbar:
-                for ok, res in pool.starmap(Resize.resize_an_image, tasks):
-                    if ok:
-                        success_cnt += 1
-                    else:
-                        tqdm.write(f"Error: {res}")
-                    pbar.update()
+        logger.info(f"Resize {files_cnt} image files with multiprocess ...")
+        success_cnt = Common.multiprocess_progress_bar(
+            Resize.resize_an_image, "Resize image files", tasks
+        )
         logger.info(f"\nSuccessfully resized {success_cnt}/{files_cnt} files")
         return True

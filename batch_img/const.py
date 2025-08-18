@@ -11,3 +11,13 @@ MSG_OK = "✅ Processed the image file(s)"
 MSG_BAD = "❌ Failed to process the image file(s)."
 
 TS_FORMAT = "%Y-%m-%d_%H-%M-%S"
+PATTERNS = (
+    "*.HEIC",
+    "*.heic",
+    "*.JPG",
+    "*.jpg",
+    "*.JPEG",
+    "*.jpeg",
+    "*.PNG",
+    "*.png",
+)

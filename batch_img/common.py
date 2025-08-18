@@ -2,11 +2,13 @@
 Copyright © 2025 John Liu
 """
 
+import itertools
 import json
 import subprocess
 import tomllib
 from datetime import datetime
 from importlib.metadata import version
+from multiprocessing import Pool, cpu_count
 from os.path import getmtime, getsize
 from pathlib import Path
 
@@ -15,8 +17,9 @@ import pillow_heif
 from loguru import logger
 from PIL import Image, ImageChops
 from PIL.TiffImagePlugin import IFDRational
+from tqdm import tqdm
 
-from batch_img.const import PKG_NAME, TS_FORMAT, VER
+from batch_img.const import PATTERNS, PKG_NAME, TS_FORMAT, VER
 
 pillow_heif.register_heif_opener()  # allow Pillow to open HEIC files
 
@@ -194,3 +197,45 @@ class Common:
             f"{path2}:\n{json.dumps(meta2, indent=2, default=Common.jsn_serial)}"
         )
         return ImageChops.difference(data1, data2).getbbox() is None
+
+    @staticmethod
+    def prepare_all_files(in_path: Path, out_path: Path):
+        """
+
+        Args:
+            in_path: input dir path
+            out_path: output dir path
+
+        Returns:
+            iterable: files list generator
+        """
+        out_path.mkdir(parents=True, exist_ok=True)
+        _files = itertools.chain.from_iterable(in_path.glob(p) for p in PATTERNS)
+        return _files
+
+    @staticmethod
+    def multiprocess_progress_bar(func, desc, tasks: list) -> int:
+        """Run task in multiprocess with progress bar
+
+        Args:
+            func: function to be run in multiprocess
+            desc: description str
+            tasks: tasks list for multiprocess pool
+
+        Returns:
+            int: success_cnt
+        """
+        success_cnt = 0
+        files_cnt = len(tasks)
+        # Limit to 4 workers if cpu cores cnt > 4
+        workers = min(cpu_count(), 4)
+
+        with Pool(workers) as pool:
+            with tqdm(total=files_cnt, desc=desc) as pbar:
+                for ok, res in pool.starmap(func, tasks):
+                    if ok:
+                        success_cnt += 1
+                    else:
+                        tqdm.write(f"Error: {res}")
+                    pbar.update()
+        return success_cnt
