@@ -9,32 +9,41 @@ from unittest.mock import patch
 
 import pytest
 
-from batch_img.orientation import Orientation, ORIENTATION_MAP, UNKNOWN
+from batch_img.orientation import Orientation, EXIF_CW_ANGLE
 
 
 @pytest.fixture(
     params=[
-        (Path(f"{dirname(__file__)}/data/PNG/Checkmark.PNG"), ORIENTATION_MAP[1]),
-        (Path(f"{dirname(__file__)}/data/JPG/P1040566.jpeg"), UNKNOWN),
-        (Path(f"{dirname(__file__)}/data/PNG/LagrangePoints.png"), UNKNOWN),
-        (Path(f"{dirname(__file__)}/data/HEIC/Cartoon.heic"), ORIENTATION_MAP[1]),
+        (Path(f"{dirname(__file__)}/data/PNG/Checkmark.PNG"), EXIF_CW_ANGLE[1]),
+        (Path(f"{dirname(__file__)}/data/JPG/P1040566.jpeg"), -1),
+        (Path(f"{dirname(__file__)}/data/PNG/LagrangePoints.png"), -1),
+        (Path(f"{dirname(__file__)}/data/HEIC/Cartoon.heic"), EXIF_CW_ANGLE[1]),
+        # JL 2025-08-18: the below two cases got 'Orientation': 1
+        # (
+        #     Path(f"{dirname(__file__)}/data/HEIC/chef_orientation_3.heic"),
+        #     EXIF_CW_ANGLE[3],
+        # ),
+        # (
+        #     Path(f"{dirname(__file__)}/data/HEIC/chef_orientation_8.heic"),
+        #     EXIF_CW_ANGLE[8],
+        # ),
     ]
 )
-def data_get_image_orientation(request):
+def data_exif_orientation(request):
     return request.param
 
 
-def test_get_exif_orientation(data_get_image_orientation):
-    file, expected = data_get_image_orientation
-    actual = Orientation.get_exif_orientation(file)
+def test_exif_orientation_2_cw_angle(data_exif_orientation):
+    file, expected = data_exif_orientation
+    actual = Orientation.exif_orientation_2_cw_angle(file)
     assert actual == expected
 
 
 @patch("PIL.Image.open")
-def test_error_get_exif_orientation(mock_open):
+def test_error_exif_orientation_2_cw_angle(mock_open):
     mock_open.side_effect = ValueError("VE")
-    actual = Orientation.get_exif_orientation(Path("img/file"))
-    assert "img/file" in actual
+    actual = Orientation.exif_orientation_2_cw_angle(Path("img/file"))
+    assert actual == -1
 
 
 @pytest.fixture(
@@ -52,7 +61,7 @@ def data_detect_by_face(request):
     return request.param
 
 
-def test_detect_by_face(data_detect_by_face):
+def test_get_cw_angle_by_face(data_detect_by_face):
     file, expected = data_detect_by_face
-    actual = Orientation().detect_by_face(file)
+    actual = Orientation().get_cw_angle_by_face(file)
     assert actual == expected

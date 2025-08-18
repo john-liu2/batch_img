@@ -247,3 +247,20 @@ def test_are_images_equal(data_are_images_equal):
     path1, path2, expected = data_are_images_equal
     actual = Common.are_images_equal(path1, path2)
     assert actual == expected
+
+
+@pytest.fixture(
+    params=[
+        (1024, 768, 10, (10, 10, 1014, 758)),
+        (960, 1280, 5, (5, 5, 955, 1275)),
+        (640, 480, 9, (9, 9, 631, 471)),
+    ]
+)
+def data_get_crop_box(request):
+    return request.param
+
+
+def test_get_crop_box(data_get_crop_box):
+    width, height, border_width, expected = data_get_crop_box
+    actual = Common.get_crop_box(width, height, border_width)
+    assert actual == expected

@@ -11,7 +11,6 @@ from loguru import logger
 from PIL import Image
 
 from batch_img.common import Common
-from batch_img.const import UNKNOWN
 
 pillow_heif.register_heif_opener()  # allow Pillow to open HEIC files
 
@@ -25,35 +24,46 @@ ORIENTATION_MAP = {
     7: "rotated_right_mirrored",
     8: "rotated_right",
 }
+EXIF_CW_ANGLE = {
+    1: 0,
+    2: 0,
+    3: 180,
+    4: 180,
+    5: 270,
+    6: 270,
+    7: 90,
+    8: 90,
+}
 
 
 class Orientation:
     @staticmethod
-    def get_exif_orientation(file: Path) -> str:
+    def exif_orientation_2_cw_angle(file: Path) -> int:
         """Get image orientation by EXIF data
 
         Args:
             file: image file path
 
         Returns:
-            str
+            int: clockwise angle: 0, 90, 180, 270
         """
         try:
             with Image.open(file) as img:
                 if "exif" not in img.info:
                     logger.warning(f"No EXIF data in {file}")
-                    return UNKNOWN
+                    return -1
                 exif_info = Common.decode_exif(img.info["exif"])
                 if "Orientation" in exif_info:
-                    return ORIENTATION_MAP.get(exif_info["Orientation"])
+                    return EXIF_CW_ANGLE.get(exif_info["Orientation"])
             logger.warning(f"No 'Orientation' tag in {exif_info=}")
-            return UNKNOWN
+            return -1
         except (AttributeError, FileNotFoundError, ValueError) as e:
-            return f"{file}:\n{e}"
+            logger.error(e)
+            return -1
 
     @staticmethod
     def _rotate_image(img, angle: int):
-        """Rotate image by the angle degree clock wise
+        """Helper to rotate image by the clock wise angle degree
 
         Args:
             img: image data
@@ -70,7 +80,7 @@ class Orientation:
             return cv2.rotate(img, cv2.ROTATE_90_COUNTERCLOCKWISE)
         return img
 
-    def detect_by_face(self, file: Path) -> int:
+    def get_cw_angle_by_face(self, file: Path) -> int:
         """Detect orientation by face in mage by Haar Cascades:
         * Fastest but least accurate
         * Works best with frontal faces
@@ -80,7 +90,7 @@ class Orientation:
             file: image file path
 
         Returns:
-            int: 0, 90, 180, 270
+            int: clockwise angle: 0, 90, 180, 270
         """
         face_cascade = cv2.CascadeClassifier(
             cv2.data.haarcascades + "haarcascade_frontalface_default.xml"

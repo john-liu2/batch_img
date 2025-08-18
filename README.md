@@ -73,7 +73,7 @@ Options:
   -bw, --border_width INTEGER RANGE
                                   Add border to image file(s) with the
                                   border_width. 0 - no border  [default: 5;
-                                  0<=x<=20]
+                                  0<=x<=30]
   -bc, --border_color TEXT        Add border to image file(s) with the
                                   border_color string  [default: gray]
   -o, --output TEXT               Output file path. If skipped, use the

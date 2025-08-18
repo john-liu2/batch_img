@@ -94,13 +94,14 @@ class Common:
         exif_dict = piexif.load(exif_data)
         _dict = {}
         for ifd_name, val in exif_dict.items():
-            # Canon EOS 5D Mark II 'thumbnail': : b'\xff\xd8\xff\xdb...
+            # Canon EOS 5D Mark II 'thumbnail': b'\xff\xd8\xff\xdb...
             # 'utf-8' codec can't decode byte 0xff in position 0: invalid start byte
             if not val or ifd_name == "thumbnail":
                 continue
             for tag_id, value in val.items():
                 tag_name = piexif.TAGS[ifd_name].get(tag_id, {}).get("name", tag_id)
                 _dict[tag_name] = value
+        # logger.info(f"{_dict=}")
         for key in (
             "FNumber",
             "FocalLength",
@@ -197,6 +198,24 @@ class Common:
             f"{path2}:\n{json.dumps(meta2, indent=2, default=Common.jsn_serial)}"
         )
         return ImageChops.difference(data1, data2).getbbox() is None
+
+    @staticmethod
+    def get_crop_box(width, height, border_width) -> tuple[float, float, float, float]:
+        """Get the crop box tuple
+
+        Args:
+            width: image width int
+            height: image height int
+            border_width: border width int
+
+        Returns:
+            tuple[float, float, float, float]
+        """
+        crop_left = border_width
+        crop_top = border_width
+        crop_right = width - border_width
+        crop_bottom = height - border_width
+        return crop_left, crop_top, crop_right, crop_bottom
 
     @staticmethod
     def prepare_all_files(in_path: Path, out_path: Path):

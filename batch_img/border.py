@@ -16,24 +16,6 @@ pillow_heif.register_heif_opener()  # allow Pillow to open HEIC files
 
 class Border:
     @staticmethod
-    def get_crop_box(width, height, border_width) -> tuple[float, float, float, float]:
-        """Get the crop box tuple
-
-        Args:
-            width: image width int
-            height: image height int
-            border_width: border width int
-
-        Returns:
-            tuple[float, float, float, float]
-        """
-        crop_left = border_width
-        crop_top = border_width
-        crop_right = width - border_width
-        crop_bottom = height - border_width
-        return crop_left, crop_top, crop_right, crop_bottom
-
-    @staticmethod
     def add_border_1_image(
         in_path: Path, out_path: Path, border_width: int, border_color: str
     ) -> tuple:
@@ -51,7 +33,7 @@ class Border:
         try:
             with Image.open(in_path) as img:
                 width, height = img.size
-                box = Border.get_crop_box(width, height, border_width)
+                box = Common.get_crop_box(width, height, border_width)
                 cropped_img = img.crop(box)
                 bd_img = Image.new(img.mode, (width, height), border_color)
                 bd_img.paste(cropped_img, (border_width, border_width))
