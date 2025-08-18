@@ -35,6 +35,21 @@ def test_border(mock_add_border, data_border):
     assert result.output == expected
 
 
+@pytest.fixture(params=["img/file -bw -9", "img/file --border_width 21"])
+def data_error_border(request):
+    return request.param
+
+
+@patch("batch_img.main.Main.border")
+def test_error_border(mock_add_border, data_error_border):
+    _input = data_error_border
+    mock_add_border.return_value = True
+    runner = CliRunner()
+    result = runner.invoke(border, args=_input.split())
+    print(result.output)
+    assert result.exception
+
+
 @pytest.fixture(
     params=[
         ("src_path --output out/dir", True, MSG_OK),

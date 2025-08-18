@@ -9,6 +9,7 @@ from pathlib import Path
 
 from loguru import logger
 
+from batch_img.border import Border
 from batch_img.const import PKG_NAME, TS_FORMAT
 from batch_img.resize import Resize
 from batch_img.rotate import Rotate
@@ -96,8 +97,22 @@ class Main:
         """
         logger.info(f"{json.dumps(options, indent=2)}")
         Main.init_log_file()
-        # To-do
-        return True
+        in_path = Path(options["src_path"])
+        bd_width = options.get("border_width")
+        bd_color = options.get("border_color")
+        output = options.get("output")
+        if not bd_width or bd_width == 0:
+            logger.warning(f"No add border due to bad {bd_width=}")
+            return False
+        if not output:
+            output = Path(os.getcwd())
+        else:
+            output = Path(output)
+        if in_path.is_file():
+            ok, _ = Border.add_border_1_image(in_path, output, bd_width, bd_color)
+        else:
+            ok = Border.add_border_all_in_dir(in_path, output, bd_width, bd_color)
+        return ok
 
     @staticmethod
     def default_run(options: dict) -> bool:

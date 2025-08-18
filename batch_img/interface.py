@@ -18,7 +18,7 @@ def cli(ctx, version):  # pragma: no cover
             click.secho(Common.get_version())
 
 
-@cli.command(help="Add border to image file(s)")
+@cli.command(help="Add internal border to image file(s), not expand the size")
 @click.argument(
     "src_path",
     required=True,
@@ -28,7 +28,7 @@ def cli(ctx, version):  # pragma: no cover
     "--border_width",
     default=5,
     show_default=True,
-    type=click.IntRange(min=0),
+    type=click.IntRange(min=0, max=20),
     help="Add border to image file(s) with the border_width. 0 - no border",
 )
 @click.option(

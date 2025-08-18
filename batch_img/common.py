@@ -227,8 +227,7 @@ class Common:
         """
         success_cnt = 0
         files_cnt = len(tasks)
-        # Limit to 4 workers if cpu cores cnt > 4
-        workers = min(cpu_count(), 4)
+        workers = max(cpu_count(), 4)
 
         with Pool(workers) as pool:
             with tqdm(total=files_cnt, desc=desc) as pbar:
