@@ -62,7 +62,14 @@ def test_error_add_border_1_image(mock_open):
             9,
             "#CCBBAA",
             True,
-        )
+        ),
+        (
+            Path(f"{dirname(__file__)}/data/JPG"),
+            Path(f"{dirname(__file__)}/.out/"),
+            5,
+            "green",
+            True,
+        ),
     ]
 )
 def data_add_border_all_in_dir(request):

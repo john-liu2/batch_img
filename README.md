@@ -4,6 +4,31 @@ Batch processing image files by utilizing **[Pillow / PIL](https://github.com/py
 Resize, rotate, add border or do default actions on a single image file or all image files in a folder.
 Tested these image file formats (**HEIC, JPG, PNG**) on macOS.
 
+### Installation
+
+#### One Time Setup
+
+One time installation of the `uv` tool to prepare for **All** future Python tools installation.
+Install `uv` tool by its standalone installers:
+
+```
+# On macOS and Linux.
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+```
+# On Windows.
+powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+```
+
+#### Install the `batch_img` tool
+
+Install the `batch_img` tool from PyPI:
+
+```
+uv pip install --upgrade batch_img
+```
+
 ### Usage
 
 #### Sample command lines:
@@ -48,7 +73,7 @@ Options:
   -bw, --border_width INTEGER RANGE
                                   Add border to image file(s) with the
                                   border_width. 0 - no border  [default: 5;
-                                  0<=x<=20]
+                                  0<=x<=30]
   -bc, --border_color TEXT        Add border to image file(s) with the
                                   border_color string  [default: gray]
   -o, --output TEXT               Output file path. If skipped, use the

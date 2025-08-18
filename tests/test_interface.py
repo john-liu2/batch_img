@@ -35,7 +35,7 @@ def test_border(mock_add_border, data_border):
     assert result.output == expected
 
 
-@pytest.fixture(params=["img/file -bw -9", "img/file --border_width 21"])
+@pytest.fixture(params=["img/file -bw -9", "img/file --border_width 31"])
 def data_error_border(request):
     return request.param
 

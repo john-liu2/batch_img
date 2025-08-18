@@ -14,6 +14,23 @@ from batch_img.rotate import Rotate
 
 @pytest.fixture(
     params=[
+        (Path(f"{dirname(__file__)}/data/HEIC/chef_orientation_3.heic"), 3, True),
+        (Path(f"{dirname(__file__)}/data/HEIC/chef_orientation_8.heic"), 8, True),
+    ]
+)
+def data_set_exif_orientation(request):
+    return request.param
+
+
+# JL 2025-08-18: not run as the whole pytest as it modifies the test data files
+# def test_set_exif_orientation(data_set_exif_orientation):
+#     file, o_val, expected = data_set_exif_orientation
+#     actual = Rotate.set_exif_orientation(file, o_val)
+#     assert actual == expected
+
+
+@pytest.fixture(
+    params=[
         (
             Path(f"{dirname(__file__)}/data/HEIC/IMG_0070.HEIC"),
             Path(f"{dirname(__file__)}/.out/"),
@@ -31,6 +48,12 @@ from batch_img.rotate import Rotate
             Path(f"{dirname(__file__)}/.out/"),
             270,
             (True, Path(f"{dirname(__file__)}/.out/152_270cw.JPG")),
+        ),
+        (
+            Path(f"{dirname(__file__)}/data/HEIC/chef_show2.heic"),
+            Path(f"{dirname(__file__)}/.out/"),
+            180,
+            (True, Path(f"{dirname(__file__)}/.out/chef_show2_180cw.heic")),
         ),
     ]
 )

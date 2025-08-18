@@ -11,6 +11,7 @@ from loguru import logger
 
 from batch_img.border import Border
 from batch_img.const import PKG_NAME, TS_FORMAT
+from batch_img.defaults import Defaults
 from batch_img.resize import Resize
 from batch_img.rotate import Rotate
 
@@ -117,11 +118,20 @@ class Main:
     @staticmethod
     def default_run(options: dict) -> bool:
         """Do the default action on the image file(s):
-        1) Resize to 1280 pixels as the max length
-        2) Add a border: 5 pixel width, gray color
-        3) Not rotate
+        * Resize to 1280 pixels as the max length
+        * Add the border of 5 pixel width in green color
+        * Auto-rotate if upside down or sideways
         """
         logger.info(f"{json.dumps(options, indent=2)}")
         Main.init_log_file()
-        # To-do
-        return True
+        in_path = Path(options["src_path"])
+        output = options.get("output")
+        if not output:
+            output = Path(os.getcwd())
+        else:
+            output = Path(output)
+        if in_path.is_file():
+            ok, _ = Defaults.do_actions(in_path, output)
+        else:
+            ok = Defaults.run_on_all(in_path, output)
+        return ok

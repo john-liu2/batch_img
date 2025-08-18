@@ -28,7 +28,7 @@ def cli(ctx, version):  # pragma: no cover
     "--border_width",
     default=5,
     show_default=True,
-    type=click.IntRange(min=0, max=20),
+    type=click.IntRange(min=0, max=30),
     help="Add border to image file(s) with the border_width. 0 - no border",
 )
 @click.option(
@@ -60,7 +60,7 @@ def border(src_path, border_width, border_color, output):
 
 @cli.command(
     help="Process image file(s) with default actions:\n"
-    "1) resize to 1280; 2) add 5-pixel gray color border; 3) auto-rotate if needed"
+    "1) resize to 1280; 2) add 5-pixel green color border; 3) auto-rotate if needed"
 )
 @click.argument(
     "src_path",
@@ -77,7 +77,7 @@ def border(src_path, border_width, border_color, output):
 def defaults(src_path, output):
     """Do the default action on the image file(s):
     * Resize to 1280 pixels as the max length
-    * Add a border: 5 pixel width, gray color
+    * Add the border of 5 pixel width in green color
     * Auto-rotate if upside down or sideways
     """
     options = {"src_path": src_path, "output": output}
