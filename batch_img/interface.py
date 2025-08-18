@@ -85,11 +85,16 @@ def defaults(src_path):
     type=click.IntRange(min=0),
     help="Resize image file(s) on original aspect ratio to the length. 0 - no resize",
 )
-def resize(src_path, length):
-    options = {
-        "src_path": src_path,
-        "length": length,
-    }
+@click.option(
+    "-o",
+    "--output",
+    default="",
+    show_default=True,
+    type=str,
+    help="Output file path. If skipped, use the current dir path",
+)
+def resize(src_path, length, output):
+    options = {"src_path": src_path, "length": length, "output": output}
     res = Main.resize(options)
     msg = MSG_OK if res else MSG_BAD
     click.secho(msg)
@@ -101,18 +106,27 @@ def resize(src_path, length):
     required=True,
 )
 @click.option(
-    "-d",
-    "--degree",
+    "-a",
+    "--angle",
     is_flag=False,
     default=0,
     show_default=True,
     type=click.IntRange(min=0),
-    help="Rotate image file(s) to the degree clock-wise. 0 - no rotate",
+    help="Rotate image file(s) to the clockwise angle. 0 - no rotate",
 )
-def rotate(src_path, degree):
+@click.option(
+    "-o",
+    "--output",
+    default="",
+    show_default=True,
+    type=str,
+    help="Output file path. If skipped, use the current dir path",
+)
+def rotate(src_path, angle, output):
     options = {
         "src_path": src_path,
-        "degree": degree,
+        "angle": angle,
+        "output": output,
     }
     res = Main.rotate(options)
     msg = MSG_OK if res else MSG_BAD

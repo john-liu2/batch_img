@@ -9,6 +9,8 @@ import pillow_heif
 from loguru import logger
 from PIL import Image
 
+from batch_img.common import Common
+
 pillow_heif.register_heif_opener()  # allow Pillow to open HEIC files
 
 
@@ -41,17 +43,54 @@ class Rotate:
                 if out_path.is_dir():
                     filename = f"{in_path.stem}_{angle_cw}cw{in_path.suffix}"
                     out_file = Path(f"{out_path}/{filename}")
+                # img.rotate() for any angle (slower & slight quality loss)
                 if angle_cw == 90:
-                    rotated_img = img.rotate(-90, expand=True)
+                    rotated_img = img.transpose(Image.ROTATE_270)
                 elif angle_cw == 180:
-                    rotated_img = img.rotate(180, expand=True)
+                    rotated_img = img.transpose(Image.ROTATE_180)
                 elif angle_cw == 270:
-                    rotated_img = img.rotate(90, expand=True)
+                    rotated_img = img.transpose(Image.ROTATE_90)
                 else:
                     rotated_img = img
 
-                rotated_img.save(out_file, img.format, exif=exif_bytes)
-            logger.info(f"Saved rotated ({angle_cw}°) to {out_file}")
+                rotated_img.save(out_file, img.format, exif=exif_bytes, optimize=True)
+            logger.info(f"Saved ({angle_cw}°) clockwise rotated to {out_file}")
             return True, out_file
         except (AttributeError, FileNotFoundError, ValueError) as e:
             return False, f"{in_path}:\n{e}"
+
+    @staticmethod
+    def rotate_all_in_dir(in_path: Path, out_path: Path, angle_cw: int) -> bool:
+        """Rotate all image files in the given dir
+
+        Args:
+            in_path: input dir path
+            out_path: output dir path
+            angle_cw: rotation angle clockwise: 90, 180, or 270
+
+        Returns:
+            bool: True - Success. False - Error
+        """
+        if angle_cw not in {90, 180, 270}:
+            logger.error(f"Bad {angle_cw=}. Only allow 90, 180, 270")
+            return False
+        image_files = Common.prepare_all_files(in_path, out_path)
+        if not image_files:
+            logger.error(f"No image files at {in_path}")
+            return False
+        tasks = [
+            (
+                f,
+                out_path,
+                angle_cw,
+            )
+            for f in image_files
+        ]
+        files_cnt = len(tasks)
+
+        logger.info(f"Rotate {files_cnt} image files with multiprocess ...")
+        success_cnt = Common.multiprocess_progress_bar(
+            Rotate.rotate_1_image_file, "Rotate image files", tasks
+        )
+        logger.info(f"\nSuccessfully rotated {success_cnt}/{files_cnt} files")
+        return True

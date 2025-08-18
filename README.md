@@ -78,6 +78,8 @@ Usage: batch_img resize [OPTIONS] SRC_PATH
 Options:
   -l, --length INTEGER RANGE  Resize image file(s) on original aspect ratio to
                               the length. 0 - no resize  [default: 0; x>=0]
+  -o, --output TEXT           Output file path. If skipped, use the current
+                              dir path  [default: ""]
   --help                      Show this message and exit.
 ```
 
@@ -90,7 +92,9 @@ Usage: batch_img rotate [OPTIONS] SRC_PATH
   Rotate image file(s)
 
 Options:
-  -d, --degree INTEGER RANGE  Rotate image file(s) to the degree clock-wise. 0
-                              - no rotate  [default: 0; x>=0]
-  --help                      Show this message and exit.
+  -a, --angle INTEGER RANGE  Rotate image file(s) to the clockwise angle. 0 -
+                             no rotate  [default: 0; x>=0]
+  -o, --output TEXT          Output file path. If skipped, use the current dir
+                             path  [default: ""]
+  --help                     Show this message and exit.
 ```

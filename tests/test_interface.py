@@ -58,8 +58,8 @@ def test_defaults(mock_run, data_defaults):
 
 @pytest.fixture(
     params=[
-        ("src_path -l 1234", True, MSG_OK),
-        ("img/file --length 9876", False, MSG_BAD),
+        ("src_path -l 1234 -o out/dir", True, MSG_OK),
+        ("img/file --length 9876 --output out/file", False, MSG_BAD),
     ]
 )
 def data_resize(request):
@@ -90,8 +90,8 @@ def test_error_resize(mock_resize):
 
 @pytest.fixture(
     params=[
-        ("src_path -d 90", True, MSG_OK),
-        ("img/file --degree 270", False, MSG_BAD),
+        ("src_path -a 90 -o out/dir", True, MSG_OK),
+        ("img/file --angle 270 --output out/file", False, MSG_BAD),
     ]
 )
 def data_rotate(request):
@@ -112,7 +112,7 @@ def test_rotate(mock_rotate, data_rotate):
 
 @patch("batch_img.main.Main.rotate")
 def test_error_rotate(mock_rotate):
-    _input = "img/file --degree -90"
+    _input = "img/file --angle -90"
     mock_rotate.return_value = True
     runner = CliRunner()
     result = runner.invoke(rotate, args=_input.split())

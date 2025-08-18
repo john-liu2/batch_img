@@ -26,6 +26,12 @@ from batch_img.rotate import Rotate
             180,
             (True, Path(f"{dirname(__file__)}/.out/Checkmark_180cw.PNG")),
         ),
+        (
+            Path(f"{dirname(__file__)}/data/JPG/152.JPG"),
+            Path(f"{dirname(__file__)}/.out/"),
+            270,
+            (True, Path(f"{dirname(__file__)}/.out/152_270cw.JPG")),
+        ),
     ]
 )
 def data_rotate_1_image_file(request):
@@ -43,3 +49,29 @@ def test_error_rotate_1_image_file(mock_open):
     mock_open.side_effect = ValueError("VE")
     actual = Rotate.rotate_1_image_file(Path("img/file"), Path("out/path"), 90)
     assert "img/file" in actual[1]
+
+
+@pytest.fixture(
+    params=[
+        (
+            Path(f"{dirname(__file__)}/data/mixed"),
+            Path(f"{dirname(__file__)}/.out/"),
+            90,
+            True,
+        ),
+        (
+            Path(f"{dirname(__file__)}/data/mixed"),
+            Path(f"{dirname(__file__)}/.out/"),
+            180,
+            True,
+        ),
+    ]
+)
+def data_rotate_all_in_dir(request):
+    return request.param
+
+
+def test_rotate_all_in_dir(data_rotate_all_in_dir):
+    in_path, out_path, angle_cw, expected = data_rotate_all_in_dir
+    actual = Rotate.rotate_all_in_dir(in_path, out_path, angle_cw)
+    assert actual == expected
