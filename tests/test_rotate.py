@@ -22,10 +22,11 @@ def data_set_exif_orientation(request):
     return request.param
 
 
-def test_set_exif_orientation(data_set_exif_orientation):
-    file, o_val, expected = data_set_exif_orientation
-    actual = Rotate.set_exif_orientation(file, o_val)
-    assert actual == expected
+# JL 2025-08-18: not run as the whole pytest as it modifies the test data files
+# def test_set_exif_orientation(data_set_exif_orientation):
+#     file, o_val, expected = data_set_exif_orientation
+#     actual = Rotate.set_exif_orientation(file, o_val)
+#     assert actual == expected
 
 
 @pytest.fixture(
