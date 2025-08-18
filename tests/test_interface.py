@@ -15,14 +15,15 @@ from batch_img.interface import border, defaults, resize, rotate
 @pytest.fixture(
     params=[
         ("src_path -bw 3 --border_color #AABBCC", True, MSG_OK),
-        ("img/file --border_width 9 -bc blue", False, MSG_BAD),
+        ("img/file --border_width 9 -bc blue -o out/file", False, MSG_BAD),
+        ("src_path -o out/dir", True, MSG_OK),
     ]
 )
 def data_border(request):
     return request.param
 
 
-@patch("batch_img.main.Main.add_border")
+@patch("batch_img.main.Main.border")
 def test_border(mock_add_border, data_border):
     _input, res, expected = data_border
     mock_add_border.return_value = res
@@ -36,8 +37,9 @@ def test_border(mock_add_border, data_border):
 
 @pytest.fixture(
     params=[
-        ("src_path", True, MSG_OK),
+        ("src_path --output out/dir", True, MSG_OK),
         ("img/file", False, MSG_BAD),
+        ("src_path -o out/dir", True, MSG_OK),
     ]
 )
 def data_defaults(request):
@@ -60,6 +62,7 @@ def test_defaults(mock_run, data_defaults):
     params=[
         ("src_path -l 1234 -o out/dir", True, MSG_OK),
         ("img/file --length 9876 --output out/file", False, MSG_BAD),
+        ("src_path -l 1234", True, MSG_OK),
     ]
 )
 def data_resize(request):
@@ -92,6 +95,7 @@ def test_error_resize(mock_resize):
     params=[
         ("src_path -a 90 -o out/dir", True, MSG_OK),
         ("img/file --angle 270 --output out/file", False, MSG_BAD),
+        ("src_path -a 90", True, MSG_OK),
     ]
 )
 def data_rotate(request):

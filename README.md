@@ -51,6 +51,8 @@ Options:
                                   x>=0]
   -bc, --border_color TEXT        Add border to image file(s) with the
                                   border_color string  [default: gray]
+  -o, --output TEXT               Output file path. If skipped, use the
+                                  current dir path  [default: ""]
   --help                          Show this message and exit.
 ```
 
@@ -64,7 +66,9 @@ Usage: batch_img defaults [OPTIONS] SRC_PATH
   5-pixel gray color border; 3) auto-rotate if needed
 
 Options:
-  --help  Show this message and exit.
+  -o, --output TEXT  Output file path. If skipped, use the current dir path
+                     [default: ""]
+  --help             Show this message and exit.
 ```
 
 #### The `resize` sub-command CLI options:

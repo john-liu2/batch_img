@@ -85,7 +85,7 @@ class Main:
         return ok
 
     @staticmethod
-    def add_border(options: dict) -> bool:
+    def border(options: dict) -> bool:
         """Add border to the image file(s)
 
         Args:
