@@ -16,7 +16,7 @@ from batch_img.const import NAME, PKG_NAME, VER
 from .helper import DotDict
 
 
-@pytest.fixture(params=[(PKG_NAME, "0.0.9"), ("", "0.1.0")])
+@pytest.fixture(params=[(PKG_NAME, "0.1.0"), ("", "0.1.0")])
 def ver_data(request):
     return request.param
 
@@ -29,7 +29,7 @@ def test_get_version(ver_data):
 
 @pytest.fixture(
     params=[
-        (PKG_NAME, f"✅ {PKG_NAME} is up to date (0.0.9)"),
+        (PKG_NAME, f"✅ {PKG_NAME} is up to date (0.1.0)"),
         (
             "bad_bogus",
             f"⚠️ Error get data from PyPI: https://pypi.org/pypi/bad_bogus/json",
