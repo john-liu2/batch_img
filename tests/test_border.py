@@ -10,6 +10,7 @@ from unittest.mock import patch
 import pytest
 
 from batch_img.border import Border
+from batch_img.const import REPLACE
 
 
 @pytest.fixture(
@@ -37,20 +38,27 @@ from batch_img.border import Border
         ),
     ]
 )
-def data_add_border_1_image(request):
+def data_border_1_image(request):
     return request.param
 
 
-def test_add_border_1_image(data_add_border_1_image):
-    in_path, out_path, bd_width, bd_color, expected = data_add_border_1_image
-    actual = Border.add_border_1_image(in_path, out_path, bd_width, bd_color)
+def test_border_1_image(data_border_1_image):
+    in_path, out_path, bd_width, bd_color, expected = data_border_1_image
+    actual = Border.border_1_image(in_path, out_path, bd_width, bd_color)
     assert actual == expected
+
+
+@pytest.mark.slow(reason="This test modifies test data file.")
+def test_border_1_image_replace():
+    in_path = Path(f"{dirname(__file__)}/data/PNG/Checkmark.PNG")
+    actual = Border.border_1_image(in_path, REPLACE, 9, "red")
+    assert actual == (True, in_path)
 
 
 @patch("PIL.Image.open")
 def test_error_add_border_1_image(mock_open):
     mock_open.side_effect = ValueError("VE")
-    actual = Border.add_border_1_image(Path("img/file"), Path("out/path"), 9, "red")
+    actual = Border.border_1_image(Path("img/file"), Path("out/path"), 9, "red")
     assert "img/file" in actual[1]
 
 
@@ -78,5 +86,5 @@ def data_add_border_all_in_dir(request):
 
 def test_add_border_all_in_dir(data_add_border_all_in_dir):
     in_path, out_path, bd_width, bd_color, expected = data_add_border_all_in_dir
-    actual = Border.add_border_all_in_dir(in_path, out_path, bd_width, bd_color)
+    actual = Border.border_all_in_dir(in_path, out_path, bd_width, bd_color)
     assert actual == expected

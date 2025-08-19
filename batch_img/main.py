@@ -10,8 +10,7 @@ from pathlib import Path
 from loguru import logger
 
 from batch_img.border import Border
-from batch_img.const import PKG_NAME, TS_FORMAT
-from batch_img.defaults import Defaults
+from batch_img.const import PKG_NAME, REPLACE, TS_FORMAT
 from batch_img.resize import Resize
 from batch_img.rotate import Rotate
 
@@ -48,14 +47,11 @@ class Main:
         if not length or length == 0:
             logger.warning(f"No resize due to bad {length=}")
             return False
-        if not output:
-            output = Path(os.getcwd())
-        else:
-            output = Path(output)
+        out = Path(output) if output else REPLACE
         if in_path.is_file():
-            ok, _ = Resize.resize_an_image(in_path, output, length)
+            ok, _ = Resize.resize_an_image(in_path, out, length)
         else:
-            ok = Resize.resize_all_progress_bar(in_path, output, length)
+            ok = Resize.resize_all_progress_bar(in_path, out, length)
         return ok
 
     @staticmethod
@@ -76,14 +72,11 @@ class Main:
         if not angle or angle == 0:
             logger.warning(f"No rotate due to bad {angle=}")
             return False
-        if not output:
-            output = Path(os.getcwd())
-        else:
-            output = Path(output)
+        out = Path(output) if output else REPLACE
         if in_path.is_file():
-            ok, _ = Rotate.rotate_1_image_file(in_path, output, angle)
+            ok, _ = Rotate.rotate_1_image(in_path, out, angle)
         else:
-            ok = Rotate.rotate_all_in_dir(in_path, output, angle)
+            ok = Rotate.rotate_all_in_dir(in_path, out, angle)
         return ok
 
     @staticmethod
@@ -105,33 +98,9 @@ class Main:
         if not bd_width or bd_width == 0:
             logger.warning(f"No add border due to bad {bd_width=}")
             return False
-        if not output:
-            output = Path(os.getcwd())
-        else:
-            output = Path(output)
+        out = Path(output) if output else REPLACE
         if in_path.is_file():
-            ok, _ = Border.add_border_1_image(in_path, output, bd_width, bd_color)
+            ok, _ = Border.border_1_image(in_path, out, bd_width, bd_color)
         else:
-            ok = Border.add_border_all_in_dir(in_path, output, bd_width, bd_color)
-        return ok
-
-    @staticmethod
-    def default_run(options: dict) -> bool:
-        """Do the default action on the image file(s):
-        * Resize to 1280 pixels as the max length
-        * Add the border of 5 pixel width in green color
-        * Auto-rotate if upside down or sideways
-        """
-        logger.info(f"{json.dumps(options, indent=2)}")
-        Main.init_log_file()
-        in_path = Path(options["src_path"])
-        output = options.get("output")
-        if not output:
-            output = Path(os.getcwd())
-        else:
-            output = Path(output)
-        if in_path.is_file():
-            ok, _ = Defaults.do_actions(in_path, output)
-        else:
-            ok = Defaults.run_on_all(in_path, output)
+            ok = Border.border_all_in_dir(in_path, out, bd_width, bd_color)
         return ok

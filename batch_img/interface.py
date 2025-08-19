@@ -11,14 +11,14 @@ from batch_img.main import Main
 
 @click.group(invoke_without_command=True)
 @click.pass_context
-@click.option("--version", is_flag=True, help="Show this tool's version")
+@click.option("--version", is_flag=True, help="Show this tool's version.")
 def cli(ctx, version):  # pragma: no cover
     if not ctx.invoked_subcommand:
         if version:
             click.secho(Common.get_version())
 
 
-@cli.command(help="Add internal border to image file(s), not expand the size")
+@cli.command(help="Add internal border to image file(s), not expand the size.")
 @click.argument(
     "src_path",
     required=True,
@@ -29,14 +29,14 @@ def cli(ctx, version):  # pragma: no cover
     default=5,
     show_default=True,
     type=click.IntRange(min=0, max=30),
-    help="Add border to image file(s) with the border_width. 0 - no border",
+    help="Add border to image file(s) with the border_width. 0 - no border.",
 )
 @click.option(
     "-bc",
     "--border_color",
     default="gray",
     show_default=True,
-    help="Add border to image file(s) with the border_color string",
+    help="Add border to image file(s) with the border_color string.",
 )
 @click.option(
     "-o",
@@ -44,7 +44,7 @@ def cli(ctx, version):  # pragma: no cover
     default="",
     show_default=True,
     type=str,
-    help="Output file path. If skipped, use the current dir path",
+    help="Output file path. If not specified, replace the input file.",
 )
 def border(src_path, border_width, border_color, output):
     options = {
@@ -58,35 +58,7 @@ def border(src_path, border_width, border_color, output):
     click.secho(msg)
 
 
-@cli.command(
-    help="Process image file(s) with default actions:\n"
-    "1) resize to 1280; 2) add 5-pixel green color border; 3) auto-rotate if needed"
-)
-@click.argument(
-    "src_path",
-    required=True,
-)
-@click.option(
-    "-o",
-    "--output",
-    default="",
-    show_default=True,
-    type=str,
-    help="Output file path. If skipped, use the current dir path",
-)
-def defaults(src_path, output):
-    """Do the default action on the image file(s):
-    * Resize to 1280 pixels as the max length
-    * Add the border of 5 pixel width in green color
-    * Auto-rotate if upside down or sideways
-    """
-    options = {"src_path": src_path, "output": output}
-    res = Main.default_run(options)
-    msg = MSG_OK if res else MSG_BAD
-    click.secho(msg)
-
-
-@cli.command(help="Resize image file(s)")
+@cli.command(help="Resize image file(s).")
 @click.argument(
     "src_path",
     required=True,
@@ -98,7 +70,7 @@ def defaults(src_path, output):
     default=0,
     show_default=True,
     type=click.IntRange(min=0),
-    help="Resize image file(s) on original aspect ratio to the length. 0 - no resize",
+    help="Resize image file(s) on original aspect ratio to the length. 0 - no resize.",
 )
 @click.option(
     "-o",
@@ -106,7 +78,7 @@ def defaults(src_path, output):
     default="",
     show_default=True,
     type=str,
-    help="Output file path. If skipped, use the current dir path",
+    help="Output file path. If not specified, replace the input file.",
 )
 def resize(src_path, length, output):
     options = {"src_path": src_path, "length": length, "output": output}
@@ -115,7 +87,7 @@ def resize(src_path, length, output):
     click.secho(msg)
 
 
-@cli.command(help="Rotate image file(s)")
+@cli.command(help="Rotate image file(s).")
 @click.argument(
     "src_path",
     required=True,
@@ -126,8 +98,8 @@ def resize(src_path, length, output):
     is_flag=False,
     default=0,
     show_default=True,
-    type=click.IntRange(min=0),
-    help="Rotate image file(s) to the clockwise angle. 0 - no rotate",
+    type=click.Choice([0, 90, 180, 270]),
+    help="Rotate image file(s) to the clockwise angle. 0 - no rotate.",
 )
 @click.option(
     "-o",
@@ -135,7 +107,7 @@ def resize(src_path, length, output):
     default="",
     show_default=True,
     type=str,
-    help="Output file path. If skipped, use the current dir path",
+    help="Output file path. If not specified, replace the input file.",
 )
 def rotate(src_path, angle, output):
     options = {

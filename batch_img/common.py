@@ -19,7 +19,7 @@ from PIL import Image, ImageChops
 from PIL.TiffImagePlugin import IFDRational
 from tqdm import tqdm
 
-from batch_img.const import PATTERNS, PKG_NAME, TS_FORMAT, VER
+from batch_img.const import PATTERNS, PKG_NAME, REPLACE, TS_FORMAT, VER
 
 pillow_heif.register_heif_opener()  # allow Pillow to open HEIC files
 
@@ -218,17 +218,18 @@ class Common:
         return crop_left, crop_top, crop_right, crop_bottom
 
     @staticmethod
-    def prepare_all_files(in_path: Path, out_path: Path):
+    def prepare_all_files(in_path: Path, out_path: Path | str):
         """
 
         Args:
             in_path: input dir path
-            out_path: output dir path
+            out_path: output dir path or REPLACE
 
         Returns:
             iterable: files list generator
         """
-        out_path.mkdir(parents=True, exist_ok=True)
+        if out_path != REPLACE:
+            out_path.mkdir(parents=True, exist_ok=True)
         _files = itertools.chain.from_iterable(in_path.glob(p) for p in PATTERNS)
         return _files
 
@@ -257,3 +258,22 @@ class Common:
                         tqdm.write(f"Error: {res}")
                     pbar.update()
         return success_cnt
+
+    @staticmethod
+    def set_out_file(in_path: Path, out_path: Path, extra: str) -> Path:
+        """Set the output file path
+
+        Args:
+            in_path: input file path
+            out_path: output dir path
+            extra: extra str in output file name
+
+        Returns:
+            Path:
+        """
+        out_path.mkdir(parents=True, exist_ok=True)
+        out_file = out_path
+        if out_path.is_dir():
+            filename = f"{in_path.stem}_{extra}{in_path.suffix}"
+            out_file = Path(f"{out_path}/{filename}")
+        return out_file
