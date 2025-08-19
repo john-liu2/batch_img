@@ -2,43 +2,106 @@
 Copyright © 2025 John Liu
 """
 
+import importlib.metadata
 import itertools
 import json
 import subprocess
 import tomllib
 from datetime import datetime
-from importlib.metadata import version
 from multiprocessing import Pool, cpu_count
 from os.path import getmtime, getsize
 from pathlib import Path
 
 import piexif
 import pillow_heif
+import requests
 from loguru import logger
+from packaging import version  # compare versions safely
 from PIL import Image, ImageChops
 from PIL.TiffImagePlugin import IFDRational
 from tqdm import tqdm
 
-from batch_img.const import PATTERNS, PKG_NAME, REPLACE, TS_FORMAT, VER
+from batch_img.const import PATTERNS, REPLACE, TS_FORMAT, VER
 
 pillow_heif.register_heif_opener()  # allow Pillow to open HEIC files
 
 
 class Common:
     @staticmethod
-    def get_version() -> str:
-        """
-        Get this package version using several ways
+    def get_version(pkg_name: str) -> str:
+        """Get this package version by various ways
+
+        Args:
+            pkg_name: package name str
+
+        Returns:
+            str:
         """
         try:
-            return version(PKG_NAME)
+            return importlib.metadata.version(pkg_name)
         except (FileNotFoundError, ImportError, ValueError) as e:
-            # Use lazy % formatting in logging for efficiency
-            logger.warning(f"importlib.metadata.version Error: {e}")
-            logger.debug("Try to get version from pyproject.toml file")
+            logger.warning(f"importlib.metadata.version() Error: {e}")
+            logger.debug("Get version from pyproject.toml file")
             pyproject = Path(__file__).parent.parent / "pyproject.toml"
             with open(pyproject, "rb") as f:
                 return tomllib.load(f)["project"][VER]
+
+    @staticmethod
+    def check_latest_version(pkg_name: str) -> str:
+        """Check if the installed version is the latest one
+
+        Args:
+            pkg_name: package name str
+
+        Returns:
+            str
+        """
+        try:
+            jsn_url = f"https://pypi.org/pypi/{pkg_name}/json"
+            response = requests.get(jsn_url, timeout=8)
+            if response.status_code != 200:
+                msg = f"⚠️ Error get data from PyPI: {jsn_url}"
+                logger.error(msg)
+                return msg
+
+            latest_ver = response.json()["info"]["version"]
+            cur_ver = Common.get_version(pkg_name)
+            if version.parse(cur_ver) < version.parse(latest_ver):
+                msg = (
+                    f"🔔 Update available: {cur_ver} → {latest_ver}\n"
+                    f"Please run '{pkg_name} --update'"
+                )
+            else:
+                msg = f"✅ {pkg_name} is up to date ({cur_ver})"
+            logger.info(msg)
+        except requests.RequestException as e:
+            msg = f"requests.get() Exception: {e}"
+            logger.error(msg)
+        except (KeyError, json.JSONDecodeError) as e:
+            msg = f"Error parse PyPI response: {e}"
+            logger.error(msg)
+        return msg
+
+    @staticmethod
+    def update_package(pkg_name: str) -> str:
+        """Update the package to the latest version
+
+        Args:
+            pkg_name: package name str
+
+        Returns:
+            str
+        """
+        logger.info(f"🔄 Updating {pkg_name} ...")
+        cmd = f"uv pip install --upgrade {pkg_name}"
+        try:
+            Common.run_cmd(cmd)
+            msg = "✅ Update completed."
+            logger.info(msg)
+        except subprocess.CalledProcessError as e:
+            msg = f"❌ Failed to update {pkg_name}: {e}"
+            logger.error(msg)
+        return msg
 
     @staticmethod
     def run_cmd(cmd: str) -> tuple:

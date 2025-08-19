@@ -9,23 +9,58 @@ from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
+import requests
 
 from batch_img.common import Common
 from batch_img.const import NAME, PKG_NAME, VER
 from .helper import DotDict
 
 
-@pytest.fixture(params=[({NAME: PKG_NAME, VER: "0.1.2"}, "0.0.8"), ({}, "0.0.8")])
+@pytest.fixture(params=[(PKG_NAME, "0.0.9"), ("", "0.0.9")])
 def ver_data(request):
     return request.param
 
 
 def test_get_version(ver_data):
-    fake_v, expected = ver_data
-    mock = MagicMock()
-    mock.version = expected
-    actual = Common.get_version()
+    pkg_name, expected = ver_data
+    actual = Common.get_version(pkg_name)
     assert actual == expected
+
+
+@pytest.fixture(
+    params=[
+        (PKG_NAME, f"✅ {PKG_NAME} is up to date (0.0.9)"),
+        (
+            "bad_bogus",
+            f"⚠️ Error get data from PyPI: https://pypi.org/pypi/bad_bogus/json",
+        ),
+    ]
+)
+def data_check_latest_version(request):
+    return request.param
+
+
+def test_check_latest_version(data_check_latest_version):
+    pkg_name, expected = data_check_latest_version
+    actual = Common.check_latest_version(pkg_name)
+    assert actual == expected
+
+
+@patch("requests.get")
+def test_error1_check_latest_version(mock_req_get):
+    mock_req_get.side_effect = requests.RequestException
+    actual = Common.check_latest_version(PKG_NAME)
+    assert actual == "requests.get() Exception: "
+
+
+@patch("requests.get")
+def test_error2_check_latest_version(mock_req_get):
+    mock_response = MagicMock()
+    mock_response.status_code = 200
+    mock_response.json.return_value = {"key": "value"}
+    mock_req_get.return_value = mock_response
+    actual = Common.check_latest_version(PKG_NAME)
+    assert actual == "Error parse PyPI response: 'info'"
 
 
 @pytest.fixture(

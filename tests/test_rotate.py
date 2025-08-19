@@ -38,6 +38,12 @@ from batch_img.rotate import Rotate
             180,
             (True, Path(f"{dirname(__file__)}/.out/chef_show2_180cw.heic")),
         ),
+        (
+            Path(f"{dirname(__file__)}/data/JPG/152.JPG"),
+            Path(f"{dirname(__file__)}/.out/"),
+            33,
+            (False, "Bad angle_cw=33. Only allow 90, 180, 270"),
+        ),
     ]
 )
 def data_rotate_1_image(request):
@@ -77,6 +83,12 @@ def test_error_rotate_1_image_file(mock_open):
             Path(f"{dirname(__file__)}/.out/"),
             180,
             True,
+        ),
+        (
+            Path(f"{dirname(__file__)}/data/mixed"),
+            Path(f"{dirname(__file__)}/.out/"),
+            40,
+            False,
         ),
     ]
 )

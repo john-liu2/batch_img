@@ -52,7 +52,8 @@ uv pip install --upgrade batch_img
 Usage: batch_img [OPTIONS] COMMAND [ARGS]...
 
 Options:
-  --version  Show this tool's version.
+  --update   Update the tool to the latest version.
+  --version  Show the tool's version.
   --help     Show this message and exit.
 
 Commands:
