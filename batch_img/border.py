@@ -62,15 +62,15 @@ class Border:
 
     @staticmethod
     def border_all_in_dir(
-        in_path: Path, out_path: Path, border_width: int, border_color: str
+        in_path: Path, out_path: Path | str, bd_width: int, bd_color: str
     ) -> bool:
         """Add border to all image files in the given dir
 
         Args:
             in_path: input dir path
-            out_path: output dir path
-            border_width: border width int
-            border_color: border color str
+            out_path: output dir path or REPLACE
+            bd_width: border width int
+            bd_color: border color str
 
         Returns:
             bool: True - Success. False - Error
@@ -79,8 +79,11 @@ class Border:
         if not image_files:
             logger.error(f"No image files at {in_path}")
             return False
-        tasks = [(f, out_path, border_width, border_color) for f in image_files]
+        tasks = [(f, out_path, bd_width, bd_color) for f in image_files]
         files_cnt = len(tasks)
+        if files_cnt == 0:
+            logger.error(f"No image files at {in_path}")
+            return False
 
         logger.info(f"Add border to {files_cnt} image files in multiprocess ...")
         success_cnt = Common.multiprocess_progress_bar(

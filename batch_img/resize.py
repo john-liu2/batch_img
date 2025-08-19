@@ -56,12 +56,14 @@ class Resize:
             return False, f"{in_path}:\n{e}"
 
     @staticmethod
-    def resize_all_progress_bar(in_path: Path, out_path: Path, length: int) -> bool:
+    def resize_all_progress_bar(
+        in_path: Path, out_path: Path | str, length: int
+    ) -> bool:
         """Resize all image files in the given dir
 
         Args:
             in_path: input dir path
-            out_path: output dir path
+            out_path: output dir path or REPLACE
             length: max length (width or height) in pixels
 
         Returns:
@@ -73,6 +75,9 @@ class Resize:
             return False
         tasks = [(f, out_path, length) for f in image_files]
         files_cnt = len(tasks)
+        if files_cnt == 0:
+            logger.error(f"No image files at {in_path}")
+            return False
 
         logger.info(f"Resize {files_cnt} image files in multiprocess ...")
         success_cnt = Common.multiprocess_progress_bar(
