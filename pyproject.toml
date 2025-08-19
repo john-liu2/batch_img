@@ -20,14 +20,14 @@ requires-python = ">=3.12"
 dependencies = [
     "click",
     "loguru",
+    "numpy", # check orientation
+    "opencv-python", # check orientation by face
+    "packaging",
     "piexif",
     "pillow",
     "pillow-heif",
-    "tqdm",
-    "numpy", # check orientation
-    "opencv-python", # check orientation by face
     "requests",
-    "packaging",
+    "tqdm",
 ]
 [project.scripts]
 batch_img = "batch_img.interface:cli"
