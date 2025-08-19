@@ -5,17 +5,20 @@ Copyright © 2025 John Liu
 import click
 
 from batch_img.common import Common
-from batch_img.const import MSG_BAD, MSG_OK
+from batch_img.const import MSG_BAD, MSG_OK, PKG_NAME
 from batch_img.main import Main
 
 
 @click.group(invoke_without_command=True)
 @click.pass_context
-@click.option("--version", is_flag=True, help="Show this tool's version.")
-def cli(ctx, version):  # pragma: no cover
+@click.option("--update", is_flag=True, help="Update the tool to the latest version.")
+@click.option("--version", is_flag=True, help="Show the tool's version.")
+def cli(ctx, update, version):  # pragma: no cover
     if not ctx.invoked_subcommand:
+        if update:
+            Common.update_package(PKG_NAME)
         if version:
-            click.secho(Common.get_version())
+            click.secho(Common.get_version(PKG_NAME))
 
 
 @cli.command(help="Add internal border to image file(s), not expand the size.")
