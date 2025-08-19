@@ -6,7 +6,7 @@ Copyright © 2025 John Liu
 import json
 from os.path import dirname
 from pathlib import Path
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
 import pytest
 import requests
