@@ -15,7 +15,7 @@ from batch_img.const import NAME, PKG_NAME, VER
 from .helper import DotDict
 
 
-@pytest.fixture(params=[({NAME: PKG_NAME, VER: "0.1.2"}, "0.0.7"), ({}, "0.0.7")])
+@pytest.fixture(params=[({NAME: PKG_NAME, VER: "0.1.2"}, "0.0.8"), ({}, "0.0.8")])
 def ver_data(request):
     return request.param
 
