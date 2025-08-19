@@ -2,6 +2,7 @@
 Copyright © 2025 John Liu
 """
 
+import os
 from pathlib import Path
 
 import piexif
@@ -10,19 +11,20 @@ from loguru import logger
 from PIL import Image
 
 from batch_img.common import Common
+from batch_img.const import REPLACE
 
 pillow_heif.register_heif_opener()  # allow Pillow to open HEIC files
 
 
 class Resize:
     @staticmethod
-    def resize_an_image(in_path: Path, out_path: Path, length: int) -> tuple:
+    def resize_an_image(in_path: Path, out_path: Path | str, length: int) -> tuple:
         """Resize an image file and save to the output dir
 
         Args:
             in_path: input file path
-            out_path: output dir path
-            length: max length (width or height) in pixels
+            out_path: output dir path or REPLACE
+            length: max pixels length (width or height)
 
         Returns:
             tuple: bool, output file path
@@ -32,24 +34,25 @@ class Resize:
                 max_size = (length, length)
                 # The thumbnail() keeps the original aspect ratio
                 img.thumbnail(max_size, Image.Resampling.LANCZOS)
+                if out_path == REPLACE:
+                    file = Path(f"{in_path.parent}/{in_path.stem}_tmp{in_path.suffix}")
+                else:
+                    file = Common.set_out_file(in_path, out_path, f"{length}")
 
-                out_path.mkdir(parents=True, exist_ok=True)
-                out_file = out_path
-                if out_path.is_dir():
-                    filename = f"{in_path.stem}_{length}{in_path.suffix}"
-                    out_file = Path(f"{out_path}/{filename}")
-
-                exif_dict = None
                 if "exif" in img.info:
                     exif_dict = piexif.load(img.info["exif"])
-                if exif_dict:
                     exif_bytes = piexif.dump(exif_dict)
-                    img.save(out_file, img.format, optimize=True, exif=exif_bytes)
+                    img.save(file, img.format, optimize=True, exif=exif_bytes)
                 else:
-                    img.save(out_file, img.format, optimize=True)
-            logger.info(f"Saved {out_file}")
-            return True, out_file
+                    img.save(file, img.format, optimize=True)
+            logger.info(f"Saved resized image to {file}")
+            if out_path == REPLACE:
+                os.replace(file, in_path)
+                logger.info(f"Replaced {in_path} with tmp_file")
+                file = in_path
+            return True, file
         except (AttributeError, FileNotFoundError, ValueError) as e:
+            logger.error(e)
             return False, f"{in_path}:\n{e}"
 
     @staticmethod

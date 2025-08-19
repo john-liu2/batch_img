@@ -8,7 +8,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 import pytest
-
+from batch_img.const import REPLACE
 from batch_img.resize import Resize
 
 
@@ -36,7 +36,13 @@ def test_resize_an_image(data_resize_an_image):
     in_file, out_path, max_side, expected = data_resize_an_image
     actual = Resize.resize_an_image(in_file, out_path, max_side)
     assert actual == expected
-    # assert Common.are_images_equal(in_file, actual) is False
+
+
+@pytest.mark.slow(reason="This test modifies test data file.")
+def test_resize_an_image_replace():
+    in_path = Path(f"{dirname(__file__)}/data/PNG/Checkmark.PNG")
+    actual = Resize.resize_an_image(in_path, REPLACE, 800)
+    assert actual == (True, in_path)
 
 
 @patch("PIL.Image.open")

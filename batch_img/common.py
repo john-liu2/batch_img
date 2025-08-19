@@ -257,3 +257,22 @@ class Common:
                         tqdm.write(f"Error: {res}")
                     pbar.update()
         return success_cnt
+
+    @staticmethod
+    def set_out_file(in_path: Path, out_path: Path, extra: str) -> Path:
+        """Set the output file path
+
+        Args:
+            in_path: input file path
+            out_path: output dir path
+            extra: extra str in output file name
+
+        Returns:
+            Path:
+        """
+        out_path.mkdir(parents=True, exist_ok=True)
+        out_file = out_path
+        if out_path.is_dir():
+            filename = f"{in_path.stem}_{extra}{in_path.suffix}"
+            out_file = Path(f"{out_path}/{filename}")
+        return out_file

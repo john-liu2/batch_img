@@ -24,3 +24,4 @@ PATTERNS = (
 MAX_LENGTH = 1280
 BD_WIDTH = 5
 BD_COLOR = "green"
+REPLACE = "replace"

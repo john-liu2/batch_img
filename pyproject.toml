@@ -4,7 +4,7 @@ requires = ["setuptools>=80.0"]
 
 [project]
 name = "batch_img"
-version = "0.0.7"
+version = "0.0.8"
 description = "Batch processing image files by utilizing Pillow / PIL library"
 readme = "README.md"
 authors = [{ name = "John Liu" }]
@@ -84,4 +84,9 @@ exclude = [
     "**/tests/",
     "**/build/",
     "**/generated/**/*.py",
+]
+[tool.pytest.ini_options]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "serial",
 ]

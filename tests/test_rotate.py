@@ -8,25 +8,8 @@ from pathlib import Path
 from unittest.mock import patch
 
 import pytest
-
+from batch_img.const import REPLACE
 from batch_img.rotate import Rotate
-
-
-@pytest.fixture(
-    params=[
-        (Path(f"{dirname(__file__)}/data/HEIC/chef_orientation_3.heic"), 3, True),
-        (Path(f"{dirname(__file__)}/data/HEIC/chef_orientation_8.heic"), 8, True),
-    ]
-)
-def data_set_exif_orientation(request):
-    return request.param
-
-
-# JL 2025-08-18: not run as the whole pytest as it modifies the test data files
-# def test_set_exif_orientation(data_set_exif_orientation):
-#     file, o_val, expected = data_set_exif_orientation
-#     actual = Rotate.set_exif_orientation(file, o_val)
-#     assert actual == expected
 
 
 @pytest.fixture(
@@ -57,20 +40,27 @@ def data_set_exif_orientation(request):
         ),
     ]
 )
-def data_rotate_1_image_file(request):
+def data_rotate_1_image(request):
     return request.param
 
 
-def test_rotate_1_image_file(data_rotate_1_image_file):
-    in_path, out_path, angle, expected = data_rotate_1_image_file
-    actual = Rotate.rotate_1_image_file(in_path, out_path, angle)
+def test_rotate_1_image(data_rotate_1_image):
+    in_path, out_path, angle, expected = data_rotate_1_image
+    actual = Rotate.rotate_1_image(in_path, out_path, angle)
     assert actual == expected
+
+
+@pytest.mark.slow(reason="This test modifies test data file.")
+def test_rotate_1_image_replace():
+    in_path = Path(f"{dirname(__file__)}/data/PNG/Checkmark.PNG")
+    actual = Rotate.rotate_1_image(in_path, REPLACE, 90)
+    assert actual == (True, in_path)
 
 
 @patch("PIL.Image.open")
 def test_error_rotate_1_image_file(mock_open):
     mock_open.side_effect = ValueError("VE")
-    actual = Rotate.rotate_1_image_file(Path("img/file"), Path("out/path"), 90)
+    actual = Rotate.rotate_1_image(Path("img/file"), Path("out/path"), 90)
     assert "img/file" in actual[1]
 
 
@@ -97,4 +87,21 @@ def data_rotate_all_in_dir(request):
 def test_rotate_all_in_dir(data_rotate_all_in_dir):
     in_path, out_path, angle_cw, expected = data_rotate_all_in_dir
     actual = Rotate.rotate_all_in_dir(in_path, out_path, angle_cw)
+    assert actual == expected
+
+
+@pytest.fixture(
+    params=[
+        (Path(f"{dirname(__file__)}/data/HEIC/chef_orientation_3.heic"), 3, True),
+        (Path(f"{dirname(__file__)}/data/HEIC/chef_orientation_8.heic"), 8, True),
+    ]
+)
+def data_set_exif_orientation(request):
+    return request.param
+
+
+@pytest.mark.slow(reason="This test modifies test data file.")
+def test_set_exif_orientation(data_set_exif_orientation):
+    file, o_val, expected = data_set_exif_orientation
+    actual = Rotate.set_exif_orientation(file, o_val)
     assert actual == expected

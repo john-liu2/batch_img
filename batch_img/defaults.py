@@ -88,7 +88,7 @@ class Defaults:
         if cw_angle in {-1, 0}:
             logger.warning(f"Skip due to bad or 0 clockwise angle: {cw_angle=}")
             return False, in_path
-        ok, out_file = Rotate.rotate_1_image_file(in_path, out_path, cw_angle)
+        ok, out_file = Rotate.rotate_1_image(in_path, out_path, cw_angle)
         return ok, out_file
 
     @staticmethod

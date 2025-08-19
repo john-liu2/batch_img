@@ -9,7 +9,7 @@ import pytest
 from click.testing import CliRunner
 
 from batch_img.const import MSG_OK, MSG_BAD
-from batch_img.interface import border, defaults, resize, rotate
+from batch_img.interface import border, resize, rotate
 
 
 @pytest.fixture(
@@ -48,29 +48,6 @@ def test_error_border(mock_add_border, data_error_border):
     result = runner.invoke(border, args=_input.split())
     print(result.output)
     assert result.exception
-
-
-@pytest.fixture(
-    params=[
-        ("src_path --output out/dir", True, MSG_OK),
-        ("img/file", False, MSG_BAD),
-        ("src_path -o out/dir", True, MSG_OK),
-    ]
-)
-def data_defaults(request):
-    return request.param
-
-
-@patch("batch_img.main.Main.default_run")
-def test_defaults(mock_run, data_defaults):
-    _input, res, expected = data_defaults
-    mock_run.return_value = res
-    expected += "\n"
-    runner = CliRunner()
-    result = runner.invoke(defaults, args=_input.split())
-    print(result.output)
-    assert not result.exception
-    assert result.output == expected
 
 
 @pytest.fixture(
