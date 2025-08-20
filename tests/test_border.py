@@ -44,21 +44,21 @@ def data_border_1_image(request):
 
 def test_border_1_image(data_border_1_image):
     in_path, out_path, bd_width, bd_color, expected = data_border_1_image
-    actual = Border.border_1_image(in_path, out_path, bd_width, bd_color)
+    actual = Border.border_1_image((in_path, out_path, bd_width, bd_color))
     assert actual == expected
 
 
 @pytest.mark.slow(reason="This test modifies test data file.")
 def test_border_1_image_replace():
     in_path = Path(f"{dirname(__file__)}/data/PNG/Checkmark.PNG")
-    actual = Border.border_1_image(in_path, REPLACE, 9, "red")
+    actual = Border.border_1_image((in_path, REPLACE, 9, "red"))
     assert actual == (True, in_path)
 
 
 @patch("PIL.Image.open")
 def test_error_add_border_1_image(mock_open):
     mock_open.side_effect = ValueError("VE")
-    actual = Border.border_1_image(Path("img/file"), Path("out/path"), 9, "red")
+    actual = Border.border_1_image((Path("img/file"), Path("out/path"), 9, "red"))
     assert "img/file" in actual[1]
 
 

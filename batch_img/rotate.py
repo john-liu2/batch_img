@@ -7,21 +7,22 @@ from pathlib import Path
 
 import piexif
 import pillow_heif
-from loguru import logger
 from PIL import Image
 
 from batch_img.common import Common
 from batch_img.const import REPLACE
+from batch_img.log import log
 
 pillow_heif.register_heif_opener()  # allow Pillow to open HEIC files
 
 
 class Rotate:
     @staticmethod
-    def rotate_1_image(in_path: Path, out_path: Path | str, angle_cw: int) -> tuple:
+    def rotate_1_image(args: tuple) -> tuple:
         """Rotate an image file and save to the output dir
 
         Args:
+            args: tuple of the below params:
             in_path: input file path
             out_path: output dir path or REPLACE
             angle_cw: rotation angle clockwise: 90, 180, or 270
@@ -29,6 +30,7 @@ class Rotate:
         Returns:
             tuple: bool, str
         """
+        in_path, out_path, angle_cw = args
         if angle_cw not in {90, 180, 270}:
             return False, f"Bad {angle_cw=}. Only allow 90, 180, 270"
         try:
@@ -50,14 +52,14 @@ class Rotate:
                     rotated_img = img.transpose(Image.ROTATE_90)
 
                 rotated_img.save(file, img.format, exif=exif_bytes, optimize=True)
-            logger.info(f"Saved ({angle_cw}°) clockwise rotated to {file}")
+            log.debug(f"Saved ({angle_cw}°) clockwise rotated to {file}")
             if out_path == REPLACE:
                 os.replace(file, in_path)
-                logger.info(f"Replaced {in_path} with the new tmp_file")
+                log.debug(f"Replaced {in_path} with the new tmp_file")
                 file = in_path
             return True, file
         except (AttributeError, FileNotFoundError, ValueError) as e:
-            logger.error(e)
+            log.error(e)
             return False, f"{in_path}:\n{e}"
 
     @staticmethod
@@ -73,23 +75,23 @@ class Rotate:
             bool: True - Success. False - Error
         """
         if angle_cw not in {90, 180, 270}:
-            logger.error(f"Bad {angle_cw=}. Only allow 90, 180, 270")
+            log.error(f"Bad {angle_cw=}. Only allow 90, 180, 270")
             return False
         image_files = Common.prepare_all_files(in_path, out_path)
         if not image_files:
-            logger.error(f"No image files at {in_path}")
+            log.error(f"No image files at {in_path}")
             return False
         tasks = [(f, out_path, angle_cw) for f in image_files]
         files_cnt = len(tasks)
         if files_cnt == 0:
-            logger.error(f"No image files at {in_path}")
+            log.error(f"No image files at {in_path}")
             return False
 
-        logger.info(f"Rotate {files_cnt} image files in multiprocess ...")
+        log.debug(f"Rotate {files_cnt} image files in multiprocess ...")
         success_cnt = Common.multiprocess_progress_bar(
             Rotate.rotate_1_image, "Rotate image files", tasks
         )
-        logger.info(f"\nSuccessfully rotated {success_cnt}/{files_cnt} files")
+        log.info(f"\nSuccessfully rotated {success_cnt}/{files_cnt} files")
         return True
 
     @staticmethod
@@ -104,7 +106,7 @@ class Rotate:
             bool: True - Success. False - Error
         """
         if o_val not in {1, 2, 3, 4, 5, 6, 7, 8}:
-            logger.error(f"Quit due to bad orientation value: {o_val=}")
+            log.error(f"Quit due to bad orientation value: {o_val=}")
             return False
         try:
             tmp_file = Path(f"{file.parent}/{file.stem}_tmp{file.suffix}")
@@ -115,10 +117,10 @@ class Rotate:
                 exif_dict["0th"][piexif.ImageIFD.Orientation] = o_val
                 exif_bytes = piexif.dump(exif_dict)
                 img.save(tmp_file, img.format, exif=exif_bytes, optimize=True)
-            logger.info(f"Saved the updated EXIF image to {tmp_file}")
+            log.debug(f"Saved the updated EXIF image to {tmp_file}")
             os.replace(tmp_file, file)
-            logger.info(f"Replaced {file} with tmp_file")
+            log.debug(f"Replaced {file} with tmp_file")
             return True
         except (AttributeError, FileNotFoundError, ValueError) as e:
-            logger.error(e)
+            log.error(e)
             return False

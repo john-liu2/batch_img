@@ -7,21 +7,22 @@ from pathlib import Path
 
 import piexif
 import pillow_heif
-from loguru import logger
 from PIL import Image
 
 from batch_img.common import Common
 from batch_img.const import REPLACE
+from batch_img.log import log
 
 pillow_heif.register_heif_opener()  # allow Pillow to open HEIC files
 
 
 class Resize:
     @staticmethod
-    def resize_an_image(in_path: Path, out_path: Path | str, length: int) -> tuple:
+    def resize_an_image(args: tuple) -> tuple:
         """Resize an image file and save to the output dir
 
         Args:
+            args: tuple of the below params:
             in_path: input file path
             out_path: output dir path or REPLACE
             length: max pixels length (width or height)
@@ -29,6 +30,7 @@ class Resize:
         Returns:
             tuple: bool, output file path
         """
+        in_path, out_path, length = args
         try:
             with Image.open(in_path) as img:
                 max_size = (length, length)
@@ -42,14 +44,14 @@ class Resize:
                     img.save(file, img.format, optimize=True, exif=exif_bytes)
                 else:
                     img.save(file, img.format, optimize=True)
-            logger.info(f"Saved resized image to {file}")
+            log.debug(f"Saved resized image to {file}")
             if out_path == REPLACE:
                 os.replace(file, in_path)
-                logger.info(f"Replaced {in_path} with the new tmp_file")
+                log.debug(f"Replaced {in_path} with the new tmp_file")
                 file = in_path
             return True, file
         except (AttributeError, FileNotFoundError, ValueError) as e:
-            logger.error(e)
+            log.error(e)
             return False, f"{in_path}:\n{e}"
 
     @staticmethod
@@ -68,17 +70,17 @@ class Resize:
         """
         image_files = Common.prepare_all_files(in_path, out_path)
         if not image_files:
-            logger.error(f"No image files at {in_path}")
+            log.error(f"No image files at {in_path}")
             return False
         tasks = [(f, out_path, length) for f in image_files]
         files_cnt = len(tasks)
         if files_cnt == 0:
-            logger.error(f"No image files at {in_path}")
+            log.error(f"No image files at {in_path}")
             return False
 
-        logger.info(f"Resize {files_cnt} image files in multiprocess ...")
+        log.debug(f"Resize {files_cnt} image files in multiprocess ...")
         success_cnt = Common.multiprocess_progress_bar(
             Resize.resize_an_image, "Resize image files", tasks
         )
-        logger.info(f"\nSuccessfully resized {success_cnt}/{files_cnt} files")
+        log.info(f"\nSuccessfully resized {success_cnt}/{files_cnt} files")
         return True

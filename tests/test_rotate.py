@@ -52,21 +52,21 @@ def data_rotate_1_image(request):
 
 def test_rotate_1_image(data_rotate_1_image):
     in_path, out_path, angle, expected = data_rotate_1_image
-    actual = Rotate.rotate_1_image(in_path, out_path, angle)
+    actual = Rotate.rotate_1_image((in_path, out_path, angle))
     assert actual == expected
 
 
 @pytest.mark.slow(reason="This test modifies test data file.")
 def test_rotate_1_image_replace():
     in_path = Path(f"{dirname(__file__)}/data/PNG/Checkmark.PNG")
-    actual = Rotate.rotate_1_image(in_path, REPLACE, 90)
+    actual = Rotate.rotate_1_image((in_path, REPLACE, 90))
     assert actual == (True, in_path)
 
 
 @patch("PIL.Image.open")
 def test_error_rotate_1_image_file(mock_open):
     mock_open.side_effect = ValueError("VE")
-    actual = Rotate.rotate_1_image(Path("img/file"), Path("out/path"), 90)
+    actual = Rotate.rotate_1_image((Path("img/file"), Path("out/path"), 90))
     assert "img/file" in actual[1]
 
 

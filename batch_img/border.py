@@ -7,23 +7,22 @@ from pathlib import Path
 
 import piexif
 import pillow_heif
-from loguru import logger
 from PIL import Image
 
 from batch_img.common import Common
 from batch_img.const import REPLACE
+from batch_img.log import log
 
 pillow_heif.register_heif_opener()  # allow Pillow to open HEIC files
 
 
 class Border:
     @staticmethod
-    def border_1_image(
-        in_path: Path, out_path: Path | str, bd_width: int, bd_color: str
-    ) -> tuple:
+    def border_1_image(args: tuple) -> tuple:
         """Add internal border to an image file, not to expand the size
 
         Args:
+            args: tuple of the below params:
             in_path: input file path
             out_path: output dir path or REPLACE
             bd_width: border width int
@@ -32,6 +31,7 @@ class Border:
         Returns:
             tuple: bool, str
         """
+        in_path, out_path, bd_width, bd_color = args
         try:
             with Image.open(in_path) as img:
                 width, height = img.size
@@ -47,14 +47,14 @@ class Border:
                     bd_img.save(file, img.format, optimize=True, exif=exif_bytes)
                 else:
                     bd_img.save(file, img.format, optimize=True)
-            logger.info(f"Saved image with border to {file}")
+            log.debug(f"Saved image with border to {file}")
             if out_path == REPLACE:
                 os.replace(file, in_path)
-                logger.info(f"Replaced {in_path} with the new tmp_file")
+                log.debug(f"Replaced {in_path} with the new tmp_file")
                 file = in_path
             return True, file
         except (AttributeError, FileNotFoundError, ValueError) as e:
-            logger.error(e)
+            log.error(e)
             return False, f"{in_path}:\n{e}"
 
     @staticmethod
@@ -74,17 +74,17 @@ class Border:
         """
         image_files = Common.prepare_all_files(in_path, out_path)
         if not image_files:
-            logger.error(f"No image files at {in_path}")
+            log.error(f"No image files at {in_path}")
             return False
         tasks = [(f, out_path, bd_width, bd_color) for f in image_files]
         files_cnt = len(tasks)
         if files_cnt == 0:
-            logger.error(f"No image files at {in_path}")
+            log.error(f"No image files at {in_path}")
             return False
 
-        logger.info(f"Add border to {files_cnt} image files in multiprocess ...")
+        log.debug(f"Add border to {files_cnt} image files in multiprocess ...")
         success_cnt = Common.multiprocess_progress_bar(
             Border.border_1_image, "Add border to image files", tasks
         )
-        logger.info(f"\nSuccessfully added border to {success_cnt}/{files_cnt} files")
+        log.info(f"\nSuccessfully added border to {success_cnt}/{files_cnt} files")
         return True
