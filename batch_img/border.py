@@ -40,10 +40,7 @@ class Border:
                 bd_img = Image.new(img.mode, (width, height), bd_color)
                 bd_img.paste(cropped_img, (bd_width, bd_width))
 
-                if out_path == REPLACE:
-                    file = Path(f"{in_path.parent}/{in_path.stem}_tmp{in_path.suffix}")
-                else:
-                    file = Common.set_out_file(in_path, out_path, f"bw{bd_width}")
+                file = Common.set_out_file(in_path, out_path, f"bw{bd_width}")
                 if "exif" in img.info:
                     exif_dict = piexif.load(img.info["exif"])
                     exif_bytes = piexif.dump(exif_dict)
@@ -53,7 +50,7 @@ class Border:
             logger.info(f"Saved image with border to {file}")
             if out_path == REPLACE:
                 os.replace(file, in_path)
-                logger.info(f"Replaced {in_path} with tmp_file")
+                logger.info(f"Replaced {in_path} with the new tmp_file")
                 file = in_path
             return True, file
         except (AttributeError, FileNotFoundError, ValueError) as e:

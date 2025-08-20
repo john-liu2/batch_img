@@ -12,11 +12,11 @@ import pytest
 import requests
 
 from batch_img.common import Common
-from batch_img.const import NAME, PKG_NAME, VER
+from batch_img.const import PKG_NAME, REPLACE
 from .helper import DotDict
 
 
-@pytest.fixture(params=[(PKG_NAME, "0.0.9"), ("", "0.0.9")])
+@pytest.fixture(params=[(PKG_NAME, "0.1.0"), ("", "0.1.0")])
 def ver_data(request):
     return request.param
 
@@ -29,7 +29,7 @@ def test_get_version(ver_data):
 
 @pytest.fixture(
     params=[
-        (PKG_NAME, f"✅ {PKG_NAME} is up to date (0.0.9)"),
+        (PKG_NAME, f"✅ {PKG_NAME} is up to date (0.1.0)"),
         (
             "bad_bogus",
             f"⚠️ Error get data from PyPI: https://pypi.org/pypi/bad_bogus/json",
@@ -298,4 +298,30 @@ def data_get_crop_box(request):
 def test_get_crop_box(data_get_crop_box):
     width, height, border_width, expected = data_get_crop_box
     actual = Common.get_crop_box(width, height, border_width)
+    assert actual == expected
+
+
+@pytest.fixture(
+    params=[
+        (
+            Path(f"{dirname(__file__)}/data/HEIC/Cartoon.heic"),
+            Path(f"{dirname(__file__)}/.out/"),
+            "90cw",
+            Path(f"{dirname(__file__)}/.out/Cartoon_90cw.heic"),
+        ),
+        (
+            Path(f"{dirname(__file__)}/data/HEIC/Cartoon.heic"),
+            REPLACE,
+            "90cw",
+            Path(f"{dirname(__file__)}/data/HEIC/Cartoon_tmp.heic"),
+        ),
+    ]
+)
+def data_set_out_file(request):
+    return request.param
+
+
+def test_set_out_file(data_set_out_file):
+    in_path, out_path, extra, expected = data_set_out_file
+    actual = Common.set_out_file(in_path, out_path, extra)
     assert actual == expected

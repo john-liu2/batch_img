@@ -34,11 +34,8 @@ class Resize:
                 max_size = (length, length)
                 # The thumbnail() keeps the original aspect ratio
                 img.thumbnail(max_size, Image.Resampling.LANCZOS)
-                if out_path == REPLACE:
-                    file = Path(f"{in_path.parent}/{in_path.stem}_tmp{in_path.suffix}")
-                else:
-                    file = Common.set_out_file(in_path, out_path, f"{length}")
 
+                file = Common.set_out_file(in_path, out_path, f"{length}")
                 if "exif" in img.info:
                     exif_dict = piexif.load(img.info["exif"])
                     exif_bytes = piexif.dump(exif_dict)
@@ -48,7 +45,7 @@ class Resize:
             logger.info(f"Saved resized image to {file}")
             if out_path == REPLACE:
                 os.replace(file, in_path)
-                logger.info(f"Replaced {in_path} with tmp_file")
+                logger.info(f"Replaced {in_path} with the new tmp_file")
                 file = in_path
             return True, file
         except (AttributeError, FileNotFoundError, ValueError) as e:

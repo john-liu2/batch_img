@@ -334,6 +334,9 @@ class Common:
         Returns:
             Path:
         """
+        if out_path == REPLACE:
+            out_file = Path(f"{in_path.parent}/{in_path.stem}_tmp{in_path.suffix}")
+            return out_file
         out_path.mkdir(parents=True, exist_ok=True)
         out_file = out_path
         if out_path.is_dir():

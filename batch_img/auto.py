@@ -1,4 +1,4 @@
-"""class Defaults: apply default actions to the image file(s):
+"""class Auto - do auto actions to the image file(s):
     * Resize to 1280 pixels as the max length
     * Add the border of 5 pixel width in green color
     * Auto-rotate if upside down or sideways
@@ -20,7 +20,7 @@ from batch_img.rotate import Rotate
 pillow_heif.register_heif_opener()  # allow Pillow to open HEIC files
 
 
-class Defaults:
+class Auto:
     @staticmethod
     def resize_add_border(in_path: Path, out_path: Path) -> tuple:
         """Resize and add border to an image file:
@@ -83,7 +83,7 @@ class Defaults:
         # JL 2025-08-18: not get orientation from EXIF as it's unreliable
         # cw_angle = Orientation.exif_orientation_2_cw_angle(in_path)
         # logger.info(f"From exif: {cw_angle=}")
-        cw_angle = Orientation().get_cw_angle_by_face(in_path)
+        cw_angle = Orientation.get_orientation_by_floor(in_path)
         logger.info(f"By face: {cw_angle=}")
         if cw_angle in {-1, 0}:
             logger.warning(f"Skip due to bad or 0 clockwise angle: {cw_angle=}")
@@ -105,8 +105,8 @@ class Defaults:
         Returns:
             tuple: bool, str
         """
-        _, file = Defaults.rotate_if_needed(in_path, out_path)
-        return Defaults.resize_add_border(file, out_path)
+        _, file = Auto.rotate_if_needed(in_path, out_path)
+        return Auto.resize_add_border(file, out_path)
 
     @staticmethod
     def run_on_all(in_path: Path, out_path: Path) -> bool:
@@ -128,7 +128,7 @@ class Defaults:
 
         logger.info(f"Do default actions on {files_cnt} files in multiprocess ...")
         success_cnt = Common.multiprocess_progress_bar(
-            Defaults.do_actions, "Default action on image files", tasks
+            Auto.do_actions, "Default action on image files", tasks
         )
         logger.info(f"\nFinished default actions on {success_cnt}/{files_cnt} files")
         return True
