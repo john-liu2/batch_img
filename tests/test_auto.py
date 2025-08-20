@@ -39,11 +39,27 @@ def test_error_resize_add_border(mock_open):
 
 @pytest.fixture(
     params=[
-        # (
-        #     Path(f"{dirname(__file__)}/data/HEIC/chef_180cw.heic"),
-        #     Path(f"{dirname(__file__)}/.out/"),
-        #     (True, Path(f"{dirname(__file__)}/.out/chef_180cw_180cw.heic")),
-        # ),
+        (
+            Path(f"{dirname(__file__)}/data/HEIC/chef_180cw.heic"),
+            Path(f"{dirname(__file__)}/.out/"),
+            (True, Path(f"{dirname(__file__)}/.out/chef_180cw_180cw.heic")),
+        ),
+        (
+            Path(f"{dirname(__file__)}/data/HEIC/chef2_90cw.heic"),
+            Path(f"{dirname(__file__)}/.out/"),
+            (True, Path(f"{dirname(__file__)}/.out/chef2_90cw_270cw.heic")),
+        ),
+        # JL 2025-08-20: check sky/clouds orientation by floor
+        (
+            Path(f"{dirname(__file__)}/data/HEIC/IMG_2529_90cw.HEIC"),
+            Path(f"{dirname(__file__)}/.out/"),
+            (True, Path(f"{dirname(__file__)}/.out/IMG_2529_90cw_270cw.HEIC")),
+        ),
+        (
+            Path(f"{dirname(__file__)}/data/HEIC/IMG_2529_270cw.HEIC"),
+            Path(f"{dirname(__file__)}/.out/"),
+            (True, Path(f"{dirname(__file__)}/.out/IMG_2529_270cw_90cw.HEIC")),
+        ),
         (
             Path(f"{dirname(__file__)}/data/HEIC/chef_show2.heic"),
             Path(f"{dirname(__file__)}/.out/"),

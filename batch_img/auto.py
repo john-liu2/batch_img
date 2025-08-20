@@ -83,7 +83,7 @@ class Auto:
         # JL 2025-08-18: not get orientation from EXIF as it's unreliable
         # cw_angle = Orientation.exif_orientation_2_cw_angle(in_path)
         # logger.info(f"From exif: {cw_angle=}")
-        cw_angle = Orientation().get_cw_angle_by_face(in_path)
+        cw_angle = Orientation.get_orientation_by_floor(in_path)
         logger.info(f"By face: {cw_angle=}")
         if cw_angle in {-1, 0}:
             logger.warning(f"Skip due to bad or 0 clockwise angle: {cw_angle=}")
