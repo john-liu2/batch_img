@@ -7,10 +7,10 @@ from pathlib import Path
 import cv2
 import numpy as np
 import pillow_heif
-from loguru import logger
 from PIL import Image
 
 from batch_img.common import Common
+from batch_img.log import log
 
 pillow_heif.register_heif_opener()  # allow Pillow to open HEIC files
 
@@ -46,15 +46,15 @@ class Orientation:
         try:
             with Image.open(file) as img:
                 if "exif" not in img.info:
-                    logger.warning(f"No EXIF data in {file}")
+                    log.warning(f"No EXIF data in {file}")
                     return -1
                 exif_info = Common.decode_exif(img.info["exif"])
                 if "Orientation" in exif_info:
                     return EXIF_CW_ANGLE.get(exif_info["Orientation"])
-            logger.warning(f"No 'Orientation' tag in {exif_info=}")
+            log.warning(f"No 'Orientation' tag in {exif_info=}")
             return -1
         except (AttributeError, FileNotFoundError, ValueError) as e:
-            logger.error(e)
+            log.error(e)
             return -1
 
     @staticmethod
@@ -103,7 +103,7 @@ class Orientation:
                 )
                 if len(faces) > 0:
                     return angle_cw
-        logger.warning(f"Found no face in {file}")
+        log.warning(f"Found no face in {file}")
         return -1
 
     @staticmethod
@@ -136,7 +136,7 @@ class Orientation:
             "right": mask[:, 2 * w // 3 :],
         }
         counts = {k: cv2.countNonZero(v) for k, v in regions.items()}
-        logger.info(f"Floor pixels cnt: {counts=}")
+        log.debug(f"Floor pixels cnt: {counts=}")
 
         max_region = max(counts, key=counts.get)
         cw_angle = ROTATION_MAP.get(max_region, -1)
@@ -176,5 +176,5 @@ class Orientation:
             "right": sky_cloud_mask[:, 2 * w // 3 :],
         }
         counts = {k: cv2.countNonZero(v) for k, v in regions.items()}
-        logger.info(f"Sky/Cloud pixels cnt: {counts=}")
+        log.debug(f"Sky/Cloud pixels cnt: {counts=}")
         return ROTATION_MAP.get(max(counts, key=counts.get), -1)

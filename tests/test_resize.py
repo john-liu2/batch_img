@@ -34,21 +34,21 @@ def data_resize_an_image(request):
 
 def test_resize_an_image(data_resize_an_image):
     in_file, out_path, max_side, expected = data_resize_an_image
-    actual = Resize.resize_an_image(in_file, out_path, max_side)
+    actual = Resize.resize_an_image((in_file, out_path, max_side))
     assert actual == expected
 
 
 @pytest.mark.slow(reason="This test modifies test data file.")
 def test_resize_an_image_replace():
     in_path = Path(f"{dirname(__file__)}/data/PNG/Checkmark.PNG")
-    actual = Resize.resize_an_image(in_path, REPLACE, 800)
+    actual = Resize.resize_an_image((in_path, REPLACE, 800))
     assert actual == (True, in_path)
 
 
 @patch("PIL.Image.open")
 def test_error_resize_an_image(mock_open):
     mock_open.side_effect = ValueError("VE")
-    actual = Resize.resize_an_image(Path("in/file"), Path("out/file"), 800)
+    actual = Resize.resize_an_image((Path("in/file"), Path("out/file"), 800))
     assert actual[0] is False
 
 

@@ -18,8 +18,14 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
 ```
-# On Windows.
+# On Windows (PowerShell).
 powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+
+$env:Path = "C:\Users\{your_user_name}\.local\bin:$env:Path"
+
+uv venv
+
+.venv\Scripts\activate
 ```
 
 #### Install the `batch_img` tool

@@ -15,13 +15,13 @@ from pathlib import Path
 import piexif
 import pillow_heif
 import requests
-from loguru import logger
 from packaging import version  # compare versions safely
 from PIL import Image, ImageChops
 from PIL.TiffImagePlugin import IFDRational
 from tqdm import tqdm
 
 from batch_img.const import PATTERNS, REPLACE, TS_FORMAT, VER
+from batch_img.log import log
 
 pillow_heif.register_heif_opener()  # allow Pillow to open HEIC files
 
@@ -40,8 +40,8 @@ class Common:
         try:
             return importlib.metadata.version(pkg_name)
         except (FileNotFoundError, ImportError, ValueError) as e:
-            logger.warning(f"importlib.metadata.version() Error: {e}")
-            logger.debug("Get version from pyproject.toml file")
+            log.warning(f"importlib.metadata.version() Error: {e}")
+            log.debug("Get version from pyproject.toml file")
             pyproject = Path(__file__).parent.parent / "pyproject.toml"
             with open(pyproject, "rb") as f:
                 return tomllib.load(f)["project"][VER]
@@ -61,7 +61,7 @@ class Common:
             response = requests.get(jsn_url, timeout=8)
             if response.status_code != 200:
                 msg = f"⚠️ Error get data from PyPI: {jsn_url}"
-                logger.error(msg)
+                log.error(msg)
                 return msg
 
             latest_ver = response.json()["info"]["version"]
@@ -73,13 +73,13 @@ class Common:
                 )
             else:
                 msg = f"✅ {pkg_name} is up to date ({cur_ver})"
-            logger.info(msg)
+            log.debug(msg)
         except requests.RequestException as e:
             msg = f"requests.get() Exception: {e}"
-            logger.error(msg)
+            log.error(msg)
         except (KeyError, json.JSONDecodeError) as e:
             msg = f"Error parse PyPI response: {e}"
-            logger.error(msg)
+            log.error(msg)
         return msg
 
     @staticmethod
@@ -92,15 +92,15 @@ class Common:
         Returns:
             str
         """
-        logger.info(f"🔄 Updating {pkg_name} ...")
+        log.info(f"🔄 Updating {pkg_name} ...")
         cmd = f"uv pip install --upgrade {pkg_name}"
         try:
             Common.run_cmd(cmd)
             msg = "✅ Update completed."
-            logger.info(msg)
+            log.info(msg)
         except subprocess.CalledProcessError as e:
             msg = f"❌ Failed to update {pkg_name}: {e}"
-            logger.error(msg)
+            log.error(msg)
         return msg
 
     @staticmethod
@@ -113,7 +113,7 @@ class Common:
         Returns:
             tuple: returnCode, StdOut, StdErr
         """
-        logger.debug(f"{cmd=}")
+        log.debug(f"{cmd=}")
         try:
             p = subprocess.run(
                 cmd, capture_output=True, text=True, shell=True, check=True
@@ -121,10 +121,10 @@ class Common:
             r_code = p.returncode
             stdout = p.stdout
             stderr = p.stderr
-            logger.debug(f"'{cmd}'\n {r_code=}\n {stdout=}\n {stderr=}")
+            log.debug(f"'{cmd}'\n {r_code=}\n {stdout=}\n {stderr=}")
             return r_code, stdout, stderr
         except subprocess.CalledProcessError as e:
-            logger.exception(e)
+            log.exception(e)
             raise e
 
     @staticmethod
@@ -195,7 +195,7 @@ class Common:
         _res = {
             k: (v.decode() if isinstance(v, bytes) else v) for k, v in _dict.items()
         }
-        logger.info(f"{_res=}")
+        log.debug(f"{_res=}")
         return _res
 
     @staticmethod
@@ -254,12 +254,8 @@ class Common:
         data1, meta1 = Common.get_image_data(path1)
         data2, meta2 = Common.get_image_data(path2)
 
-        logger.info(
-            f"{path1}:\n{json.dumps(meta1, indent=2, default=Common.jsn_serial)}"
-        )
-        logger.info(
-            f"{path2}:\n{json.dumps(meta2, indent=2, default=Common.jsn_serial)}"
-        )
+        log.debug(f"{path1}:\n{json.dumps(meta1, indent=2, default=Common.jsn_serial)}")
+        log.debug(f"{path2}:\n{json.dumps(meta2, indent=2, default=Common.jsn_serial)}")
         return ImageChops.difference(data1, data2).getbbox() is None
 
     @staticmethod
@@ -314,12 +310,12 @@ class Common:
 
         with Pool(workers) as pool:
             with tqdm(total=files_cnt, desc=desc) as pbar:
-                for ok, res in pool.starmap(func, tasks):
+                for ok, res in pool.imap_unordered(func, tasks):
                     if ok:
                         success_cnt += 1
                     else:
                         tqdm.write(f"Error: {res}")
-                    pbar.update()
+                    pbar.update(1)
         return success_cnt
 
     @staticmethod

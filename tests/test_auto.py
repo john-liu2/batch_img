@@ -98,7 +98,7 @@ def data_do_actions(request):
 @pytest.mark.slow(reason="This test modifies test data file.")
 def test_do_actions(data_do_actions):
     in_path, out_path, expected = data_do_actions
-    actual = Auto.do_actions(in_path, out_path)
+    actual = Auto.do_actions((in_path, out_path))
     assert actual == expected
 
 
