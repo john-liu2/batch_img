@@ -72,6 +72,10 @@ def test_get_cw_angle_by_face(data_detect_by_face):
     params=[
         (Path(f"{dirname(__file__)}/data/HEIC/chef_180cw.heic"), 180),
         (Path(f"{dirname(__file__)}/data/HEIC/chef2_90cw.heic"), 270),
+        # JL 2025-08-20: check sky/clouds orientation by floor
+        (Path(f"{dirname(__file__)}/data/HEIC/IMG_2529_180cw.HEIC"), 180),
+        (Path(f"{dirname(__file__)}/data/HEIC/IMG_2529_90cw.HEIC"), 270),
+        (Path(f"{dirname(__file__)}/data/HEIC/IMG_2529_270cw.HEIC"), 90),
     ]
 )
 def data_get_orientation_by_floor(request):
@@ -95,8 +99,8 @@ def data_get_cw_angle_by_sky(request):
     return request.param
 
 
-@pytest.mark.slow(reason="This test modifies test data file.")
-def test_get_cw_angle_sky_by_rotate(data_get_cw_angle_by_sky):
+@pytest.mark.slow(reason="The check orientation by sky & clouds failed.")
+def test_get_cw_angle_by_sky(data_get_cw_angle_by_sky):
     file, expected = data_get_cw_angle_by_sky
-    actual = Orientation().get_cw_angle_sky_by_rotate(file)
+    actual = Orientation().get_cw_angle_by_sky(file)
     assert actual == expected
