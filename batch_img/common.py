@@ -306,8 +306,7 @@ class Common:
         """
         success_cnt = 0
         files_cnt = len(tasks)
-        # max 4 worker to fix UserWarning: resource_tracker: leaked semaphore objects
-        workers = min(cpu_count(), 4)
+        workers = max(cpu_count(), 4)
 
         with Pool(workers) as pool:
             with tqdm(total=files_cnt, desc=desc) as pbar:
