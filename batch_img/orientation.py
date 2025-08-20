@@ -14,15 +14,11 @@ from batch_img.common import Common
 
 pillow_heif.register_heif_opener()  # allow Pillow to open HEIC files
 
-ORIENTATION_MAP = {
-    1: "normal",
-    2: "mirrored_horizontal",
-    3: "upside_down",
-    4: "mirrored_vertical",
-    5: "rotated_left_mirrored",
-    6: "rotated_left",
-    7: "rotated_right_mirrored",
-    8: "rotated_right",
+ROTATION_MAP = {  # map to the clockwise angle to correct
+    "bottom": 0,
+    "top": 180,
+    "left": 270,  # rotated right
+    "right": 90,  # rotated left
 }
 EXIF_CW_ANGLE = {
     1: 0,
@@ -81,7 +77,7 @@ class Orientation:
         return img
 
     def get_cw_angle_by_face(self, file: Path) -> int:
-        """Detect orientation by face in mage by Haar Cascades:
+        """Get image orientation by face using Haar Cascades:
         * Fastest but least accurate
         * Works best with frontal faces
         * May produce false positives
@@ -105,8 +101,134 @@ class Orientation:
                 faces = face_cascade.detectMultiScale(
                     gray, scaleFactor=1.2, minNeighbors=6
                 )
-                # logger.info(f"{len(faces)=}")
                 if len(faces) > 0:
                     return angle_cw
         logger.warning(f"Found no face in {file}")
         return -1
+
+    @staticmethod
+    def get_orientation_by_floor(file: Path) -> int:
+        """Get image orientation by floor
+
+        Args:
+            file: image file path
+
+        Returns:
+            int: clockwise angle: 0, 90, 180, 270
+        """
+        with Image.open(file) as img:
+            opencv_img = np.array(img)
+            if opencv_img is None:
+                raise ValueError(f"Failed to load {file}")
+
+        # Convert to HSV for color-based floor detection
+        hsv = cv2.cvtColor(opencv_img, cv2.COLOR_BGR2HSV)
+        # Heuristic: floors are often low saturation, medium-low value (gray/brown)
+        lower_floor = np.array([0, 0, 30])
+        upper_floor = np.array([180, 100, 180])
+        mask = cv2.inRange(hsv, lower_floor, upper_floor)
+
+        h, w, _ = opencv_img.shape
+        regions = {  # Divide image into 4 regions
+            "top": mask[0 : h // 3, :],
+            "bottom": mask[2 * h // 3 :, :],
+            "left": mask[:, 0 : w // 3],
+            "right": mask[:, 2 * w // 3 :],
+        }
+        counts = {k: cv2.countNonZero(v) for k, v in regions.items()}
+        logger.info(f"Floor pixels cnt: {counts=}")
+
+        max_region = max(counts, key=counts.get)
+        cw_angle = ROTATION_MAP.get(max_region, -1)
+        return cw_angle
+
+    @staticmethod
+    def get_cw_angle_by_sky(file: Path) -> int:
+        """Get image orientation by sky, clouds
+
+        Args:
+            file: image file path
+
+        Returns:
+            int: clockwise angle: 0, 90, 180, 270
+        """
+        with Image.open(file) as img:
+            opencv_img = np.array(img)
+            if opencv_img is None:
+                raise ValueError(f"Failed to load {file}")
+
+        # Convert to HSV to detect sky (blue-ish) and cloud (white-ish)
+        hsv = cv2.cvtColor(opencv_img, cv2.COLOR_BGR2HSV)
+
+        # sky_lower = np.array([90, 20, 70])
+        # sky_upper = np.array([140, 255, 255])
+        sky_lower = np.array([80, 40, 100])
+        sky_upper = np.array([140, 200, 255])
+
+        # cloud_lower = np.array([0, 0, 180])
+        # cloud_upper = np.array([180, 70, 255])
+        cloud_lower = np.array([0, 0, 180])
+        cloud_upper = np.array([180, 70, 255])
+
+        # Masks
+        sky_mask = cv2.inRange(hsv, sky_lower, sky_upper)
+        cloud_mask = cv2.inRange(hsv, cloud_lower, cloud_upper)
+        sky_cloud_mask = cv2.bitwise_or(sky_mask, cloud_mask)
+
+        h, w, _ = opencv_img.shape
+        regions = {  # Divide image into 4 regions
+            "top": sky_cloud_mask[0 : h // 3, :],
+            "bottom": sky_cloud_mask[2 * h // 3 :, :],
+            "left": sky_cloud_mask[:, 0 : w // 3],
+            "right": sky_cloud_mask[:, 2 * w // 3 :],
+        }
+        counts = {k: cv2.countNonZero(v) for k, v in regions.items()}
+        logger.info(f"Sky/Cloud pixels cnt: {counts=}")
+        return ROTATION_MAP.get(max(counts, key=counts.get), -1)
+
+    @staticmethod
+    def get_sky_score(img):
+        h, _ = img.shape[:2]
+        hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+
+        # Sky: blue range
+        sky_lower = np.array([90, 20, 70])
+        sky_upper = np.array([140, 255, 255])
+
+        # Clouds: low saturation, high value (white)
+        cloud_lower = np.array([0, 0, 180])
+        cloud_upper = np.array([180, 50, 255])
+
+        sky_mask = cv2.inRange(hsv, sky_lower, sky_upper)
+        cloud_mask = cv2.inRange(hsv, cloud_lower, cloud_upper)
+
+        combined_mask = cv2.bitwise_or(sky_mask, cloud_mask)
+
+        # Only consider the top 1/3 region of the image
+        top_region = combined_mask[0 : h // 3, :]
+        score = cv2.countNonZero(top_region)
+        return score
+
+    def get_cw_angle_sky_by_rotate(self, file: Path) -> int:
+        """Get image orientation by sky, clouds
+
+        Args:
+            file: image file path
+
+        Returns:
+            int: clockwise angle: 0, 90, 180, 270
+        """
+        with Image.open(file) as img:
+            opencv_img = np.array(img)
+            if opencv_img is None:
+                raise ValueError(f"Failed to load {file}")
+        scores = {}
+        for angle in [0, 90, 180, 270]:
+            rotated = self._rotate_image(opencv_img, angle)
+            score = self.get_sky_score(rotated)
+            scores[angle] = score
+        logger.info(f"Sky/Cloud: {scores=}")
+
+        # Best orientation is the one with most sky at the top
+        best_angle = max(scores, key=scores.get)
+        return best_angle

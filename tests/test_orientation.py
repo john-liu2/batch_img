@@ -55,6 +55,7 @@ def test_error_exif_orientation_2_cw_angle(mock_open):
         (Path(f"{dirname(__file__)}/data/HEIC/IMG_0070.HEIC"), -1),
         (Path(f"{dirname(__file__)}/data/PNG/LagrangePoints.png"), -1),
         (Path(f"{dirname(__file__)}/data/JPG/152.JPG"), -1),
+        (Path(f"{dirname(__file__)}/data/HEIC/chef2_90cw.heic"), 270),
     ]
 )
 def data_detect_by_face(request):
@@ -64,4 +65,38 @@ def data_detect_by_face(request):
 def test_get_cw_angle_by_face(data_detect_by_face):
     file, expected = data_detect_by_face
     actual = Orientation().get_cw_angle_by_face(file)
+    assert actual == expected
+
+
+@pytest.fixture(
+    params=[
+        (Path(f"{dirname(__file__)}/data/HEIC/chef_180cw.heic"), 180),
+        (Path(f"{dirname(__file__)}/data/HEIC/chef2_90cw.heic"), 270),
+    ]
+)
+def data_get_orientation_by_floor(request):
+    return request.param
+
+
+def test_get_orientation_by_floor(data_get_orientation_by_floor):
+    file, expected = data_get_orientation_by_floor
+    actual = Orientation.get_orientation_by_floor(file)
+    assert actual == expected
+
+
+@pytest.fixture(
+    params=[
+        (Path(f"{dirname(__file__)}/data/HEIC/IMG_2529_180cw.HEIC"), 180),
+        (Path(f"{dirname(__file__)}/data/HEIC/IMG_2529_90cw.HEIC"), 270),
+        (Path(f"{dirname(__file__)}/data/HEIC/IMG_2529_270cw.HEIC"), 90),
+    ]
+)
+def data_get_cw_angle_by_sky(request):
+    return request.param
+
+
+@pytest.mark.slow(reason="This test modifies test data file.")
+def test_get_cw_angle_sky_by_rotate(data_get_cw_angle_by_sky):
+    file, expected = data_get_cw_angle_by_sky
+    actual = Orientation().get_cw_angle_sky_by_rotate(file)
     assert actual == expected

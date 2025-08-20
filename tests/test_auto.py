@@ -1,5 +1,5 @@
-"""Test defaults.py
-pytest -sv tests/test_defaults.py
+"""Test auto.py
+pytest -sv tests/test_auto.py
 Copyright © 2025 John Liu
 """
 
@@ -8,7 +8,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 import pytest
-from batch_img.defaults import Defaults
+from batch_img.auto import Auto
 
 
 @pytest.fixture(
@@ -26,24 +26,23 @@ def data_resize_add_border(request):
 
 def test_resize_add_border(data_resize_add_border):
     in_path, out_path, expected = data_resize_add_border
-    actual = Defaults.resize_add_border(in_path, out_path)
+    actual = Auto.resize_add_border(in_path, out_path)
     assert actual == expected
 
 
 @patch("PIL.Image.open")
 def test_error_resize_add_border(mock_open):
     mock_open.side_effect = ValueError("VE")
-    actual = Defaults.resize_add_border(Path("img/file"), Path("out/path"))
+    actual = Auto.resize_add_border(Path("img/file"), Path("out/path"))
     assert "img/file" in actual[1]
 
 
 @pytest.fixture(
     params=[
-        # JL 2025-08-18: race condition when pytest --cov-report=term --cov=batch_img tests
         # (
-        #     Path(f"{dirname(__file__)}/data/HEIC/chef_orientation_3.heic"),
+        #     Path(f"{dirname(__file__)}/data/HEIC/chef_180cw.heic"),
         #     Path(f"{dirname(__file__)}/.out/"),
-        #     (True, Path(f"{dirname(__file__)}/.out/chef_orientation_3_180cw.heic")),
+        #     (True, Path(f"{dirname(__file__)}/.out/chef_180cw_180cw.heic")),
         # ),
         (
             Path(f"{dirname(__file__)}/data/HEIC/chef_show2.heic"),
@@ -58,7 +57,7 @@ def data_rotate_if_needed(request):
 
 def test_rotate_if_needed(data_rotate_if_needed):
     in_path, out_path, expected = data_rotate_if_needed
-    actual = Defaults.rotate_if_needed(in_path, out_path)
+    actual = Auto.rotate_if_needed(in_path, out_path)
     assert actual == expected
 
 
@@ -80,11 +79,11 @@ def data_do_actions(request):
     return request.param
 
 
-# JL 2025-08-18: race condition when pytest --cov-report=term --cov=batch_img tests
-# def test_do_actions(data_do_actions):
-#     in_path, out_path, expected = data_do_actions
-#     actual = Defaults.do_actions(in_path, out_path)
-#     assert actual == expected
+@pytest.mark.slow(reason="This test modifies test data file.")
+def test_do_actions(data_do_actions):
+    in_path, out_path, expected = data_do_actions
+    actual = Auto.do_actions(in_path, out_path)
+    assert actual == expected
 
 
 @pytest.fixture(
@@ -105,8 +104,8 @@ def data_run_on_all(request):
     return request.param
 
 
-# JL 2025-08-18: race condition when pytest --cov-report=term --cov=batch_img tests
-# def test_run_on_all(data_run_on_all):
-#     in_path, out_path, expected = data_run_on_all
-#     actual = Defaults.run_on_all(in_path, out_path)
-#     assert actual == expected
+@pytest.mark.slow(reason="This test modifies test data file.")
+def test_run_on_all(data_run_on_all):
+    in_path, out_path, expected = data_run_on_all
+    actual = Auto.run_on_all(in_path, out_path)
+    assert actual == expected
