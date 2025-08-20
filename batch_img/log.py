@@ -40,34 +40,34 @@ class Log:
 
         logger.remove()
         config = Log.load_config(f"{dirname(__file__)}/config.json")
-        mode = config.get("mode", "dev").lower()
         level = config.get("level")
-        if mode == "dev":
-            # verbose, colorful
-            logger.add(
-                sys.stderr,
-                level=level,
-                format=(
-                    "<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green> | "
-                    "<level>{level: <8}</level> | "
-                    "<cyan>{name}</cyan>:<cyan>{function}</cyan>:<cyan>{line}</cyan> - "
-                    "<level>{message}</level>"
-                ),
-                backtrace=True,
-                diagnose=True,
+        mode = config.get("mode")
+        if mode.lower() == "dev":
+            logformat = (
+                "<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green> | "
+                "<level>{level: <8}</level> | "
+                "<cyan>{name}</cyan>:<cyan>{function}</cyan>:<cyan>{line}</cyan> - "
+                "<level>{message}</level>"
             )
+            backtrace = True
+            diagnose = True
         else:
             # cleaner output
-            logger.add(
-                sys.stderr,
-                level=level,
-                format="{time:HH:mm:ss} | {level} | {message}",
-                backtrace=False,
-                diagnose=False,
-            )
+            logformat = "{time:HH:mm:ss} | {level} | {message}"
+            backtrace = False
+            diagnose = False
+        logger.add(
+            sys.stderr,
+            level=level,
+            format=logformat,
+            backtrace=backtrace,
+            diagnose=diagnose,
+        )
         Log._file = f"run_{PKG_NAME}_{datetime.now().strftime(TS_FORMAT)}.log"
         log_f = f"{os.getcwd()}/{Log._file}"
-        logger.add(log_f, backtrace=True, diagnose=True, enqueue=True)
+        logger.add(
+            log_f, level=level, format=logformat, backtrace=backtrace, diagnose=diagnose
+        )
         return Log._file
 
 
