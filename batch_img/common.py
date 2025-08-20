@@ -73,7 +73,7 @@ class Common:
                 )
             else:
                 msg = f"✅ {pkg_name} is up to date ({cur_ver})"
-            log.debug(msg)
+            log.info(msg)
         except requests.RequestException as e:
             msg = f"requests.get() Exception: {e}"
             log.error(msg)

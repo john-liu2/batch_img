@@ -12,4 +12,5 @@ python -m build
 
 mv pyproject_dev.toml pyproject.toml
 mv batch_img/config_dev.json batch_img/config.json
+cp -p dist/batch_img*.tar.gz ~/Downloads/
 echo "Build complete: ll dist/*"
