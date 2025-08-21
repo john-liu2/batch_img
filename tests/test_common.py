@@ -16,7 +16,7 @@ from batch_img.const import PKG_NAME, REPLACE
 from .helper import DotDict
 
 
-@pytest.fixture(params=[(PKG_NAME, "0.1.3"), ("", "0.1.3")])
+@pytest.fixture(params=[(PKG_NAME, "0.1.4"), ("", "0.1.4")])
 def ver_data(request):
     return request.param
 
@@ -29,7 +29,7 @@ def test_get_version(ver_data):
 
 @pytest.fixture(
     params=[
-        (PKG_NAME, f"✅ {PKG_NAME} is up to date (0.1.3)"),
+        (PKG_NAME, f"✅ {PKG_NAME} is up to date (0.1.4)"),
         (
             "bad_bogus",
             f"⚠️ Error get data from PyPI: https://pypi.org/pypi/bad_bogus/json",
@@ -298,6 +298,23 @@ def data_get_crop_box(request):
 def test_get_crop_box(data_get_crop_box):
     width, height, border_width, expected = data_get_crop_box
     actual = Common.get_crop_box(width, height, border_width)
+    assert actual == expected
+
+
+@pytest.fixture(
+    params=[
+        (1024, 768, 1280, (1280, 960)),
+        (960, 1280, 1024, (768, 1024)),
+        (640, 480, 1024, (1024, 768)),
+    ]
+)
+def data_calculate_new_size(request):
+    return request.param
+
+
+def test_calculate_new_size(data_calculate_new_size):
+    width, height, max_len, expected = data_calculate_new_size
+    actual = Common.calculate_new_size(width, height, max_len)
     assert actual == expected
 
 

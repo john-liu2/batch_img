@@ -281,6 +281,27 @@ class Common:
         return crop_left, crop_top, crop_right, crop_bottom
 
     @staticmethod
+    def calculate_new_size(width: int, height: int, max_len: int) -> tuple[int, int]:
+        """Calculate the new size with the same aspect ratio
+
+        Args:
+            width: image width int
+            height: image height int
+            max_len: max length int
+
+        Returns:
+            tuple: new_width, new_height
+        """
+        # Calculate to keep aspect ratio
+        if width > height:
+            ratio = max_len / width
+        else:
+            ratio = max_len / height
+        new_width = int(width * ratio)
+        new_height = int(height * ratio)
+        return new_width, new_height
+
+    @staticmethod
     def prepare_all_files(in_path: Path, out_path: Path | str):
         """
 

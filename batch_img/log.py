@@ -15,6 +15,7 @@ from batch_img.const import PKG_NAME, TS_FORMAT
 
 class Log:
     _file = ""
+    _conf = {}
 
     @staticmethod
     def load_config(path):
@@ -39,10 +40,11 @@ class Log:
             return Log._file
 
         logger.remove()
-        config = Log.load_config(f"{dirname(__file__)}/config.json")
-        level = config.get("level")
-        mode = config.get("mode")
-        if mode.lower() == "dev":
+        if not Log._conf:
+            Log._conf = Log.load_config(f"{dirname(__file__)}/config.json")
+        level = Log._conf.get("level")
+        mode = Log._conf.get("mode")
+        if mode == "dev":
             logformat = (
                 "<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green> | "
                 "<level>{level: <8}</level> | "
@@ -79,10 +81,11 @@ class Log:
             logger: for this worker process
         """
         logger.remove()
-        config = Log.load_config(f"{dirname(__file__)}/config.json")
-        level = config.get("level")
-        mode = config.get("mode")
-        if mode.lower() == "dev":
+        if not Log._conf:
+            Log._conf = Log.load_config(f"{dirname(__file__)}/config.json")
+        level = Log._conf.get("level")
+        mode = Log._conf.get("mode")
+        if mode == "dev":
             logformat = (
                 "<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green> | "
                 "<level>{level: <8}</level> | "
