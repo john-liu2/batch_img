@@ -42,7 +42,9 @@ class Resize:
                     ratio = length / height
                 new_width = int(width * ratio)
                 new_height = int(height * ratio)
-                new_img = img.resize((new_width, new_height), Image.Resampling.LANCZOS)
+                new_img = img.resize(
+                    (new_width, new_height), Image.Resampling.LANCZOS, reducing_gap=3
+                )
 
                 # thumbnail() keep the aspect ratio, but shrink only, not enlarge
                 # img.thumbnail((length, length), Image.Resampling.LANCZOS)
