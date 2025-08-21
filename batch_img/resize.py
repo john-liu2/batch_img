@@ -35,16 +35,8 @@ class Resize:
         try:
             with Image.open(in_path) as img:
                 width, height = img.size
-                # Calculate to keep aspect ratio
-                if width > height:
-                    ratio = length / width
-                else:
-                    ratio = length / height
-                new_width = int(width * ratio)
-                new_height = int(height * ratio)
-                new_img = img.resize(
-                    (new_width, new_height), Image.Resampling.LANCZOS, reducing_gap=3
-                )
+                new_size = Common.calculate_new_size(width, height, length)
+                new_img = img.resize(new_size, Image.Resampling.LANCZOS, reducing_gap=3)
 
                 # thumbnail() keep the aspect ratio, but shrink only, not enlarge
                 # img.thumbnail((length, length), Image.Resampling.LANCZOS)

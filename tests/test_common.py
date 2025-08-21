@@ -303,6 +303,23 @@ def test_get_crop_box(data_get_crop_box):
 
 @pytest.fixture(
     params=[
+        (1024, 768, 1280, (1280, 960)),
+        (960, 1280, 1024, (768, 1024)),
+        (640, 480, 1024, (1024, 768)),
+    ]
+)
+def data_calculate_new_size(request):
+    return request.param
+
+
+def test_calculate_new_size(data_calculate_new_size):
+    width, height, max_len, expected = data_calculate_new_size
+    actual = Common.calculate_new_size(width, height, max_len)
+    assert actual == expected
+
+
+@pytest.fixture(
+    params=[
         (
             Path(f"{dirname(__file__)}/data/HEIC/Cartoon.heic"),
             Path(f"{dirname(__file__)}/.out/"),
