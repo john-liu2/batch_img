@@ -3,6 +3,7 @@ pytest -sv tests/test_main.py
 Copyright © 2025 John Liu
 """
 
+from os.path import dirname
 from unittest.mock import patch
 
 import pytest
@@ -45,6 +46,28 @@ def test_resize(
 
 @pytest.fixture(
     params=[
+        (
+            {
+                "src_path": f"{dirname(__file__)}/data/mixed",
+                "output": f"{dirname(__file__)}/.out/",
+                "length": 1024,
+            },
+            True,
+        )
+    ]
+)
+def data_resize_all(request):
+    return request.param
+
+
+def test_resize_all_in_dir(data_resize_all):
+    options, expected = data_resize_all
+    actual = Main.resize(options)
+    assert actual == expected
+
+
+@pytest.fixture(
+    params=[
         ("any", "any", {"src_path": "src/file"}, False),
         ("any", "any", {"src_path": "src/file", "angle": 0}, False),
         ("v_1", "v_2", {"src_path": "src/file", "angle": 90}, "v_2"),
@@ -73,6 +96,28 @@ def test_rotate(
     mock_rotate_1_image.return_value = v_1
     mock_rotate_all_in_dir.return_value = v_2
     mock_check_latest_version.return_value = "ok"
+    actual = Main.rotate(options)
+    assert actual == expected
+
+
+@pytest.fixture(
+    params=[
+        (
+            {
+                "src_path": f"{dirname(__file__)}/data/mixed",
+                "output": f"{dirname(__file__)}/.out/",
+                "angle": 180,
+            },
+            True,
+        )
+    ]
+)
+def data_rotate_all(request):
+    return request.param
+
+
+def test_rotate_all_in_dir(data_rotate_all):
+    options, expected = data_rotate_all
     actual = Main.rotate(options)
     assert actual == expected
 
@@ -115,5 +160,28 @@ def test_border(
     mock_border_1_image.return_value = v_1
     mock_border_all_in_dir.return_value = v_2
     mock_check_latest_version.return_value = "ok"
+    actual = Main.border(options)
+    assert actual == expected
+
+
+@pytest.fixture(
+    params=[
+        (
+            {
+                "src_path": f"{dirname(__file__)}/data/mixed",
+                "output": f"{dirname(__file__)}/.out/",
+                "border_width": 10,
+                "border_color": "red",
+            },
+            True,
+        )
+    ]
+)
+def data_border_all(request):
+    return request.param
+
+
+def test_border_all_in_dir(data_border_all):
+    options, expected = data_border_all
     actual = Main.border(options)
     assert actual == expected

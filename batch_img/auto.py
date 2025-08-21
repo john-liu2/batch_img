@@ -13,7 +13,7 @@ from PIL import Image
 
 from batch_img.common import Common
 from batch_img.const import BD_COLOR, BD_WIDTH, MAX_LENGTH
-from batch_img.log import log
+from batch_img.log import logger
 from batch_img.orientation import Orientation
 from batch_img.rotate import Rotate
 
@@ -42,7 +42,7 @@ class Auto:
 
                 # Add border
                 width, height = img.size
-                log.debug(f"{width=}, {height=}")
+                logger.debug(f"{width=}, {height=}")
                 box = Common.get_crop_box(width, height, BD_WIDTH)
                 cropped_img = img.crop(box)
                 bd_img = Image.new(img.mode, (width, height), BD_COLOR)
@@ -64,7 +64,7 @@ class Auto:
                     bd_img.save(out_file, img.format, optimize=True, exif=exif_bytes)
                 else:
                     bd_img.save(out_file, img.format, optimize=True)
-            log.debug(f"Saved {out_file}")
+            logger.debug(f"Saved {out_file}")
             return True, out_file
         except (AttributeError, FileNotFoundError, ValueError) as e:
             return False, f"{in_path}:\n{e}"
@@ -84,9 +84,9 @@ class Auto:
         # cw_angle = Orientation.exif_orientation_2_cw_angle(in_path)
         # logger.info(f"From exif: {cw_angle=}")
         cw_angle = Orientation.get_orientation_by_floor(in_path)
-        log.debug(f"By face: {cw_angle=}")
+        logger.debug(f"By face: {cw_angle=}")
         if cw_angle in {-1, 0}:
-            log.warning(f"Skip due to bad or 0 clockwise angle: {cw_angle=}")
+            logger.warning(f"Skip due to bad or 0 clockwise angle: {cw_angle=}")
             return False, in_path
         ok, out_file = Rotate.rotate_1_image((in_path, out_path, cw_angle))
         return ok, out_file
@@ -107,6 +107,7 @@ class Auto:
             tuple: bool, str
         """
         in_path, out_path = args
+        Common.set_log_by_process()
         _, file = Auto.rotate_if_needed(in_path, out_path)
         return Auto.resize_add_border(file, out_path)
 
@@ -125,12 +126,12 @@ class Auto:
         tasks = [(f, out_path) for f in image_files]
         files_cnt = len(tasks)
         if files_cnt == 0:
-            log.error(f"No image files at {in_path}")
+            logger.error(f"No image files at {in_path}")
             return False
 
-        log.debug(f"Do auto actions on {files_cnt} files in multiprocess ...")
+        logger.debug(f"Do auto actions on {files_cnt} files in multiprocess ...")
         success_cnt = Common.multiprocess_progress_bar(
-            Auto.do_actions, "Default action on image files", tasks
+            Auto.do_actions, "Auto actions on image files", tasks
         )
-        log.info(f"\nFinished auto actions on {success_cnt}/{files_cnt} files")
+        logger.info(f"\nFinished auto actions on {success_cnt}/{files_cnt} files")
         return True

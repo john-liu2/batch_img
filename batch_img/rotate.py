@@ -11,7 +11,7 @@ from PIL import Image
 
 from batch_img.common import Common
 from batch_img.const import REPLACE
-from batch_img.log import log
+from batch_img.log import logger
 
 pillow_heif.register_heif_opener()  # allow Pillow to open HEIC files
 
@@ -31,6 +31,7 @@ class Rotate:
             tuple: bool, str
         """
         in_path, out_path, angle_cw = args
+        Common.set_log_by_process()
         if angle_cw not in {90, 180, 270}:
             return False, f"Bad {angle_cw=}. Only allow 90, 180, 270"
         try:
@@ -52,14 +53,14 @@ class Rotate:
                     rotated_img = img.transpose(Image.ROTATE_90)
 
                 rotated_img.save(file, img.format, exif=exif_bytes, optimize=True)
-            log.debug(f"Saved ({angle_cw}°) clockwise rotated to {file}")
+            logger.debug(f"Saved ({angle_cw}°) clockwise rotated to {file}")
             if out_path == REPLACE:
                 os.replace(file, in_path)
-                log.debug(f"Replaced {in_path} with the new tmp_file")
+                logger.debug(f"Replaced {in_path} with the new tmp_file")
                 file = in_path
             return True, file
         except (AttributeError, FileNotFoundError, ValueError) as e:
-            log.error(e)
+            logger.error(e)
             return False, f"{in_path}:\n{e}"
 
     @staticmethod
@@ -75,23 +76,23 @@ class Rotate:
             bool: True - Success. False - Error
         """
         if angle_cw not in {90, 180, 270}:
-            log.error(f"Bad {angle_cw=}. Only allow 90, 180, 270")
+            logger.error(f"Bad {angle_cw=}. Only allow 90, 180, 270")
             return False
         image_files = Common.prepare_all_files(in_path, out_path)
         if not image_files:
-            log.error(f"No image files at {in_path}")
+            logger.error(f"No image files at {in_path}")
             return False
         tasks = [(f, out_path, angle_cw) for f in image_files]
         files_cnt = len(tasks)
         if files_cnt == 0:
-            log.error(f"No image files at {in_path}")
+            logger.error(f"No image files at {in_path}")
             return False
 
-        log.debug(f"Rotate {files_cnt} image files in multiprocess ...")
+        logger.debug(f"Rotate {files_cnt} image files in multiprocess ...")
         success_cnt = Common.multiprocess_progress_bar(
             Rotate.rotate_1_image, "Rotate image files", tasks
         )
-        log.info(f"\nSuccessfully rotated {success_cnt}/{files_cnt} files")
+        logger.info(f"\nSuccessfully rotated {success_cnt}/{files_cnt} files")
         return True
 
     @staticmethod
@@ -106,7 +107,7 @@ class Rotate:
             bool: True - Success. False - Error
         """
         if o_val not in {1, 2, 3, 4, 5, 6, 7, 8}:
-            log.error(f"Quit due to bad orientation value: {o_val=}")
+            logger.error(f"Quit due to bad orientation value: {o_val=}")
             return False
         try:
             tmp_file = Path(f"{file.parent}/{file.stem}_tmp{file.suffix}")
@@ -117,10 +118,10 @@ class Rotate:
                 exif_dict["0th"][piexif.ImageIFD.Orientation] = o_val
                 exif_bytes = piexif.dump(exif_dict)
                 img.save(tmp_file, img.format, exif=exif_bytes, optimize=True)
-            log.debug(f"Saved the updated EXIF image to {tmp_file}")
+            logger.debug(f"Saved the updated EXIF image to {tmp_file}")
             os.replace(tmp_file, file)
-            log.debug(f"Replaced {file} with tmp_file")
+            logger.debug(f"Replaced {file} with tmp_file")
             return True
         except (AttributeError, FileNotFoundError, ValueError) as e:
-            log.error(e)
+            logger.error(e)
             return False

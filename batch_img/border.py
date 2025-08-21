@@ -11,7 +11,7 @@ from PIL import Image
 
 from batch_img.common import Common
 from batch_img.const import REPLACE
-from batch_img.log import log
+from batch_img.log import logger
 
 pillow_heif.register_heif_opener()  # allow Pillow to open HEIC files
 
@@ -32,6 +32,7 @@ class Border:
             tuple: bool, str
         """
         in_path, out_path, bd_width, bd_color = args
+        Common.set_log_by_process()
         try:
             with Image.open(in_path) as img:
                 width, height = img.size
@@ -47,14 +48,14 @@ class Border:
                     bd_img.save(file, img.format, optimize=True, exif=exif_bytes)
                 else:
                     bd_img.save(file, img.format, optimize=True)
-            log.debug(f"Saved image with border to {file}")
+            logger.debug(f"Saved image with border to {file}")
             if out_path == REPLACE:
                 os.replace(file, in_path)
-                log.debug(f"Replaced {in_path} with the new tmp_file")
+                logger.debug(f"Replaced {in_path} with the new tmp_file")
                 file = in_path
             return True, file
         except (AttributeError, FileNotFoundError, ValueError) as e:
-            log.error(e)
+            logger.error(e)
             return False, f"{in_path}:\n{e}"
 
     @staticmethod
@@ -74,17 +75,17 @@ class Border:
         """
         image_files = Common.prepare_all_files(in_path, out_path)
         if not image_files:
-            log.error(f"No image files at {in_path}")
+            logger.error(f"No image files at {in_path}")
             return False
         tasks = [(f, out_path, bd_width, bd_color) for f in image_files]
         files_cnt = len(tasks)
         if files_cnt == 0:
-            log.error(f"No image files at {in_path}")
+            logger.error(f"No image files at {in_path}")
             return False
 
-        log.debug(f"Add border to {files_cnt} image files in multiprocess ...")
+        logger.debug(f"Add border to {files_cnt} image files in multiprocess ...")
         success_cnt = Common.multiprocess_progress_bar(
             Border.border_1_image, "Add border to image files", tasks
         )
-        log.info(f"\nSuccessfully added border to {success_cnt}/{files_cnt} files")
+        logger.info(f"\nSuccessfully added border to {success_cnt}/{files_cnt} files")
         return True
