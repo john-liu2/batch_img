@@ -10,7 +10,7 @@ import pillow_heif
 from PIL import Image
 
 from batch_img.common import Common
-from batch_img.log import log
+from batch_img.log import logger
 
 pillow_heif.register_heif_opener()  # allow Pillow to open HEIC files
 
@@ -46,15 +46,15 @@ class Orientation:
         try:
             with Image.open(file) as img:
                 if "exif" not in img.info:
-                    log.warning(f"No EXIF data in {file}")
+                    logger.warning(f"No EXIF data in {file}")
                     return -1
                 exif_info = Common.decode_exif(img.info["exif"])
                 if "Orientation" in exif_info:
                     return EXIF_CW_ANGLE.get(exif_info["Orientation"])
-            log.warning(f"No 'Orientation' tag in {exif_info=}")
+            logger.warning(f"No 'Orientation' tag in {exif_info=}")
             return -1
         except (AttributeError, FileNotFoundError, ValueError) as e:
-            log.error(e)
+            logger.error(e)
             return -1
 
     @staticmethod
@@ -103,7 +103,7 @@ class Orientation:
                 )
                 if len(faces) > 0:
                     return angle_cw
-        log.warning(f"Found no face in {file}")
+        logger.warning(f"Found no face in {file}")
         return -1
 
     @staticmethod
@@ -136,7 +136,7 @@ class Orientation:
             "right": mask[:, 2 * w // 3 :],
         }
         counts = {k: cv2.countNonZero(v) for k, v in regions.items()}
-        log.debug(f"Floor pixels cnt: {counts=}")
+        logger.debug(f"Floor pixels cnt: {counts=}")
 
         max_region = max(counts, key=counts.get)
         cw_angle = ROTATION_MAP.get(max_region, -1)
@@ -176,5 +176,5 @@ class Orientation:
             "right": sky_cloud_mask[:, 2 * w // 3 :],
         }
         counts = {k: cv2.countNonZero(v) for k, v in regions.items()}
-        log.debug(f"Sky/Cloud pixels cnt: {counts=}")
+        logger.debug(f"Sky/Cloud pixels cnt: {counts=}")
         return ROTATION_MAP.get(max(counts, key=counts.get), -1)

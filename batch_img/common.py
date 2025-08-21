@@ -8,7 +8,7 @@ import json
 import subprocess
 import tomllib
 from datetime import datetime
-from multiprocessing import Pool, cpu_count
+from multiprocessing import Pool, cpu_count, current_process
 from os.path import getmtime, getsize
 from pathlib import Path
 
@@ -21,7 +21,7 @@ from PIL.TiffImagePlugin import IFDRational
 from tqdm import tqdm
 
 from batch_img.const import PATTERNS, REPLACE, TS_FORMAT, VER
-from batch_img.log import log
+from batch_img.log import Log, logger
 
 pillow_heif.register_heif_opener()  # allow Pillow to open HEIC files
 
@@ -40,8 +40,8 @@ class Common:
         try:
             return importlib.metadata.version(pkg_name)
         except (FileNotFoundError, ImportError, ValueError) as e:
-            log.warning(f"importlib.metadata.version() Error: {e}")
-            log.debug("Get version from pyproject.toml file")
+            logger.warning(f"importlib.metadata.version() Error: {e}")
+            logger.debug("Get version from pyproject.toml file")
             pyproject = Path(__file__).parent.parent / "pyproject.toml"
             with open(pyproject, "rb") as f:
                 return tomllib.load(f)["project"][VER]
@@ -61,7 +61,7 @@ class Common:
             response = requests.get(jsn_url, timeout=8)
             if response.status_code != 200:
                 msg = f"⚠️ Error get data from PyPI: {jsn_url}"
-                log.error(msg)
+                logger.error(msg)
                 return msg
 
             latest_ver = response.json()["info"]["version"]
@@ -73,13 +73,13 @@ class Common:
                 )
             else:
                 msg = f"✅ {pkg_name} is up to date ({cur_ver})"
-            log.info(msg)
+            logger.info(msg)
         except requests.RequestException as e:
             msg = f"requests.get() Exception: {e}"
-            log.error(msg)
+            logger.error(msg)
         except (KeyError, json.JSONDecodeError) as e:
             msg = f"Error parse PyPI response: {e}"
-            log.error(msg)
+            logger.error(msg)
         return msg
 
     @staticmethod
@@ -92,15 +92,15 @@ class Common:
         Returns:
             str
         """
-        log.info(f"🔄 Updating {pkg_name} ...")
+        logger.info(f"🔄 Updating {pkg_name} ...")
         cmd = f"uv pip install --upgrade {pkg_name}"
         try:
             Common.run_cmd(cmd)
             msg = "✅ Update completed."
-            log.info(msg)
+            logger.info(msg)
         except subprocess.CalledProcessError as e:
             msg = f"❌ Failed to update {pkg_name}: {e}"
-            log.error(msg)
+            logger.error(msg)
         return msg
 
     @staticmethod
@@ -113,7 +113,7 @@ class Common:
         Returns:
             tuple: returnCode, StdOut, StdErr
         """
-        log.debug(f"{cmd=}")
+        logger.debug(f"{cmd=}")
         try:
             p = subprocess.run(
                 cmd, capture_output=True, text=True, shell=True, check=True
@@ -121,10 +121,10 @@ class Common:
             r_code = p.returncode
             stdout = p.stdout
             stderr = p.stderr
-            log.debug(f"'{cmd}'\n {r_code=}\n {stdout=}\n {stderr=}")
+            logger.debug(f"'{cmd}'\n {r_code=}\n {stdout=}\n {stderr=}")
             return r_code, stdout, stderr
         except subprocess.CalledProcessError as e:
-            log.exception(e)
+            logger.exception(e)
             raise e
 
     @staticmethod
@@ -195,7 +195,7 @@ class Common:
         _res = {
             k: (v.decode() if isinstance(v, bytes) else v) for k, v in _dict.items()
         }
-        log.debug(f"{_res=}")
+        logger.debug(f"{_res=}")
         return _res
 
     @staticmethod
@@ -254,9 +254,13 @@ class Common:
         data1, meta1 = Common.get_image_data(path1)
         data2, meta2 = Common.get_image_data(path2)
 
-        log.debug(f"{path1}:\n{json.dumps(meta1, indent=2, default=Common.jsn_serial)}")
-        log.debug(f"{path2}:\n{json.dumps(meta2, indent=2, default=Common.jsn_serial)}")
-        return ImageChops.difference(data1, data2).getbbox() is None
+        s1 = f"{path1}:\n{json.dumps(meta1, indent=2, default=Common.jsn_serial)}"
+        logger.debug(s1)
+        s2 = f"{path2}:\n{json.dumps(meta2, indent=2, default=Common.jsn_serial)}"
+        logger.debug(s2)
+        is_equal = ImageChops.difference(data1, data2).getbbox() is None
+        logger.debug(f"{is_equal=}")
+        return is_equal
 
     @staticmethod
     def get_crop_box(width, height, border_width) -> tuple[float, float, float, float]:
@@ -339,3 +343,14 @@ class Common:
             filename = f"{in_path.stem}_{extra}{in_path.suffix}"
             out_file = Path(f"{out_path}/{filename}")
         return out_file
+
+    @staticmethod
+    def set_log_by_process() -> None:
+        """Do log setting in a worker process.
+        loguru config doesn’t propagate across processes.
+
+        Returns:
+            None
+        """
+        if current_process().name != "MainProcess":
+            Log.set_worker_log()
