@@ -34,17 +34,26 @@ class Resize:
         Common.set_log_by_process()
         try:
             with Image.open(in_path) as img:
-                max_size = (length, length)
-                # The thumbnail() keeps the original aspect ratio
-                img.thumbnail(max_size, Image.Resampling.LANCZOS)
+                width, height = img.size
+                # Calculate to keep aspect ratio
+                if width > height:
+                    ratio = length / width
+                else:
+                    ratio = length / height
+                new_width = int(width * ratio)
+                new_height = int(height * ratio)
+                new_img = img.resize((new_width, new_height), Image.Resampling.LANCZOS)
+
+                # thumbnail() keep the aspect ratio, but shrink only, not enlarge
+                # img.thumbnail((length, length), Image.Resampling.LANCZOS)
 
                 file = Common.set_out_file(in_path, out_path, f"{length}")
                 if "exif" in img.info:
                     exif_dict = piexif.load(img.info["exif"])
                     exif_bytes = piexif.dump(exif_dict)
-                    img.save(file, img.format, optimize=True, exif=exif_bytes)
+                    new_img.save(file, img.format, optimize=True, exif=exif_bytes)
                 else:
-                    img.save(file, img.format, optimize=True)
+                    new_img.save(file, img.format, optimize=True)
             logger.debug(f"Saved resized image to {file}")
             if out_path == REPLACE:
                 os.replace(file, in_path)

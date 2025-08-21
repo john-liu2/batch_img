@@ -3,7 +3,7 @@
 Batch processing (**resize, rotate, add border**) image files (**HEIC, JPG, PNG**) by
 utilizing **[Pillow / PIL](https://github.com/python-pillow/Pillow)** library.
 Resize, rotate, or add border to a single image file or all image files in a folder.
-Tested on macOS.
+Tested on **macOS** and **Windows**.
 
 ### Installation
 

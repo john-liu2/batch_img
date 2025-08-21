@@ -26,6 +26,12 @@ from batch_img.resize import Resize
             1024,
             (True, Path(f"{dirname(__file__)}/.out/Checkmark_1024.PNG")),
         ),
+        (
+            Path(f"{dirname(__file__)}/data/HEIC/Cartoon.heic"),
+            Path(f"{dirname(__file__)}/.out/"),
+            1024,
+            (True, Path(f"{dirname(__file__)}/.out/Cartoon_1024.heic")),
+        ),
     ]
 )
 def data_resize_an_image(request):
