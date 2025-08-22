@@ -31,7 +31,7 @@ def test_get_exif_orientation(data_exif_orientation):
 
 
 @patch("PIL.Image.open")
-def test_error_exif_orientation_2_cw_angle(mock_open):
+def test_error_get_exif_orientation(mock_open):
     mock_open.side_effect = ValueError("VE")
     actual = Orientation.get_exif_orientation(Path("img/file"))
     assert actual == -1
