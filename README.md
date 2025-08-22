@@ -1,6 +1,6 @@
 ## batch_img
 
-Batch processing (**resize, rotate, add border**) image files (**HEIC, JPG, PNG**) by
+Batch processing (**resize, rotate, remove GPS, add border**) image files (**HEIC, JPG, PNG**) by
 utilizing **[Pillow / PIL](https://github.com/python-pillow/Pillow)** library.
 Resize, rotate, or add border to a single image file or all image files in a folder.
 Tested on **macOS** and **Windows**.
@@ -64,6 +64,7 @@ Options:
 
 Commands:
   border  Add internal border to image file(s), not expand the size.
+  no-gps  Remove GPS location info in image file(s).
   resize  Resize image file(s).
   rotate  Rotate image file(s).
 ```
@@ -86,6 +87,20 @@ Options:
   -o, --output TEXT               Output file path. If not specified, replace
                                   the input file.  [default: ""]
   --help                          Show this message and exit.
+```
+
+#### The `no-gps` sub-command CLI options:
+
+```
+✗ batch_img no-gps --help
+Usage: batch_img no-gps [OPTIONS] SRC_PATH
+
+  Remove GPS location info in image file(s).
+
+Options:
+  -o, --output TEXT  Output file path. If not specified, replace the input
+                     file.  [default: ""]
+  --help             Show this message and exit.
 ```
 
 #### The `resize` sub-command CLI options:

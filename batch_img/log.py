@@ -30,23 +30,20 @@ class Log:
             return {}
 
     @staticmethod
-    def init_log_file() -> str:
-        """Set up the unique name log file for each run
+    def _get_settings() -> tuple:
+        """Get log settings from config
 
         Returns:
-            str: log file path
+            tuple
         """
-        if Log._file:  # init only once
-            return Log._file
-
-        logger.remove()
         if not Log._conf:
             Log._conf = Log.load_config(f"{dirname(__file__)}/config.json")
         level = Log._conf.get("level")
         mode = Log._conf.get("mode")
+        to_file = Log._conf.get("to_file")
         if mode == "dev":
             logformat = (
-                "<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green> | "
+                "<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green> | {process} | "
                 "<level>{level: <8}</level> | "
                 "<cyan>{name}</cyan>:<cyan>{function}</cyan>:<cyan>{line}</cyan> - "
                 "<level>{message}</level>"
@@ -58,6 +55,20 @@ class Log:
             logformat = "{time:HH:mm:ss} | {process} | {level} | {message}"
             backtrace = False
             diagnose = False
+        return level, logformat, backtrace, diagnose, to_file
+
+    @staticmethod
+    def init_log_file() -> str:
+        """Set up the unique name log file for each run
+
+        Returns:
+            str: log file path
+        """
+        if Log._file:  # init only once
+            return Log._file
+
+        logger.remove()
+        level, logformat, backtrace, diagnose, to_file = Log._get_settings()
         logger.add(
             sys.stderr,
             level=level,
@@ -65,6 +76,8 @@ class Log:
             backtrace=backtrace,
             diagnose=diagnose,
         )
+        if not to_file:
+            return Log._file
         pid = os.getpid()
         Log._file = f"run_{PKG_NAME}_{pid}_{datetime.now().strftime(TS_FORMAT)}.log"
         log_f = f"{os.getcwd()}/{Log._file}"
@@ -81,34 +94,24 @@ class Log:
             logger: for this worker process
         """
         logger.remove()
-        if not Log._conf:
-            Log._conf = Log.load_config(f"{dirname(__file__)}/config.json")
-        level = Log._conf.get("level")
-        mode = Log._conf.get("mode")
-        if mode == "dev":
-            logformat = (
-                "<green>{time:YYYY-MM-DD HH:mm:ss.SSS}</green> | "
-                "<level>{level: <8}</level> | "
-                "<cyan>{name}</cyan>:<cyan>{function}</cyan>:<cyan>{line}</cyan> - "
-                "<level>{message}</level>"
-            )
-            bktrace = True
-            diag = True
-        else:
-            # prod output
-            logformat = "{time:HH:mm:ss} | {process} | {level} | {message}"
-            bktrace = False
-            diag = False
+        level, logformat, backtrace, diagnose, to_file = Log._get_settings()
         logger.add(
             sys.stderr,
             level=level,
             format=logformat,
-            backtrace=bktrace,
-            diagnose=diag,
+            backtrace=backtrace,
+            diagnose=diagnose,
         )
-        # JL 2025-08-20: skip due to too many run_{pid}_batch_img_*.log files
-        # f = f"run_{os.getpid()}_{PKG_NAME}_{datetime.now().strftime(TS_FORMAT)}.log"
-        # logger.add(
-        #     f, level=level, format=logformat, backtrace=bktrace, diagnose=diag
-        # )
+        # Not log to file in prod: too many run_{pid}_batch_img_*.log files
+        if not to_file:
+            return logger
+        f = f"run_{os.getpid()}_{PKG_NAME}_{datetime.now().strftime(TS_FORMAT)}.log"
+        log_file = f"{os.getcwd()}/{f}"
+        logger.add(
+            log_file,
+            level=level,
+            format=logformat,
+            backtrace=backtrace,
+            diagnose=diagnose,
+        )
         return logger

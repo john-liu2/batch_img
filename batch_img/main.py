@@ -9,11 +9,64 @@ from batch_img.border import Border
 from batch_img.common import Common
 from batch_img.const import PKG_NAME, REPLACE
 from batch_img.log import Log, logger
+from batch_img.no_gps import NoGps
 from batch_img.resize import Resize
 from batch_img.rotate import Rotate
 
 
 class Main:
+    @staticmethod
+    def border(options: dict) -> bool:
+        """Add border to the image file(s)
+
+        Args:
+            options: input options dict
+
+        Returns:
+            bool: True - Success. False - Error
+        """
+        Log.init_log_file()
+        logger.debug(f"{json.dumps(options, indent=2)}")
+        in_path = Path(options["src_path"])
+        bd_width = options.get("border_width")
+        if not bd_width or bd_width == 0:
+            logger.error(f"Bad border width: {bd_width=}")
+            return False
+        bd_color = options.get("border_color")
+        if not bd_color:
+            logger.error(f"Bad border color: {bd_color=}")
+            return False
+        output = options.get("output")
+        out = Path(output) if output else REPLACE
+        if in_path.is_file():
+            ok, _ = Border.border_1_image((in_path, out, bd_width, bd_color))
+        else:
+            ok = Border.border_all_in_dir(in_path, out, bd_width, bd_color)
+        Common.check_latest_version(PKG_NAME)
+        return ok
+
+    @staticmethod
+    def no_gps(options) -> bool:
+        """Remove GPS location info in image file(s)
+
+        Args:
+            options: input options dict
+
+        Returns:
+            bool: True - Success. False - Error
+        """
+        Log.init_log_file()
+        logger.debug(f"{json.dumps(options, indent=2)}")
+        in_path = Path(options["src_path"])
+        output = options.get("output")
+        out = Path(output) if output else REPLACE
+        if in_path.is_file():
+            ok, _ = NoGps.remove_1_image_gps((in_path, out))
+        else:
+            ok = NoGps.remove_all_images_gps(in_path, out)
+        Common.check_latest_version(PKG_NAME)
+        return ok
+
     @staticmethod
     def resize(options: dict) -> bool:
         """Resize the image file(s)
@@ -63,35 +116,5 @@ class Main:
             ok, _ = Rotate.rotate_1_image((in_path, out, angle))
         else:
             ok = Rotate.rotate_all_in_dir(in_path, out, angle)
-        Common.check_latest_version(PKG_NAME)
-        return ok
-
-    @staticmethod
-    def border(options: dict) -> bool:
-        """Add border to the image file(s)
-
-        Args:
-            options: input options dict
-
-        Returns:
-            bool: True - Success. False - Error
-        """
-        Log.init_log_file()
-        logger.debug(f"{json.dumps(options, indent=2)}")
-        in_path = Path(options["src_path"])
-        bd_width = options.get("border_width")
-        if not bd_width or bd_width == 0:
-            logger.error(f"Bad border width: {bd_width=}")
-            return False
-        bd_color = options.get("border_color")
-        if not bd_color:
-            logger.error(f"Bad border color: {bd_color=}")
-            return False
-        output = options.get("output")
-        out = Path(output) if output else REPLACE
-        if in_path.is_file():
-            ok, _ = Border.border_1_image((in_path, out, bd_width, bd_color))
-        else:
-            ok = Border.border_all_in_dir(in_path, out, bd_width, bd_color)
         Common.check_latest_version(PKG_NAME)
         return ok

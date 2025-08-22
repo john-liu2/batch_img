@@ -61,6 +61,26 @@ def border(src_path, border_width, border_color, output):
     click.secho(msg)
 
 
+@cli.command(help="Remove GPS location info in image file(s).")
+@click.argument(
+    "src_path",
+    required=True,
+)
+@click.option(
+    "-o",
+    "--output",
+    default="",
+    show_default=True,
+    type=str,
+    help="Output file path. If not specified, replace the input file.",
+)
+def no_gps(src_path, output):
+    options = {"src_path": src_path, "output": output}
+    res = Main.no_gps(options)
+    msg = MSG_OK if res else MSG_BAD
+    click.secho(msg)
+
+
 @cli.command(help="Resize image file(s).")
 @click.argument(
     "src_path",

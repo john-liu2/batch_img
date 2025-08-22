@@ -9,7 +9,7 @@ import pytest
 from click.testing import CliRunner
 
 from batch_img.const import MSG_OK, MSG_BAD
-from batch_img.interface import border, resize, rotate
+from batch_img.interface import border, no_gps, resize, rotate
 
 
 @pytest.fixture(
@@ -48,6 +48,29 @@ def test_error_border(mock_add_border, data_error_border):
     result = runner.invoke(border, args=_input.split())
     print(result.output)
     assert result.exception
+
+
+@pytest.fixture(
+    params=[
+        ("src_path -o out/dir", True, MSG_OK),
+        ("img/file --output out/file", False, MSG_BAD),
+        ("src_path", True, MSG_OK),
+    ]
+)
+def data_no_gps(request):
+    return request.param
+
+
+@patch("batch_img.main.Main.no_gps")
+def test_resize(mock_resize, data_no_gps):
+    _input, res, expected = data_no_gps
+    mock_resize.return_value = res
+    expected += "\n"
+    runner = CliRunner()
+    result = runner.invoke(no_gps, args=_input.split())
+    print(result.output)
+    assert not result.exception
+    assert result.output == expected
 
 
 @pytest.fixture(
