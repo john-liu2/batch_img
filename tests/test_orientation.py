@@ -18,15 +18,6 @@ from batch_img.orientation import Orientation, EXIF_CW_ANGLE
         (Path(f"{dirname(__file__)}/data/JPG/P1040566.jpeg"), -1),
         (Path(f"{dirname(__file__)}/data/PNG/LagrangePoints.png"), -1),
         (Path(f"{dirname(__file__)}/data/HEIC/Cartoon.heic"), EXIF_CW_ANGLE[1]),
-        # JL 2025-08-18: the below two cases got 'Orientation': 1
-        # (
-        #     Path(f"{dirname(__file__)}/data/HEIC/chef_orientation_3.heic"),
-        #     EXIF_CW_ANGLE[3],
-        # ),
-        # (
-        #     Path(f"{dirname(__file__)}/data/HEIC/chef_orientation_8.heic"),
-        #     EXIF_CW_ANGLE[8],
-        # ),
     ]
 )
 def data_exif_orientation(request):

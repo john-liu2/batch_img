@@ -139,6 +139,7 @@ class Orientation:
         logger.debug(f"Floor pixels cnt: {counts=}")
 
         max_region = max(counts, key=counts.get)
+        logger.debug(f"{max_region=}, {file.name}")
         return ROTATION_MAP.get(max_region)
 
     @staticmethod

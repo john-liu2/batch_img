@@ -145,11 +145,30 @@ class Common:
         return res
 
     @staticmethod
-    def decode_exif(exif_data: str) -> dict:
+    def remove_exif_gps(exif_data: bytes) -> tuple:
+        """Remove GPS info from the EXIF data
+
+        Args:
+            exif_data: bytes
+
+        Returns:
+            tuple: bool, bytes
+        """
+        exif_dict = piexif.load(exif_data)
+        if "GPS" in exif_dict and exif_dict["GPS"]:
+            exif_dict.pop("GPS")
+            exif_bytes = piexif.dump(exif_dict)
+            logger.debug("Removed GPS info in EXIF")
+            return True, exif_bytes
+        logger.debug("No GPS in EXIF")
+        return False, exif_data
+
+    @staticmethod
+    def decode_exif(exif_data: bytes) -> dict:
         """Decode the EXIF data
 
         Args:
-            exif_data: str
+            exif_data: bytes
 
         Returns:
             dict
@@ -180,7 +199,6 @@ class Common:
         keys = list(_dict.keys())
         for keyword in (
             "DateTime",
-            "GPS",
             "OffsetTime",
             "SubSecTime",
             "Tile",
@@ -344,7 +362,7 @@ class Common:
         return success_cnt
 
     @staticmethod
-    def set_out_file(in_path: Path, out_path: Path, extra: str) -> Path:
+    def set_out_file(in_path: Path, out_path: Path, extra: str = "") -> Path:
         """Set the output file path
 
         Args:
