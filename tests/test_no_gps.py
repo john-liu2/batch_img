@@ -23,11 +23,11 @@ from batch_img.no_gps import NoGps, REPLACE
             ),
         ),
         (
-            Path(f"{dirname(__file__)}/data/HEIC/IMG_0131_NoGPS.HEIC"),
+            Path(f"{dirname(__file__)}/data/HEIC/IMG_0131.HEIC"),
             Path(f"{dirname(__file__)}/.out/"),
             (
                 True,
-                f"No 'GPS' in EXIF of {dirname(__file__)}/data/HEIC/IMG_0131_NoGPS.HEIC",
+                f"No 'GPS' in EXIF of {dirname(__file__)}/data/HEIC/IMG_0131.HEIC",
             ),
         ),
     ]

@@ -92,6 +92,7 @@ class Common:
         Returns:
             str
         """
+        Log.init_log_file()
         logger.info(f"🔄 Updating {pkg_name} ...")
         cmd = f"uv pip install --upgrade {pkg_name}"
         try:
@@ -332,27 +333,29 @@ class Common:
         """
         if out_path != REPLACE:
             out_path.mkdir(parents=True, exist_ok=True)
-        _files = itertools.chain.from_iterable(in_path.glob(p) for p in PATTERNS)
+        # Fix Path.glob() got 2x count on Windows 10
+        tmp = [in_path.glob(p, case_sensitive=True) for p in PATTERNS]
+        _files = itertools.chain.from_iterable(set(tmp))
         return _files
 
     @staticmethod
-    def multiprocess_progress_bar(func, desc, tasks: list) -> int:
+    def multiprocess_progress_bar(func, desc: str, all_cnt: int, tasks: list) -> int:
         """Run task in multiprocess with progress bar
 
         Args:
             func: function to be run in multiprocess
             desc: description str
+            all_cnt: all tasks cnt int
             tasks: tasks list for multiprocess pool
 
         Returns:
             int: success_cnt
         """
         success_cnt = 0
-        files_cnt = len(tasks)
         workers = max(cpu_count(), 4)
 
         with Pool(workers) as pool:
-            with tqdm(total=files_cnt, desc=desc) as pbar:
+            with tqdm(total=all_cnt, desc=desc) as pbar:
                 for ok, res in pool.imap_unordered(func, tasks):
                     if ok:
                         success_cnt += 1

@@ -79,9 +79,6 @@ class Rotate:
             logger.error(f"Bad {angle_cw=}. Only allow 90, 180, 270")
             return False
         image_files = Common.prepare_all_files(in_path, out_path)
-        if not image_files:
-            logger.error(f"No image files at {in_path}")
-            return False
         tasks = [(f, out_path, angle_cw) for f in image_files]
         files_cnt = len(tasks)
         if files_cnt == 0:
@@ -90,38 +87,7 @@ class Rotate:
 
         logger.debug(f"Rotate {files_cnt} image files in multiprocess ...")
         success_cnt = Common.multiprocess_progress_bar(
-            Rotate.rotate_1_image, "Rotate image files", tasks
+            Rotate.rotate_1_image, "Rotate image files", files_cnt, tasks
         )
         logger.info(f"\nSuccessfully rotated {success_cnt}/{files_cnt} files")
         return True
-
-    @staticmethod
-    def set_exif_orientation(file: Path, o_val: int) -> bool:
-        """Set orientation in the EXIF of an image file
-
-        Args:
-            file: image file path
-            o_val: orientation value int
-
-        Returns:
-            bool: True - Success. False - Error
-        """
-        if o_val not in {1, 2, 3, 4, 5, 6, 7, 8}:
-            logger.error(f"Quit due to bad orientation value: {o_val=}")
-            return False
-        try:
-            tmp_file = Path(f"{file.parent}/{file.stem}_tmp{file.suffix}")
-            with Image.open(file) as img:
-                exif_dict = {"0th": {}, "Exif": {}}
-                if "exif" in img.info:
-                    exif_dict = piexif.load(img.info["exif"])
-                exif_dict["0th"][piexif.ImageIFD.Orientation] = o_val
-                exif_bytes = piexif.dump(exif_dict)
-                img.save(tmp_file, img.format, exif=exif_bytes, optimize=True)
-            logger.debug(f"Saved the updated EXIF image to {tmp_file}")
-            os.replace(tmp_file, file)
-            logger.debug(f"Replaced {file} with tmp_file")
-            return True
-        except (AttributeError, FileNotFoundError, ValueError) as e:
-            logger.error(e)
-            return False

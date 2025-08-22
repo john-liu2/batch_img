@@ -73,9 +73,6 @@ class Resize:
             bool: True - Success. False - Error
         """
         image_files = Common.prepare_all_files(in_path, out_path)
-        if not image_files:
-            logger.error(f"No image files at {in_path}")
-            return False
         tasks = [(f, out_path, length) for f in image_files]
         files_cnt = len(tasks)
         if files_cnt == 0:
@@ -84,7 +81,7 @@ class Resize:
 
         logger.debug(f"Resize {files_cnt} image files in multiprocess ...")
         success_cnt = Common.multiprocess_progress_bar(
-            Resize.resize_an_image, "Resize image files", tasks
+            Resize.resize_an_image, "Resize image files", files_cnt, tasks
         )
         logger.info(f"\nSuccessfully resized {success_cnt}/{files_cnt} files")
         return True

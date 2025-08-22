@@ -131,7 +131,7 @@ class Auto:
 
         logger.debug(f"Do auto actions on {files_cnt} files in multiprocess ...")
         success_cnt = Common.multiprocess_progress_bar(
-            Auto.do_actions, "Auto actions on image files", tasks
+            Auto.do_actions, "Auto actions on image files", files_cnt, tasks
         )
         logger.info(f"\nFinished auto actions on {success_cnt}/{files_cnt} files")
         return True

@@ -74,9 +74,6 @@ class Border:
             bool: True - Success. False - Error
         """
         image_files = Common.prepare_all_files(in_path, out_path)
-        if not image_files:
-            logger.error(f"No image files at {in_path}")
-            return False
         tasks = [(f, out_path, bd_width, bd_color) for f in image_files]
         files_cnt = len(tasks)
         if files_cnt == 0:
@@ -85,7 +82,7 @@ class Border:
 
         logger.debug(f"Add border to {files_cnt} image files in multiprocess ...")
         success_cnt = Common.multiprocess_progress_bar(
-            Border.border_1_image, "Add border to image files", tasks
+            Border.border_1_image, "Add border to image files", files_cnt, tasks
         )
         logger.info(f"\nSuccessfully added border to {success_cnt}/{files_cnt} files")
         return True
