@@ -129,7 +129,7 @@ class Orientation:
         mask = cv2.inRange(hsv, lower_floor, upper_floor)
 
         h, w, _ = opencv_img.shape
-        regions = {  # Divide image into 4 regions
+        regions = {
             "top": mask[0 : h // 3, :],
             "bottom": mask[2 * h // 3 :, :],
             "left": mask[:, 0 : w // 3],
@@ -158,14 +158,8 @@ class Orientation:
                 raise ValueError(f"Failed to load {file}")
 
         hsv = cv2.cvtColor(opencv_img, cv2.COLOR_BGR2HSV)
-        sky_lower = np.array([90, 20, 70])
-        sky_upper = np.array([140, 255, 255])
-
-        cloud_lower = np.array([0, 0, 180])
-        cloud_upper = np.array([180, 70, 255])
-
-        sky_mask = cv2.inRange(hsv, sky_lower, sky_upper)
-        cloud_mask = cv2.inRange(hsv, cloud_lower, cloud_upper)
+        sky_mask = cv2.inRange(hsv, np.array([90, 20, 70]), np.array([140, 255, 255]))
+        cloud_mask = cv2.inRange(hsv, np.array([0, 0, 180]), np.array([180, 70, 255]))
         sky_cloud_mask = cv2.bitwise_or(sky_mask, cloud_mask)
 
         h, w, _ = opencv_img.shape
@@ -176,5 +170,7 @@ class Orientation:
             "right": sky_cloud_mask[:, 2 * w // 3 :],
         }
         counts = {k: cv2.countNonZero(v) for k, v in regions.items()}
-        logger.debug(f"Sky/Cloud pixels cnt: {counts=}")
-        return ROTATION_MAP.get(max(counts, key=counts.get), -1)
+        logger.debug(f"Sky / Cloud: {counts=}")
+        max_region = max(counts, key=counts.get)
+        logger.debug(f"{max_region=}, {file.name}")
+        return ROTATION_MAP.get(max_region, -1)

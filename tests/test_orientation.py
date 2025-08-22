@@ -71,11 +71,18 @@ def test_get_cw_angle_by_face(data_detect_by_face):
 @pytest.fixture(
     params=[
         (Path(f"{dirname(__file__)}/data/HEIC/chef_180cw.heic"), 180),
+        (Path(f"{dirname(__file__)}/data/HEIC/chef_90cw.heic"), 270),
+        (Path(f"{dirname(__file__)}/data/HEIC/chef_270cw.heic"), 90),
+        (Path(f"{dirname(__file__)}/data/HEIC/chef2_180cw.heic"), 180),
         (Path(f"{dirname(__file__)}/data/HEIC/chef2_90cw.heic"), 270),
+        (Path(f"{dirname(__file__)}/data/HEIC/chef2_270cw.heic"), 90),
         # JL 2025-08-20: check sky/clouds orientation by floor
         (Path(f"{dirname(__file__)}/data/HEIC/IMG_2529_180cw.HEIC"), 180),
         (Path(f"{dirname(__file__)}/data/HEIC/IMG_2529_90cw.HEIC"), 270),
         (Path(f"{dirname(__file__)}/data/HEIC/IMG_2529_270cw.HEIC"), 90),
+        (Path(f"{dirname(__file__)}/data/HEIC/IMG_2530_180cw.HEIC"), 180),
+        (Path(f"{dirname(__file__)}/data/HEIC/IMG_2530_90cw.HEIC"), 270),
+        (Path(f"{dirname(__file__)}/data/HEIC/IMG_2530_270cw.HEIC"), 90),
     ]
 )
 def data_get_orientation_by_floor(request):
@@ -90,16 +97,18 @@ def test_get_orientation_by_floor(data_get_orientation_by_floor):
 
 @pytest.fixture(
     params=[
-        (Path(f"{dirname(__file__)}/data/HEIC/IMG_2529_180cw.HEIC"), 180),
-        (Path(f"{dirname(__file__)}/data/HEIC/IMG_2529_90cw.HEIC"), 270),
-        (Path(f"{dirname(__file__)}/data/HEIC/IMG_2529_270cw.HEIC"), 90),
+        (Path(f"{dirname(__file__)}/data/HEIC/IMG_2527_180cw.HEIC"), 180),
+        (Path(f"{dirname(__file__)}/data/HEIC/IMG_2527_90cw.HEIC"), 270),
+        (Path(f"{dirname(__file__)}/data/HEIC/IMG_2527_270cw.HEIC"), 90),
+        (Path(f"{dirname(__file__)}/data/HEIC/IMG_2530_180cw.HEIC"), 180),
+        (Path(f"{dirname(__file__)}/data/HEIC/IMG_2530_90cw.HEIC"), 270),
+        (Path(f"{dirname(__file__)}/data/HEIC/IMG_2530_270cw.HEIC"), 90),
     ]
 )
 def data_get_cw_angle_by_sky(request):
     return request.param
 
 
-@pytest.mark.slow(reason="The check orientation by sky & clouds failed.")
 def test_get_cw_angle_by_sky(data_get_cw_angle_by_sky):
     file, expected = data_get_cw_angle_by_sky
     actual = Orientation().get_cw_angle_by_sky(file)
