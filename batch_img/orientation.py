@@ -139,8 +139,7 @@ class Orientation:
         logger.debug(f"Floor pixels cnt: {counts=}")
 
         max_region = max(counts, key=counts.get)
-        cw_angle = ROTATION_MAP.get(max_region, -1)
-        return cw_angle
+        return ROTATION_MAP.get(max_region)
 
     @staticmethod
     def get_cw_angle_by_sky(file: Path) -> int:
@@ -173,4 +172,4 @@ class Orientation:
         logger.debug(f"Sky / Cloud: {counts=}")
         max_region = max(counts, key=counts.get)
         logger.debug(f"{max_region=}, {file.name}")
-        return ROTATION_MAP.get(max_region, -1)
+        return ROTATION_MAP.get(max_region)
