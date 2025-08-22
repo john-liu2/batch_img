@@ -91,34 +91,3 @@ class Rotate:
         )
         logger.info(f"\nSuccessfully rotated {success_cnt}/{files_cnt} files")
         return True
-
-    @staticmethod
-    def set_exif_orientation(file: Path, o_val: int) -> bool:
-        """Set orientation in the EXIF of an image file
-
-        Args:
-            file: image file path
-            o_val: orientation value int
-
-        Returns:
-            bool: True - Success. False - Error
-        """
-        if o_val not in {1, 2, 3, 4, 5, 6, 7, 8}:
-            logger.error(f"Quit due to bad orientation value: {o_val=}")
-            return False
-        try:
-            tmp_file = Path(f"{file.parent}/{file.stem}_tmp{file.suffix}")
-            with Image.open(file) as img:
-                exif_dict = {"0th": {}, "Exif": {}}
-                if "exif" in img.info:
-                    exif_dict = piexif.load(img.info["exif"])
-                exif_dict["0th"][piexif.ImageIFD.Orientation] = o_val
-                exif_bytes = piexif.dump(exif_dict)
-                img.save(tmp_file, img.format, exif=exif_bytes, optimize=True)
-            logger.debug(f"Saved the updated EXIF image to {tmp_file}")
-            os.replace(tmp_file, file)
-            logger.debug(f"Replaced {file} with tmp_file")
-            return True
-        except (AttributeError, FileNotFoundError, ValueError) as e:
-            logger.error(e)
-            return False

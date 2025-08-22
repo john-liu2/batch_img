@@ -100,20 +100,3 @@ def test_rotate_all_in_dir(data_rotate_all_in_dir):
     in_path, out_path, angle_cw, expected = data_rotate_all_in_dir
     actual = Rotate.rotate_all_in_dir(in_path, out_path, angle_cw)
     assert actual == expected
-
-
-@pytest.fixture(
-    params=[
-        (Path(f"{dirname(__file__)}/data/HEIC/chef_orientation_3.heic"), 3, True),
-        (Path(f"{dirname(__file__)}/data/HEIC/chef_orientation_8.heic"), 8, True),
-    ]
-)
-def data_set_exif_orientation(request):
-    return request.param
-
-
-@pytest.mark.slow(reason="This test modifies test data file.")
-def test_set_exif_orientation(data_set_exif_orientation):
-    file, o_val, expected = data_set_exif_orientation
-    actual = Rotate.set_exif_orientation(file, o_val)
-    assert actual == expected

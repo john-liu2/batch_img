@@ -2,10 +2,12 @@
 Copyright © 2025 John Liu
 """
 
+import os
 from pathlib import Path
 
 import cv2
 import numpy as np
+import piexif
 import pillow_heif
 from PIL import Image
 
@@ -20,6 +22,7 @@ ROTATION_MAP = {  # map to the clockwise angle to correct
     "left": 270,  # rotated right
     "right": 90,  # rotated left
 }
+THRESHOLD = 0.8
 EXIF_CW_ANGLE = {
     1: 0,
     2: 0,
@@ -34,14 +37,14 @@ EXIF_CW_ANGLE = {
 
 class Orientation:
     @staticmethod
-    def exif_orientation_2_cw_angle(file: Path) -> int:
-        """Get image orientation by EXIF data
+    def get_exif_orientation(file: Path) -> int:
+        """Get image orientation in EXIF data
 
         Args:
             file: image file path
 
         Returns:
-            int: clockwise angle: 0, 90, 180, 270
+            int: clockwise angle: 0, 90, 180, 270 or -1
         """
         try:
             with Image.open(file) as img:
@@ -56,6 +59,78 @@ class Orientation:
         except (AttributeError, FileNotFoundError, ValueError) as e:
             logger.error(e)
             return -1
+
+    @staticmethod
+    def set_exif_orientation(file: Path, o_val: int) -> bool:
+        """Set orientation in the EXIF of an image file
+
+        Args:
+            file: image file path
+            o_val: orientation value int
+
+        Returns:
+            bool: True - Success. False - Error
+        """
+        if o_val not in {1, 2, 3, 4, 5, 6, 7, 8}:
+            logger.error(f"Quit due to bad orientation value: {o_val=}")
+            return False
+        try:
+            tmp_file = Path(f"{file.parent}/{file.stem}_tmp{file.suffix}")
+            with Image.open(file) as img:
+                exif_dict = {"0th": {}, "Exif": {}}
+                if "exif" in img.info:
+                    exif_dict = piexif.load(img.info["exif"])
+                exif_dict["0th"][piexif.ImageIFD.Orientation] = o_val
+                exif_bytes = piexif.dump(exif_dict)
+                img.save(tmp_file, img.format, exif=exif_bytes, optimize=True)
+            logger.debug(f"Saved the updated EXIF image to {tmp_file}")
+            os.replace(tmp_file, file)
+            logger.debug(f"Replaced {file} with tmp_file")
+            return True
+        except (AttributeError, FileNotFoundError, ValueError) as e:
+            logger.error(e)
+            return False
+
+    @staticmethod
+    def get_floor_score(img):
+        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        h = gray.shape[0]
+        top, bottom = gray[: h // 3], gray[-h // 3 :]
+
+        edges = cv2.Canny(gray, 50, 150)
+        top_e, bot_e = edges[: h // 3], edges[-h // 3 :]
+        edge_diff = np.mean(bot_e) - np.mean(top_e)
+        brightness_diff = np.mean(bottom) - np.mean(top)
+
+        score = edge_diff + brightness_diff
+        confidence = 1 / (1 + np.exp(-score / 20))  # by sigmoid
+        return round(float(confidence), 3)
+
+    def detect_floor_by_edge(self, file: Path) -> tuple:
+        """Get image orientation by floor edge
+
+        Args:
+            file: image file path
+
+        Returns:
+            tuple: clockwise angle to correct, confidence as float
+        """
+        scores = {}
+        with Image.open(file) as safe_img:
+            opencv_img = np.array(safe_img)
+            if opencv_img is None:
+                raise ValueError(f"Failed to load {file}")
+        for angle_cw in (0, 90, 180, 270):
+            img = self._rotate_image(opencv_img, angle_cw)
+            scores[angle_cw] = self.get_floor_score(img)
+        logger.debug(f"{scores=}")
+        best_angle = max(scores, key=scores.get)
+        score = scores[best_angle]
+        logger.debug(f"{best_angle=}, {score=}")
+        if score < THRESHOLD:
+            logger.warning(f"{score=} is less than {THRESHOLD=}")
+            return -1, score
+        return best_angle, score
 
     @staticmethod
     def _rotate_image(img, angle: int):

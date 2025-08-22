@@ -24,17 +24,56 @@ def data_exif_orientation(request):
     return request.param
 
 
-def test_exif_orientation_2_cw_angle(data_exif_orientation):
+def test_get_exif_orientation(data_exif_orientation):
     file, expected = data_exif_orientation
-    actual = Orientation.exif_orientation_2_cw_angle(file)
+    actual = Orientation.get_exif_orientation(file)
     assert actual == expected
 
 
 @patch("PIL.Image.open")
 def test_error_exif_orientation_2_cw_angle(mock_open):
     mock_open.side_effect = ValueError("VE")
-    actual = Orientation.exif_orientation_2_cw_angle(Path("img/file"))
+    actual = Orientation.get_exif_orientation(Path("img/file"))
     assert actual == -1
+
+
+@pytest.fixture(
+    params=[
+        (Path(f"{dirname(__file__)}/data/PNG/Checkmark.PNG"), 3, True),
+        (Path(f"{dirname(__file__)}/data/PNG/LagrangePoints.png"), 8, True),
+    ]
+)
+def data_set_exif_orientation(request):
+    return request.param
+
+
+@pytest.mark.slow(reason="This test modifies test data file.")
+def test_set_exif_orientation(data_set_exif_orientation):
+    file, o_val, expected = data_set_exif_orientation
+    actual = Orientation.set_exif_orientation(file, o_val)
+    assert actual == expected
+
+
+@pytest.fixture(
+    params=[
+        (Path(f"{dirname(__file__)}/data/HEIC/IMG_0131.HEIC"), 270),
+        (Path(f"{dirname(__file__)}/data/HEIC/chef_180cw.heic"), 180),
+        (Path(f"{dirname(__file__)}/data/HEIC/chef_90cw.heic"), 270),
+        (Path(f"{dirname(__file__)}/data/HEIC/chef_270cw.heic"), 90),
+        (Path(f"{dirname(__file__)}/data/HEIC/chef2_180cw.heic"), 180),
+        (Path(f"{dirname(__file__)}/data/HEIC/chef2_90cw.heic"), 270),
+        (Path(f"{dirname(__file__)}/data/HEIC/chef2_270cw.heic"), 90),
+        (Path(f"{dirname(__file__)}/data/HEIC/Cartoon.heic"), -1),
+    ]
+)
+def data_detect_floor_by_edge(request):
+    return request.param
+
+
+def test_detect_floor_by_edge(data_detect_floor_by_edge):
+    file, expected = data_detect_floor_by_edge
+    actual = Orientation().detect_floor_by_edge(file)
+    assert actual[0] == expected
 
 
 @pytest.fixture(
