@@ -79,9 +79,6 @@ class Rotate:
             logger.error(f"Bad {angle_cw=}. Only allow 90, 180, 270")
             return False
         image_files = Common.prepare_all_files(in_path, out_path)
-        if not image_files:
-            logger.error(f"No image files at {in_path}")
-            return False
         tasks = [(f, out_path, angle_cw) for f in image_files]
         files_cnt = len(tasks)
         if files_cnt == 0:
@@ -90,7 +87,7 @@ class Rotate:
 
         logger.debug(f"Rotate {files_cnt} image files in multiprocess ...")
         success_cnt = Common.multiprocess_progress_bar(
-            Rotate.rotate_1_image, "Rotate image files", tasks
+            Rotate.rotate_1_image, "Rotate image files", files_cnt, tasks
         )
         logger.info(f"\nSuccessfully rotated {success_cnt}/{files_cnt} files")
         return True

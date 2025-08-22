@@ -16,7 +16,7 @@ from batch_img.const import PKG_NAME, REPLACE
 from .helper import DotDict
 
 
-@pytest.fixture(params=[(PKG_NAME, "0.1.5"), ("", "0.1.5")])
+@pytest.fixture(params=[(PKG_NAME, "0.1.6"), ("", "0.1.6")])
 def ver_data(request):
     return request.param
 
@@ -29,7 +29,7 @@ def test_get_version(ver_data):
 
 @pytest.fixture(
     params=[
-        (PKG_NAME, f"✅ {PKG_NAME} is up to date (0.1.5)"),
+        (PKG_NAME, f"✅ {PKG_NAME} is up to date (0.1.6)"),
         (
             "bad_bogus",
             f"⚠️ Error get data from PyPI: https://pypi.org/pypi/bad_bogus/json",
@@ -428,6 +428,22 @@ def test_calculate_new_size(data_calculate_new_size):
     width, height, max_len, expected = data_calculate_new_size
     actual = Common.calculate_new_size(width, height, max_len)
     assert actual == expected
+
+
+@pytest.fixture(
+    params=[
+        (Path(f"{dirname(__file__)}/data/JPG"), REPLACE, 4),
+        (Path(f"{dirname(__file__)}/data/PNG"), Path(f"{dirname(__file__)}/.out/"), 2),
+    ]
+)
+def data_prepare_all_files(request):
+    return request.param
+
+
+def test_prepare_all_files(data_prepare_all_files):
+    in_path, out_path, expected = data_prepare_all_files
+    actual = Common.prepare_all_files(in_path, out_path)
+    assert len(list(actual)) == expected
 
 
 @pytest.fixture(
