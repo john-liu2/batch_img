@@ -10,10 +10,10 @@ import pillow_heif
 from PIL import Image
 
 from batch_img.common import Common
-from batch_img.const import REPLACE
+from batch_img.const import EXIF, REPLACE
 from batch_img.log import logger
 
-pillow_heif.register_heif_opener()  # allow Pillow to open HEIC files
+pillow_heif.register_heif_opener()
 
 
 class Border:
@@ -42,8 +42,8 @@ class Border:
                 bd_img.paste(cropped_img, (bd_width, bd_width))
 
                 file = Common.set_out_file(in_path, out_path, f"bw{bd_width}")
-                if "exif" in img.info:
-                    exif_dict = piexif.load(img.info["exif"])
+                if EXIF in img.info:
+                    exif_dict = piexif.load(img.info[EXIF])
                     exif_bytes = piexif.dump(exif_dict)
                     bd_img.save(file, img.format, optimize=True, exif=exif_bytes)
                 else:

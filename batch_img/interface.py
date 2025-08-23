@@ -21,6 +21,36 @@ def cli(ctx, update, version):  # pragma: no cover
             click.secho(Common.get_version(PKG_NAME))
 
 
+@cli.command(
+    help="Auto process (resize to 1280, remove GPS, add border) image file(s)."
+)
+@click.argument(
+    "src_path",
+    required=True,
+)
+@click.option(
+    "-ar",
+    "--auto_rotate",
+    default=False,
+    is_flag=True,
+    show_default=True,
+    help="Auto-rotate image (experimental)",
+)
+@click.option(
+    "-o",
+    "--output",
+    default="",
+    show_default=True,
+    type=str,
+    help="Output file path. If not specified, replace the input file.",
+)
+def auto(src_path, auto_rotate, output):
+    options = {"src_path": src_path, "auto_rotate": auto_rotate, "output": output}
+    res = Main.auto(options)
+    msg = MSG_OK if res else MSG_BAD
+    click.secho(msg)
+
+
 @cli.command(help="Add internal border to image file(s), not expand the size.")
 @click.argument(
     "src_path",

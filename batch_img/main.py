@@ -5,6 +5,7 @@ Copyright © 2025 John Liu
 import json
 from pathlib import Path
 
+from batch_img.auto import Auto
 from batch_img.border import Border
 from batch_img.common import Common
 from batch_img.const import PKG_NAME, REPLACE
@@ -15,6 +16,32 @@ from batch_img.rotate import Rotate
 
 
 class Main:
+    @staticmethod
+    def auto(options: dict) -> bool:
+        """Auto process image file(s):
+        * Resize to 1280 pixels as the max length
+        * Add the border of 9 pixel width in gray color
+        * Remove GPS location info
+
+        Args:
+            options: input options dict
+
+        Returns:
+            bool: True - Success. False - Error
+        """
+        Log.init_log_file()
+        logger.debug(f"{json.dumps(options, indent=2)}")
+        in_path = Path(options["src_path"])
+        auto_rotate = options.get("auto_rotate")
+        output = options.get("output")
+        out = Path(output) if output else REPLACE
+        if in_path.is_file():
+            ok, _ = Auto.auto_do_1_image((in_path, out, auto_rotate))
+        else:
+            ok = Auto.auto_on_all(in_path, out, auto_rotate)
+        Common.check_latest_version(PKG_NAME)
+        return ok
+
     @staticmethod
     def border(options: dict) -> bool:
         """Add border to the image file(s)

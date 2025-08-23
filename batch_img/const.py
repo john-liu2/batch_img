@@ -21,7 +21,8 @@ PATTERNS = (
     "*.PNG",
     "*.png",
 )
+EXIF = "exif"
 MAX_LENGTH = 1280
 BD_WIDTH = 5
-BD_COLOR = "green"
+BD_COLOR = "black"
 REPLACE = "replace"

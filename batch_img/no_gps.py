@@ -9,10 +9,10 @@ import pillow_heif
 from PIL import Image
 
 from batch_img.common import Common
-from batch_img.const import REPLACE
+from batch_img.const import EXIF, REPLACE
 from batch_img.log import logger
 
-pillow_heif.register_heif_opener()  # allow Pillow to open HEIC files
+pillow_heif.register_heif_opener()
 
 
 class NoGps:
@@ -32,11 +32,11 @@ class NoGps:
         Common.set_log_by_process()
         try:
             with Image.open(in_path) as img:
-                if "exif" not in img.info:
+                if EXIF not in img.info:
                     msg = f"Skip as no EXIF in {in_path}"
                     logger.debug(msg)
                     return True, f"Skip as no EXIF in {in_path}"
-                removed, exif_bytes = Common.remove_exif_gps(img.info["exif"])
+                removed, exif_bytes = Common.remove_exif_gps(img.info[EXIF])
                 if removed:
                     file = Common.set_out_file(in_path, out_path, "NoGPS")
                     img.save(file, img.format, optimize=True, exif=exif_bytes)

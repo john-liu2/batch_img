@@ -12,9 +12,10 @@ import pillow_heif
 from PIL import Image
 
 from batch_img.common import Common
+from batch_img.const import EXIF
 from batch_img.log import logger
 
-pillow_heif.register_heif_opener()  # allow Pillow to open HEIC files
+pillow_heif.register_heif_opener()
 
 ROTATION_MAP = {  # map to the clockwise angle to correct
     "bottom": 0,
@@ -22,7 +23,6 @@ ROTATION_MAP = {  # map to the clockwise angle to correct
     "left": 270,  # rotated right
     "right": 90,  # rotated left
 }
-THRESHOLD = 0.8
 EXIF_CW_ANGLE = {
     1: 0,
     2: 0,
@@ -33,6 +33,7 @@ EXIF_CW_ANGLE = {
     7: 90,
     8: 90,
 }
+THRESHOLD = 0.73
 
 
 class Orientation:
@@ -48,10 +49,10 @@ class Orientation:
         """
         try:
             with Image.open(file) as img:
-                if "exif" not in img.info:
+                if EXIF not in img.info:
                     logger.warning(f"No EXIF data in {file}")
                     return -1
-                exif_info = Common.decode_exif(img.info["exif"])
+                exif_info = Common.decode_exif(img.info[EXIF])
                 if "Orientation" in exif_info:
                     return EXIF_CW_ANGLE.get(exif_info["Orientation"])
             logger.warning(f"No 'Orientation' tag in {exif_info=}")
@@ -78,8 +79,8 @@ class Orientation:
             tmp_file = Path(f"{file.parent}/{file.stem}_tmp{file.suffix}")
             with Image.open(file) as img:
                 exif_dict = {"0th": {}, "Exif": {}}
-                if "exif" in img.info:
-                    exif_dict = piexif.load(img.info["exif"])
+                if EXIF in img.info:
+                    exif_dict = piexif.load(img.info[EXIF])
                 exif_dict["0th"][piexif.ImageIFD.Orientation] = o_val
                 exif_bytes = piexif.dump(exif_dict)
                 img.save(tmp_file, img.format, exif=exif_bytes, optimize=True)
@@ -169,7 +170,7 @@ class Orientation:
             file: image file path
 
         Returns:
-            int: clockwise angle: 0, 90, 180, 270
+            int: clockwise angle: 0, 90, 180, 270, or -1
         """
         face_cascade = cv2.CascadeClassifier(
             cv2.data.haarcascades + "haarcascade_frontalface_default.xml"
