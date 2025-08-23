@@ -92,7 +92,15 @@ class Orientation:
             return False
 
     @staticmethod
-    def get_floor_score(img):
+    def get_floor_score(img) -> float:
+        """Get the floor score for every 90 degree rotated image
+
+        Args:
+            img: OpenCV img
+
+        Returns:
+            float:
+        """
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         h = gray.shape[0]
         top, bottom = gray[: h // 3], gray[-h // 3 :]
