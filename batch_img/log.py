@@ -18,15 +18,12 @@ class Log:
     _conf = {}
 
     @staticmethod
-    def load_config(path):
+    def load_config(path: str) -> dict:
         try:
             with open(path, encoding="utf-8") as f:
                 return json.load(f)
-        except FileNotFoundError:
-            logger.warning(f"Logging config file not found: {path}")
-            return {}
-        except json.JSONDecodeError as e:
-            logger.error(f"Invalid JSON in config file: {e}")
+        except (FileNotFoundError, json.JSONDecodeError) as e:
+            logger.error(f"Error load JSON config file: {path}\n{e}")
             return {}
 
     @staticmethod
@@ -39,6 +36,8 @@ class Log:
         if not Log._conf:
             Log._conf = Log.load_config(f"{dirname(__file__)}/config.json")
         level = Log._conf.get("level")
+        if not level:
+            level = "INFO"
         mode = Log._conf.get("mode")
         to_file = Log._conf.get("to_file")
         if mode == "dev":

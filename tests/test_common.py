@@ -12,11 +12,11 @@ import pytest
 import requests
 
 from batch_img.common import Common
-from batch_img.const import PKG_NAME, REPLACE
+from batch_img.const import PKG_NAME, REPLACE, UNKNOWN
 from .helper import DotDict
 
 
-@pytest.fixture(params=[(PKG_NAME, "0.1.6"), ("", "0.1.6")])
+@pytest.fixture(params=[(PKG_NAME, "0.1.7"), ("", "0.1.7")])
 def ver_data(request):
     return request.param
 
@@ -29,10 +29,10 @@ def test_get_version(ver_data):
 
 @pytest.fixture(
     params=[
-        (PKG_NAME, f"✅ {PKG_NAME} is up to date (0.1.6)"),
         (
-            "bad_bogus",
-            f"⚠️ Error get data from PyPI: https://pypi.org/pypi/bad_bogus/json",
+            "0.9.9",
+            PKG_NAME,
+            f"🔔 Update available: 0.1.7  →  0.9.9\nRun '{PKG_NAME} --update'",
         ),
     ]
 )
@@ -40,27 +40,52 @@ def data_check_latest_version(request):
     return request.param
 
 
-def test_check_latest_version(data_check_latest_version):
-    pkg_name, expected = data_check_latest_version
+@patch("batch_img.common.Common.get_latest_pypi_ver")
+def test_check_latest_version(mock_get_latest_pypi, data_check_latest_version):
+    v_1, pkg_name, expected = data_check_latest_version
+    mock_get_latest_pypi.return_value = v_1
     actual = Common.check_latest_version(pkg_name)
     assert actual == expected
 
 
+@pytest.fixture(
+    params=[
+        (PKG_NAME, 0, "0.1.6"),
+        ("bad_bogus", 1, UNKNOWN),
+    ]
+)
+def data_get_latest_pypi_version(request):
+    return request.param
+
+
+def test_get_latest_pypi_ver(data_get_latest_pypi_version):
+    pkg_name, expire, expected = data_get_latest_pypi_version
+    actual = Common.get_latest_pypi_ver(pkg_name, expire)
+    assert actual == expected
+
+
 @patch("requests.get")
-def test_error1_check_latest_version(mock_req_get):
+def test_error1_get_latest_pypi_ver(mock_req_get):
     mock_req_get.side_effect = requests.RequestException
-    actual = Common.check_latest_version(PKG_NAME)
-    assert actual == "requests.get() Exception: "
+    with pytest.raises(requests.RequestException):
+        Common.get_latest_pypi_ver(PKG_NAME, 0)
 
 
 @patch("requests.get")
-def test_error2_check_latest_version(mock_req_get):
+def test_error2_get_latest_pypi_ver(mock_req_get):
     mock_response = MagicMock()
     mock_response.status_code = 200
     mock_response.json.return_value = {"key": "value"}
     mock_req_get.return_value = mock_response
+    with pytest.raises(KeyError):
+        Common.get_latest_pypi_ver(PKG_NAME, 0)
+
+
+@patch("batch_img.common.Common.get_latest_pypi_ver")
+def test_error1_check_latest_version(mock_get_latest_pypi):
+    mock_get_latest_pypi.side_effect = requests.RequestException
     actual = Common.check_latest_version(PKG_NAME)
-    assert actual == "Error parse PyPI response: 'info'"
+    assert actual == "Error get PyPI data: "
 
 
 @pytest.fixture(
