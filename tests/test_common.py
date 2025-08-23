@@ -29,11 +29,10 @@ def test_get_version(ver_data):
 
 @pytest.fixture(
     params=[
-        ("0.1.7", PKG_NAME, f"✅ {PKG_NAME} is up to date (0.1.7)"),
         (
             "0.9.9",
             PKG_NAME,
-            f"🔔 Update available: 0.1.7 → 0.9.9\nPlease run '{PKG_NAME} --update'",
+            f"🔔 Update available: 0.1.7  →  0.9.9\nRun '{PKG_NAME} --update'",
         ),
     ]
 )
@@ -86,7 +85,7 @@ def test_error2_get_latest_pypi_ver(mock_req_get):
 def test_error1_check_latest_version(mock_get_latest_pypi):
     mock_get_latest_pypi.side_effect = requests.RequestException
     actual = Common.check_latest_version(PKG_NAME)
-    assert actual == "requests.get() Exception: "
+    assert actual == "Error get PyPI data: "
 
 
 @pytest.fixture(

@@ -91,22 +91,18 @@ class Common:
         Returns:
             str
         """
+        msg = ""
         try:
             latest_ver = Common.get_latest_pypi_ver(pkg_name)
             cur_ver = Common.get_version(pkg_name)
             if version.parse(cur_ver) < version.parse(latest_ver):
                 msg = (
-                    f"🔔 Update available: {cur_ver} → {latest_ver}\n"
-                    f"Please run '{pkg_name} --update'"
+                    f"🔔 Update available: {cur_ver}  →  {latest_ver}\n"
+                    f"Run '{pkg_name} --update'"
                 )
-            else:
-                msg = f"✅ {pkg_name} is up to date ({cur_ver})"
-            logger.info(msg)
-        except requests.RequestException as e:
-            msg = f"requests.get() Exception: {e}"
-            logger.error(msg)
-        except (KeyError, json.JSONDecodeError) as e:
-            msg = f"Error parse PyPI response: {e}"
+                logger.info(msg)
+        except (requests.RequestException, KeyError, json.JSONDecodeError) as e:
+            msg = f"Error get PyPI data: {e}"
             logger.error(msg)
         return msg
 
@@ -122,7 +118,7 @@ class Common:
         """
         Log.init_log_file()
         msg = Common.check_latest_version(pkg_name)
-        if "is up to date" in msg:
+        if "Update available" not in msg:
             return msg
         logger.info(f"🔄 Updating {pkg_name} ...")
         cmd = f"uv pip install --upgrade {pkg_name}"
