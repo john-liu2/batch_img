@@ -52,7 +52,6 @@ class Common:
     def get_latest_pypi_ver(pkg_name: str, expire_hr: int = 24):
         """Get the package latest version on PyPI with local cache
 
-
         Args:
             pkg_name: package name str
             expire_hr: cache expiration hour int
