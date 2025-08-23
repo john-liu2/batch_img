@@ -47,3 +47,22 @@ def test_error_remove_1_image_gps(mock_open):
     mock_open.side_effect = ValueError("VE")
     actual = NoGps.remove_1_image_gps((Path("in/file"), Path("out/file")))
     assert actual[0] is False
+
+
+@pytest.fixture(
+    params=[
+        (
+            Path(f"{dirname(__file__)}/data/mixed"),
+            Path(f"{dirname(__file__)}/.out/"),
+            True,
+        ),
+    ]
+)
+def data_remove_all_images_gps(request):
+    return request.param
+
+
+def test_remove_all_images_gps(data_remove_all_images_gps):
+    in_path, out_path, expected = data_remove_all_images_gps
+    actual = NoGps.remove_all_images_gps(in_path, out_path)
+    assert actual == expected
