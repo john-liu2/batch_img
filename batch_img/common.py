@@ -11,6 +11,7 @@ from datetime import datetime
 from multiprocessing import Pool, cpu_count, current_process
 from os.path import getmtime, getsize
 from pathlib import Path
+from time import time
 
 import piexif
 import pillow_heif
@@ -20,10 +21,11 @@ from PIL import Image, ImageChops
 from PIL.TiffImagePlugin import IFDRational
 from tqdm import tqdm
 
-from batch_img.const import PATTERNS, REPLACE, TS_FORMAT, VER
+from batch_img.const import PATTERNS, PKG_NAME, REPLACE, TS_FORMAT, UNKNOWN, VER
 from batch_img.log import Log, logger
 
 pillow_heif.register_heif_opener()  # allow Pillow to open HEIC files
+VER_CACHE = Path(f"~/.{PKG_NAME}_version_cache.json").expanduser()
 
 
 class Common:
@@ -47,6 +49,40 @@ class Common:
                 return tomllib.load(f)["project"][VER]
 
     @staticmethod
+    def get_latest_pypi_ver(pkg_name: str, expire_hr: int = 24):
+        """Get the package latest version on PyPI with local cache
+
+
+        Args:
+            pkg_name: package name str
+            expire_hr: cache expiration hour int
+
+        Returns:
+            str: latest version on PyPI
+        """
+        jsn_url = f"https://pypi.org/pypi/{pkg_name}/json"
+        latest_ver = ""
+        try:
+            if pkg_name in str(VER_CACHE) and VER_CACHE.exists():
+                with open(VER_CACHE, encoding="utf-8") as f:
+                    cache = json.load(f)
+                    if time() - cache["timestamp"] < expire_hr * 3600:
+                        latest_ver = cache["version"]
+            if not latest_ver:
+                response = requests.get(jsn_url, timeout=6)
+                if response.status_code != 200:
+                    msg = f"⚠️ Error get data from PyPI: {jsn_url}"
+                    logger.error(msg)
+                    return UNKNOWN
+                latest_ver = response.json()["info"]["version"]
+                d_cache = {"timestamp": time(), "version": latest_ver}
+                with open(VER_CACHE, "w", encoding="utf-8") as f:
+                    json.dump(d_cache, f)
+            return latest_ver
+        except (requests.RequestException, KeyError, json.JSONDecodeError) as e:
+            raise e
+
+    @staticmethod
     def check_latest_version(pkg_name: str) -> str:
         """Check if the installed version is the latest one
 
@@ -57,14 +93,7 @@ class Common:
             str
         """
         try:
-            jsn_url = f"https://pypi.org/pypi/{pkg_name}/json"
-            response = requests.get(jsn_url, timeout=8)
-            if response.status_code != 200:
-                msg = f"⚠️ Error get data from PyPI: {jsn_url}"
-                logger.error(msg)
-                return msg
-
-            latest_ver = response.json()["info"]["version"]
+            latest_ver = Common.get_latest_pypi_ver(pkg_name)
             cur_ver = Common.get_version(pkg_name)
             if version.parse(cur_ver) < version.parse(latest_ver):
                 msg = (
@@ -93,6 +122,9 @@ class Common:
             str
         """
         Log.init_log_file()
+        msg = Common.check_latest_version(pkg_name)
+        if "is up to date" in msg:
+            return msg
         logger.info(f"🔄 Updating {pkg_name} ...")
         cmd = f"uv pip install --upgrade {pkg_name}"
         try:
