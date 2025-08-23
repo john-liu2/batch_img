@@ -21,7 +21,15 @@ from PIL import Image, ImageChops
 from PIL.TiffImagePlugin import IFDRational
 from tqdm import tqdm
 
-from batch_img.const import PATTERNS, PKG_NAME, REPLACE, TS_FORMAT, UNKNOWN, VER
+from batch_img.const import (
+    EXPIRE_HOUR,
+    PATTERNS,
+    PKG_NAME,
+    REPLACE,
+    TS_FORMAT,
+    UNKNOWN,
+    VER,
+)
 from batch_img.log import Log, logger
 
 pillow_heif.register_heif_opener()  # allow Pillow to open HEIC files
@@ -49,7 +57,7 @@ class Common:
                 return tomllib.load(f)["project"][VER]
 
     @staticmethod
-    def get_latest_pypi_ver(pkg_name: str, expire_hr: int = 24):
+    def get_latest_pypi_ver(pkg_name: str, expire_hr: int = EXPIRE_HOUR):
         """Get the package latest version on PyPI with local cache
 
         Args:
@@ -74,7 +82,7 @@ class Common:
                     logger.error(msg)
                     return UNKNOWN
                 latest_ver = response.json()["info"]["version"]
-                d_cache = {"timestamp": time(), "version": latest_ver}
+                d_cache = {"timestamp": int(time()), "version": latest_ver}
                 with open(VER_CACHE, "w", encoding="utf-8") as f:
                     json.dump(d_cache, f)
             return latest_ver
