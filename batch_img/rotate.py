@@ -32,6 +32,9 @@ class Rotate:
         """
         in_path, out_path, angle_cw = args
         Common.set_log_by_process()
+        if angle_cw == 0:
+            logger.debug(f"No rotate as {angle_cw=}")
+            return False, in_path
         if angle_cw not in {90, 180, 270}:
             return False, f"Bad {angle_cw=}. Only allow 90, 180, 270"
         try:

@@ -15,8 +15,8 @@ from batch_img.interface import auto, border, no_gps, resize, rotate
 @pytest.fixture(
     params=[
         ("src_path -o out/dir", True, MSG_OK),
-        ("img/file --output out/file", False, MSG_BAD),
-        ("src_path", True, MSG_OK),
+        ("img/file --output out/file -ar", False, MSG_BAD),
+        ("src_path --auto_rotate", True, MSG_OK),
     ]
 )
 def data_auto(request):

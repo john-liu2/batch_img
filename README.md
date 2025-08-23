@@ -79,9 +79,10 @@ Usage: batch_img auto [OPTIONS] SRC_PATH
   Auto process (resize to 1280, remove GPS, add border) image file(s).
 
 Options:
-  -o, --output TEXT  Output file path. If not specified, replace the input
-                     file.  [default: ""]
-  --help             Show this message and exit.
+  -ar, --auto_rotate  Auto-rotate image (experimental)
+  -o, --output TEXT   Output file path. If not specified, replace the input
+                      file.  [default: ""]
+  --help              Show this message and exit.
 ```
 
 #### The `border` sub-command CLI options:

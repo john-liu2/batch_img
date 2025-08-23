@@ -29,6 +29,14 @@ def cli(ctx, update, version):  # pragma: no cover
     required=True,
 )
 @click.option(
+    "-ar",
+    "--auto_rotate",
+    default=False,
+    is_flag=True,
+    show_default=True,
+    help="Auto-rotate image (experimental)",
+)
+@click.option(
     "-o",
     "--output",
     default="",
@@ -36,8 +44,8 @@ def cli(ctx, update, version):  # pragma: no cover
     type=str,
     help="Output file path. If not specified, replace the input file.",
 )
-def auto(src_path, output):
-    options = {"src_path": src_path, "output": output}
+def auto(src_path, auto_rotate, output):
+    options = {"src_path": src_path, "auto_rotate": auto_rotate, "output": output}
     res = Main.auto(options)
     msg = MSG_OK if res else MSG_BAD
     click.secho(msg)

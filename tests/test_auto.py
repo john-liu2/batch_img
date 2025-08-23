@@ -49,16 +49,10 @@ def test_error_process_an_image(mock_open):
             Path(f"{dirname(__file__)}/.out/"),
             (True, Path(f"{dirname(__file__)}/.out/chef2_90cw_270cw.heic")),
         ),
-        # JL 2025-08-20: check sky/clouds orientation by floor
         (
-            Path(f"{dirname(__file__)}/data/HEIC/IMG_2529_90cw.HEIC"),
+            Path(f"{dirname(__file__)}/data/HEIC/IMG_0131.HEIC"),
             Path(f"{dirname(__file__)}/.out/"),
-            (True, Path(f"{dirname(__file__)}/.out/IMG_2529_90cw_270cw.HEIC")),
-        ),
-        (
-            Path(f"{dirname(__file__)}/data/HEIC/IMG_2529_270cw.HEIC"),
-            Path(f"{dirname(__file__)}/.out/"),
-            (True, Path(f"{dirname(__file__)}/.out/IMG_2529_270cw_90cw.HEIC")),
+            (True, Path(f"{dirname(__file__)}/.out/IMG_0131_270cw.HEIC")),
         ),
         (
             Path(f"{dirname(__file__)}/data/HEIC/chef_show2.heic"),
@@ -82,9 +76,19 @@ def test_rotate_if_needed(data_rotate_if_needed):
         (
             Path(f"{dirname(__file__)}/data/HEIC/Cartoon.heic"),
             Path(f"{dirname(__file__)}/.out/"),
+            False,
             (
                 True,
                 Path(f"{dirname(__file__)}/.out/Cartoon_bw9.heic"),
+            ),
+        ),
+        (
+            Path(f"{dirname(__file__)}/data/HEIC/IMG_0131.HEIC"),
+            Path(f"{dirname(__file__)}/.out/"),
+            True,
+            (
+                True,
+                Path(f"{dirname(__file__)}/.out/IMG_0131_270cw_bw9.HEIC"),
             ),
         ),
     ]
@@ -94,8 +98,8 @@ def data_auto_1_image(request):
 
 
 def test_auto_do_1_image(data_auto_1_image):
-    in_path, out_path, expected = data_auto_1_image
-    actual = Auto.auto_do_1_image((in_path, out_path))
+    in_path, out_path, auto_rotate, expected = data_auto_1_image
+    actual = Auto.auto_do_1_image((in_path, out_path, auto_rotate))
     assert actual == expected
 
 
@@ -104,11 +108,13 @@ def test_auto_do_1_image(data_auto_1_image):
         (
             Path(f"{dirname(__file__)}"),
             Path(f"{dirname(__file__)}/.out/"),
+            True,
             False,
         ),
         (
             Path(f"{dirname(__file__)}/data/PNG"),
             Path(f"{dirname(__file__)}/.out/"),
+            False,
             True,
         ),
     ]
@@ -118,6 +124,6 @@ def data_run_on_all(request):
 
 
 def test_auto_on_all(data_run_on_all):
-    in_path, out_path, expected = data_run_on_all
-    actual = Auto.auto_on_all(in_path, out_path)
+    in_path, out_path, auto_rotate, expected = data_run_on_all
+    actual = Auto.auto_on_all(in_path, out_path, auto_rotate)
     assert actual == expected

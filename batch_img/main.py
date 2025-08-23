@@ -32,12 +32,13 @@ class Main:
         Log.init_log_file()
         logger.debug(f"{json.dumps(options, indent=2)}")
         in_path = Path(options["src_path"])
+        auto_rotate = options.get("auto_rotate")
         output = options.get("output")
         out = Path(output) if output else REPLACE
         if in_path.is_file():
-            ok, _ = Auto.auto_do_1_image((in_path, out))
+            ok, _ = Auto.auto_do_1_image((in_path, out, auto_rotate))
         else:
-            ok = Auto.auto_on_all(in_path, out)
+            ok = Auto.auto_on_all(in_path, out, auto_rotate)
         Common.check_latest_version(PKG_NAME)
         return ok
 

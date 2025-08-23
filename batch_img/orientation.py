@@ -170,7 +170,7 @@ class Orientation:
             file: image file path
 
         Returns:
-            int: clockwise angle: 0, 90, 180, 270
+            int: clockwise angle: 0, 90, 180, 270, or -1
         """
         face_cascade = cv2.CascadeClassifier(
             cv2.data.haarcascades + "haarcascade_frontalface_default.xml"
