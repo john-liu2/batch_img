@@ -9,7 +9,30 @@ import pytest
 from click.testing import CliRunner
 
 from batch_img.const import MSG_OK, MSG_BAD
-from batch_img.interface import border, no_gps, resize, rotate
+from batch_img.interface import auto, border, no_gps, resize, rotate
+
+
+@pytest.fixture(
+    params=[
+        ("src_path -o out/dir", True, MSG_OK),
+        ("img/file --output out/file", False, MSG_BAD),
+        ("src_path", True, MSG_OK),
+    ]
+)
+def data_auto(request):
+    return request.param
+
+
+@patch("batch_img.main.Main.auto")
+def test_auto(mock_auto, data_auto):
+    _input, res, expected = data_auto
+    mock_auto.return_value = res
+    expected += "\n"
+    runner = CliRunner()
+    result = runner.invoke(auto, args=_input.split())
+    print(result.output)
+    assert not result.exception
+    assert result.output == expected
 
 
 @pytest.fixture(
@@ -24,9 +47,9 @@ def data_border(request):
 
 
 @patch("batch_img.main.Main.border")
-def test_border(mock_add_border, data_border):
+def test_border(mock_border, data_border):
     _input, res, expected = data_border
-    mock_add_border.return_value = res
+    mock_border.return_value = res
     expected += "\n"
     runner = CliRunner()
     result = runner.invoke(border, args=_input.split())
@@ -41,9 +64,9 @@ def data_error_border(request):
 
 
 @patch("batch_img.main.Main.border")
-def test_error_border(mock_add_border, data_error_border):
+def test_error_border(mock_border, data_error_border):
     _input = data_error_border
-    mock_add_border.return_value = True
+    mock_border.return_value = True
     runner = CliRunner()
     result = runner.invoke(border, args=_input.split())
     print(result.output)
@@ -62,9 +85,9 @@ def data_no_gps(request):
 
 
 @patch("batch_img.main.Main.no_gps")
-def test_resize(mock_resize, data_no_gps):
+def test_no_gps(mock_no_gps, data_no_gps):
     _input, res, expected = data_no_gps
-    mock_resize.return_value = res
+    mock_no_gps.return_value = res
     expected += "\n"
     runner = CliRunner()
     result = runner.invoke(no_gps, args=_input.split())

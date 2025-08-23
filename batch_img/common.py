@@ -22,6 +22,7 @@ from PIL.TiffImagePlugin import IFDRational
 from tqdm import tqdm
 
 from batch_img.const import (
+    EXIF,
     EXPIRE_HOUR,
     PATTERNS,
     PKG_NAME,
@@ -32,7 +33,7 @@ from batch_img.const import (
 )
 from batch_img.log import Log, logger
 
-pillow_heif.register_heif_opener()  # allow Pillow to open HEIC files
+pillow_heif.register_heif_opener()
 VER_CACHE = Path(f"~/.{PKG_NAME}_version_cache.json").expanduser()
 
 
@@ -277,9 +278,9 @@ class Common:
             for key in ("icc_profile", "xmp"):
                 if key in img.info:
                     img.info.pop(key)
-            if "exif" in img.info:
-                exif_data = img.info.pop("exif")
-                d_info["exif"] = Common.decode_exif(exif_data)
+            if EXIF in img.info:
+                exif_data = img.info.pop(EXIF)
+                d_info[EXIF] = Common.decode_exif(exif_data)
 
         return data, d_info
 

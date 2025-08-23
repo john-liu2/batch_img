@@ -16,7 +16,7 @@ from batch_img.const import PKG_NAME, REPLACE, UNKNOWN
 from .helper import DotDict
 
 
-@pytest.fixture(params=[(PKG_NAME, "0.1.7"), ("", "0.1.7")])
+@pytest.fixture(params=[(PKG_NAME, "0.1.8"), ("", "0.1.8")])
 def ver_data(request):
     return request.param
 
@@ -32,7 +32,7 @@ def test_get_version(ver_data):
         (
             "0.9.9",
             PKG_NAME,
-            f"🔔 Update available: 0.1.7  →  0.9.9\nRun '{PKG_NAME} --update'",
+            f"🔔 Update available: 0.1.8  →  0.9.9\nRun '{PKG_NAME} --update'",
         ),
     ]
 )
@@ -50,7 +50,7 @@ def test_check_latest_version(mock_get_latest_pypi, data_check_latest_version):
 
 @pytest.fixture(
     params=[
-        (PKG_NAME, 0, "0.1.6"),
+        (PKG_NAME, 0, "0.1.7"),
         ("bad_bogus", 1, UNKNOWN),
     ]
 )

@@ -12,6 +12,48 @@ from batch_img.main import Main
 
 @pytest.fixture(
     params=[
+        (
+            "v_1",
+            "v_2",
+            {
+                "src_path": "src/file",
+                "output": f"{dirname(__file__)}/.out/",
+            },
+            "v_2",
+        ),
+        (
+            "v_1",
+            "v_2",
+            {
+                "src_path": "src/file",
+            },
+            "v_2",
+        ),
+    ]
+)
+def data_auto(request):
+    return request.param
+
+
+@patch("batch_img.common.Common.check_latest_version")
+@patch("batch_img.auto.Auto.auto_on_all")
+@patch("batch_img.auto.Auto.auto_do_1_image")
+def test_auto(
+    mock_auto_do_1_image,
+    mock_auto_on_all,
+    mock_check_latest_version,
+    data_auto,
+):
+    v_1, v_2, options, expected = data_auto
+    mock_auto_do_1_image.return_value = v_1
+    mock_auto_on_all.return_value = v_2
+    mock_check_latest_version.return_value = "ok"
+    actual = Main.auto(options)
+    assert actual == expected
+
+
+@pytest.fixture(
+    params=[
         ("any", "any", {"src_path": "src/file"}, False),
         ("any", "any", {"src_path": "src/file", "border_width": 0}, False),
         ("v_1", "v_2", {"src_path": "src/file", "border_width": 20}, False),

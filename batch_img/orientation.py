@@ -12,9 +12,10 @@ import pillow_heif
 from PIL import Image
 
 from batch_img.common import Common
+from batch_img.const import EXIF
 from batch_img.log import logger
 
-pillow_heif.register_heif_opener()  # allow Pillow to open HEIC files
+pillow_heif.register_heif_opener()
 
 ROTATION_MAP = {  # map to the clockwise angle to correct
     "bottom": 0,
@@ -48,10 +49,10 @@ class Orientation:
         """
         try:
             with Image.open(file) as img:
-                if "exif" not in img.info:
+                if EXIF not in img.info:
                     logger.warning(f"No EXIF data in {file}")
                     return -1
-                exif_info = Common.decode_exif(img.info["exif"])
+                exif_info = Common.decode_exif(img.info[EXIF])
                 if "Orientation" in exif_info:
                     return EXIF_CW_ANGLE.get(exif_info["Orientation"])
             logger.warning(f"No 'Orientation' tag in {exif_info=}")
@@ -78,8 +79,8 @@ class Orientation:
             tmp_file = Path(f"{file.parent}/{file.stem}_tmp{file.suffix}")
             with Image.open(file) as img:
                 exif_dict = {"0th": {}, "Exif": {}}
-                if "exif" in img.info:
-                    exif_dict = piexif.load(img.info["exif"])
+                if EXIF in img.info:
+                    exif_dict = piexif.load(img.info[EXIF])
                 exif_dict["0th"][piexif.ImageIFD.Orientation] = o_val
                 exif_bytes = piexif.dump(exif_dict)
                 img.save(tmp_file, img.format, exif=exif_bytes, optimize=True)
