@@ -1,6 +1,6 @@
 """class Auto - do auto actions to the image file(s):
     * Resize to 1280 pixels as the max length
-    * Add the border of 9 pixel width in gray color
+    * Add the border of 5 pixel width in black color
     * Remove GPS location info
 Copyright © 2025 John Liu
 """
@@ -108,10 +108,10 @@ class Auto:
         """
         in_path, out_path, auto_rotate = args
         Common.set_log_by_process()
-        file = in_path
+        ok, file = Auto.process_an_image(in_path, out_path)
         if auto_rotate:
-            _, file = Auto.rotate_if_needed(in_path, out_path)
-        return Auto.process_an_image(file, out_path)
+            _, file = Auto.rotate_if_needed(file, out_path)
+        return ok, file
 
     @staticmethod
     def auto_on_all(in_path: Path, out_path: Path | str, auto_rotate: bool) -> bool:

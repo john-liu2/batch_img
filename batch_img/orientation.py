@@ -23,7 +23,6 @@ ROTATION_MAP = {  # map to the clockwise angle to correct
     "left": 270,  # rotated right
     "right": 90,  # rotated left
 }
-THRESHOLD = 0.8
 EXIF_CW_ANGLE = {
     1: 0,
     2: 0,
@@ -34,6 +33,7 @@ EXIF_CW_ANGLE = {
     7: 90,
     8: 90,
 }
+THRESHOLD = 0.73
 
 
 class Orientation:

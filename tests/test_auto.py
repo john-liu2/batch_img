@@ -16,7 +16,7 @@ from batch_img.auto import Auto
         (
             Path(f"{dirname(__file__)}/data/HEIC/IMG_2530.HEIC"),
             Path(f"{dirname(__file__)}/.out/"),
-            (True, Path(f"{dirname(__file__)}/.out/IMG_2530_bw9.HEIC")),
+            (True, Path(f"{dirname(__file__)}/.out/IMG_2530_bw5.HEIC")),
         ),
     ]
 )
@@ -79,7 +79,7 @@ def test_rotate_if_needed(data_rotate_if_needed):
             False,
             (
                 True,
-                Path(f"{dirname(__file__)}/.out/Cartoon_bw9.heic"),
+                Path(f"{dirname(__file__)}/.out/Cartoon_bw5.heic"),
             ),
         ),
         (
@@ -88,7 +88,7 @@ def test_rotate_if_needed(data_rotate_if_needed):
             True,
             (
                 True,
-                Path(f"{dirname(__file__)}/.out/IMG_0131_270cw_bw9.HEIC"),
+                Path(f"{dirname(__file__)}/.out/IMG_0131_bw5_270cw.HEIC"),
             ),
         ),
     ]

@@ -23,6 +23,6 @@ PATTERNS = (
 )
 EXIF = "exif"
 MAX_LENGTH = 1280
-BD_WIDTH = 9
-BD_COLOR = "gray"
+BD_WIDTH = 5
+BD_COLOR = "black"
 REPLACE = "replace"

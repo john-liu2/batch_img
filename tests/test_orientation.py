@@ -63,7 +63,7 @@ def test_set_exif_orientation(data_set_exif_orientation):
         (Path(f"{dirname(__file__)}/data/HEIC/chef2_180cw.heic"), 180),
         (Path(f"{dirname(__file__)}/data/HEIC/chef2_90cw.heic"), 270),
         (Path(f"{dirname(__file__)}/data/HEIC/chef2_270cw.heic"), 90),
-        (Path(f"{dirname(__file__)}/data/HEIC/Cartoon.heic"), -1),
+        (Path(f"{dirname(__file__)}/data/HEIC/IMG_0070.HEIC"), -1),
     ]
 )
 def data_detect_floor_by_edge(request):
