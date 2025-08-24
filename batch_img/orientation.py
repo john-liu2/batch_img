@@ -13,7 +13,7 @@ from PIL import Image
 
 from batch_img.common import Common
 from batch_img.const import EXIF
-from batch_img.log import logger
+from batch_img.log import logger as log
 
 pillow_heif.register_heif_opener()
 
@@ -50,15 +50,15 @@ class Orientation:
         try:
             with Image.open(file) as img:
                 if EXIF not in img.info:
-                    logger.warning(f"No EXIF data in {file}")
+                    log.warning(f"No EXIF data in {file}")
                     return -1
                 exif_info = Common.decode_exif(img.info[EXIF])
                 if "Orientation" in exif_info:
                     return EXIF_CW_ANGLE.get(exif_info["Orientation"])
-            logger.warning(f"No 'Orientation' tag in {exif_info=}")
+            log.warning(f"No 'Orientation' tag in {exif_info=}")
             return -1
         except (AttributeError, FileNotFoundError, ValueError) as e:
-            logger.error(e)
+            log.error(e)
             return -1
 
     @staticmethod
@@ -73,7 +73,7 @@ class Orientation:
             bool: True - Success. False - Error
         """
         if o_val not in {1, 2, 3, 4, 5, 6, 7, 8}:
-            logger.error(f"Quit due to bad orientation value: {o_val=}")
+            log.error(f"Quit due to bad orientation value: {o_val=}")
             return False
         try:
             tmp_file = Path(f"{file.parent}/{file.stem}_tmp{file.suffix}")
@@ -84,12 +84,12 @@ class Orientation:
                 exif_dict["0th"][piexif.ImageIFD.Orientation] = o_val
                 exif_bytes = piexif.dump(exif_dict)
                 img.save(tmp_file, img.format, exif=exif_bytes, optimize=True)
-            logger.debug(f"Saved the updated EXIF image to {tmp_file}")
+            log.debug(f"Saved the updated EXIF image to {tmp_file}")
             os.replace(tmp_file, file)
-            logger.debug(f"Replaced {file} with tmp_file")
+            log.debug(f"Replaced {file} with tmp_file")
             return True
         except (AttributeError, FileNotFoundError, ValueError) as e:
-            logger.error(e)
+            log.error(e)
             return False
 
     @staticmethod
@@ -132,12 +132,12 @@ class Orientation:
         for angle_cw in (0, 90, 180, 270):
             img = self._rotate_image(opencv_img, angle_cw)
             scores[angle_cw] = self.get_floor_score(img)
-        logger.debug(f"{scores=}")
+        log.debug(f"{scores=}")
         best_angle = max(scores, key=scores.get)
         score = scores[best_angle]
-        logger.debug(f"{best_angle=}, {score=}")
+        log.debug(f"{best_angle=}, {score=}")
         if score < THRESHOLD:
-            logger.warning(f"{score=} is less than {THRESHOLD=}")
+            log.warning(f"{score=} is less than {THRESHOLD=}")
             return -1, score
         return best_angle, score
 
@@ -187,7 +187,7 @@ class Orientation:
                 )
                 if len(faces) > 0:
                     return angle_cw
-        logger.warning(f"Found no face in {file}")
+        log.warning(f"Found no face in {file}")
         return -1
 
     @staticmethod
@@ -220,10 +220,10 @@ class Orientation:
             "right": mask[:, 2 * w // 3 :],
         }
         counts = {k: cv2.countNonZero(v) for k, v in regions.items()}
-        logger.debug(f"Floor pixels cnt: {counts=}")
+        log.debug(f"Floor pixels cnt: {counts=}")
 
         max_region = max(counts, key=counts.get)
-        logger.debug(f"{max_region=}, {file.name}")
+        log.debug(f"{max_region=}, {file.name}")
         return ROTATION_MAP.get(max_region)
 
     @staticmethod
@@ -254,7 +254,7 @@ class Orientation:
             "right": sky_cloud_mask[:, 2 * w // 3 :],
         }
         counts = {k: cv2.countNonZero(v) for k, v in regions.items()}
-        logger.debug(f"Sky / Cloud: {counts=}")
+        log.debug(f"Sky / Cloud: {counts=}")
         max_region = max(counts, key=counts.get)
-        logger.debug(f"{max_region=}, {file.name}")
+        log.debug(f"{max_region=}, {file.name}")
         return ROTATION_MAP.get(max_region)

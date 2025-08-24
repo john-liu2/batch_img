@@ -11,7 +11,7 @@ from PIL import Image
 
 from batch_img.common import Common
 from batch_img.const import EXIF, REPLACE
-from batch_img.log import logger
+from batch_img.log import logger as log
 
 pillow_heif.register_heif_opener()
 
@@ -48,14 +48,14 @@ class Resize:
                     new_img.save(file, img.format, optimize=True, exif=exif_bytes)
                 else:
                     new_img.save(file, img.format, optimize=True)
-            logger.debug(f"Saved resized image to {file}")
+            log.debug(f"Saved resized image to {file}")
             if out_path == REPLACE:
                 os.replace(file, in_path)
-                logger.debug(f"Replaced {in_path} with the new tmp_file")
+                log.debug(f"Replaced {in_path} with the new tmp_file")
                 file = in_path
             return True, file
         except (AttributeError, FileNotFoundError, ValueError) as e:
-            logger.error(e)
+            log.error(e)
             return False, f"{in_path}:\n{e}"
 
     @staticmethod
@@ -76,12 +76,12 @@ class Resize:
         tasks = [(f, out_path, length) for f in image_files]
         files_cnt = len(tasks)
         if files_cnt == 0:
-            logger.error(f"No image files at {in_path}")
+            log.error(f"No image files at {in_path}")
             return False
 
-        logger.debug(f"Resize {files_cnt} image files in multiprocess ...")
+        log.debug(f"Resize {files_cnt} image files in multiprocess ...")
         success_cnt = Common.multiprocess_progress_bar(
             Resize.resize_an_image, "Resize image files", files_cnt, tasks
         )
-        logger.info(f"\nSuccessfully resized {success_cnt}/{files_cnt} files")
+        log.info(f"\nSuccessfully resized {success_cnt}/{files_cnt} files")
         return True
