@@ -21,8 +21,11 @@ PATTERNS = (
     "*.PNG",
     "*.png",
 )
+REPLACE = "replace"
 EXIF = "exif"
+# Resize to 1280 pixels as the max length
+# Add the border of 5 pixel width in black color
+# Remove GPS location info
 MAX_LENGTH = 1280
 BD_WIDTH = 5
 BD_COLOR = "black"
-REPLACE = "replace"

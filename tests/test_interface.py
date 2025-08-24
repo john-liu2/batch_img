@@ -8,7 +8,7 @@ from unittest.mock import patch
 import pytest
 from click.testing import CliRunner
 
-from batch_img.const import MSG_OK, MSG_BAD
+from batch_img.const import MSG_BAD, MSG_OK
 from batch_img.interface import auto, border, no_gps, resize, rotate
 
 

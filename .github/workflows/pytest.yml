@@ -24,7 +24,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install pytest-cov click loguru piexif pillow pillow-heif tqdm numpy opencv-python packaging requests
+          pip install pytest-cov click httpx loguru piexif pillow pillow-heif tqdm numpy opencv-python packaging
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
       - name: Test with pytest
         run: |

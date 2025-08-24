@@ -8,15 +8,16 @@ from os.path import dirname
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
+import httpx
 import pytest
-import requests
 
 from batch_img.common import Common
 from batch_img.const import PKG_NAME, REPLACE, UNKNOWN
+
 from .helper import DotDict
 
 
-@pytest.fixture(params=[(PKG_NAME, "0.1.8"), ("", "0.1.8")])
+@pytest.fixture(params=[(PKG_NAME, "0.1.9"), ("", "0.1.9")])
 def ver_data(request):
     return request.param
 
@@ -32,7 +33,7 @@ def test_get_version(ver_data):
         (
             "0.9.9",
             PKG_NAME,
-            f"🔔 Update available: 0.1.8  →  0.9.9\nRun '{PKG_NAME} --update'",
+            f"🔔 Update available: 0.1.9  →  0.9.9\nRun '{PKG_NAME} --update'",
         ),
     ]
 )
@@ -50,7 +51,7 @@ def test_check_latest_version(mock_get_latest_pypi, data_check_latest_version):
 
 @pytest.fixture(
     params=[
-        (PKG_NAME, 0, "0.1.7"),
+        (PKG_NAME, 0, "0.1.8"),
         ("bad_bogus", 1, UNKNOWN),
     ]
 )
@@ -64,14 +65,14 @@ def test_get_latest_pypi_ver(data_get_latest_pypi_version):
     assert actual == expected
 
 
-@patch("requests.get")
+@patch("httpx.get")
 def test_error1_get_latest_pypi_ver(mock_req_get):
-    mock_req_get.side_effect = requests.RequestException
-    with pytest.raises(requests.RequestException):
+    mock_req_get.side_effect = httpx.RequestError("RErr")
+    with pytest.raises(httpx.RequestError):
         Common.get_latest_pypi_ver(PKG_NAME, 0)
 
 
-@patch("requests.get")
+@patch("httpx.get")
 def test_error2_get_latest_pypi_ver(mock_req_get):
     mock_response = MagicMock()
     mock_response.status_code = 200
@@ -83,9 +84,9 @@ def test_error2_get_latest_pypi_ver(mock_req_get):
 
 @patch("batch_img.common.Common.get_latest_pypi_ver")
 def test_error1_check_latest_version(mock_get_latest_pypi):
-    mock_get_latest_pypi.side_effect = requests.RequestException
+    mock_get_latest_pypi.side_effect = httpx.RequestError("RErr")
     actual = Common.check_latest_version(PKG_NAME)
-    assert actual == "Error get PyPI data: "
+    assert actual == "Error get PyPI data: RErr"
 
 
 @pytest.fixture(
@@ -123,6 +124,24 @@ def test_run_cmd(mock_s_run, run_cmd_data):
         mock_s_run.side_effect = KeyError("KE")
         with pytest.raises(KeyError):
             Common.run_cmd(cmd)
+
+
+@pytest.fixture(
+    params=[
+        (
+            Path(f"{dirname(__file__)}/conftest.py"),
+            "IiIiY29uZnRlc3QucHkKMS4gU2V0IGEgZmxhZyBzbyBhcyB0byBleGNsdWRlIHNvbWUgaW50ZWdyYXRpb24gdGVzdHMKMi4gUnVuIHRoZSBzbG93IGludGVncmF0aW9uIHRlc3QocykgaW5kaXZpZHVhbGx5CkNvcHlyaWdodCDCqSAyMDI1IEpvaG4gTGl1CiIiIgoKaW1wb3J0IHB5dGVzdAoKCmRlZiBweXRlc3RfYWRkb3B0aW9uKHBhcnNlcik6CiAgICBwYXJzZXIuYWRkb3B0aW9uKAogICAgICAgICItLXJ1bnNsb3ciLCBhY3Rpb249InN0b3JlX3RydWUiLCBkZWZhdWx0PUZhbHNlLCBoZWxwPSJydW4gc2xvdyB0ZXN0cyIKICAgICkKCgpkZWYgcHl0ZXN0X2NvbGxlY3Rpb25fbW9kaWZ5aXRlbXMoY29uZmlnLCBpdGVtcyk6CiAgICBpZiBjb25maWcuZ2V0b3B0aW9uKCItLXJ1bnNsb3ciKToKICAgICAgICAjIHNldCAtLXJ1bnNsb3cgaW4gQ0xJIG1lYW5zIGluY2x1ZGluZyBzbG93IGludGVncmF0aW9uIHRlc3QocykKICAgICAgICByZXR1cm4KICAgIHNraXBfc2xvdyA9IHB5dGVzdC5tYXJrLnNraXAocmVhc29uPSJuZWVkIC0tcnVuc2xvdyBvcHRpb24gdG8gcnVuIikKICAgIGZvciBpdGVtIGluIGl0ZW1zOgogICAgICAgIGlmICJzbG93IiBpbiBpdGVtLmtleXdvcmRzOgogICAgICAgICAgICBpdGVtLmFkZF9tYXJrZXIoc2tpcF9zbG93KQo=",
+        )
+    ]
+)
+def data_file_to_base64(request):
+    return request.param
+
+
+def test_file_to_base64(data_file_to_base64):
+    file, expected = data_file_to_base64
+    actual = Common.file_to_base64(file)
+    assert actual == expected
 
 
 @pytest.fixture(

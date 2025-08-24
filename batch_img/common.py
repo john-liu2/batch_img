@@ -7,15 +7,16 @@ import itertools
 import json
 import subprocess
 import tomllib
+from base64 import b64encode
 from datetime import datetime
 from multiprocessing import Pool, cpu_count, current_process
 from os.path import getmtime, getsize
 from pathlib import Path
 from time import time
 
+import httpx
 import piexif
 import pillow_heif
-import requests
 from packaging import version  # compare versions safely
 from PIL import Image, ImageChops
 from PIL.TiffImagePlugin import IFDRational
@@ -77,7 +78,7 @@ class Common:
                     if time() - cache["timestamp"] < expire_hr * 3600:
                         latest_ver = cache["version"]
             if not latest_ver:
-                response = requests.get(jsn_url, timeout=6)
+                response = httpx.get(jsn_url, timeout=5)
                 if response.status_code != 200:
                     msg = f"⚠️ Error get data from PyPI: {jsn_url}"
                     logger.error(msg)
@@ -87,7 +88,7 @@ class Common:
                 with open(VER_CACHE, "w", encoding="utf-8") as f:
                     json.dump(d_cache, f)
             return latest_ver
-        except (requests.RequestException, KeyError, json.JSONDecodeError) as e:
+        except (httpx.RequestError, KeyError, json.JSONDecodeError) as e:
             raise e
 
     @staticmethod
@@ -110,7 +111,7 @@ class Common:
                     f"Run '{pkg_name} --update'"
                 )
                 logger.info(msg)
-        except (requests.RequestException, KeyError, json.JSONDecodeError) as e:
+        except (httpx.RequestError, KeyError, json.JSONDecodeError) as e:
             msg = f"Error get PyPI data: {e}"
             logger.error(msg)
         return msg
@@ -163,6 +164,19 @@ class Common:
         except subprocess.CalledProcessError as e:
             logger.exception(e)
             raise e
+
+    @staticmethod
+    def file_to_base64(file: Path) -> str:
+        """Encode a file to base64 str
+
+        Args:
+            file: input file path
+
+        Returns:
+            str:
+        """
+        with open(file, "rb") as f:
+            return b64encode(f.read()).decode("utf-8")
 
     @staticmethod
     def readable_file_size(in_bytes: int) -> str:

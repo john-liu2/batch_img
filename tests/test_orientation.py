@@ -9,7 +9,7 @@ from unittest.mock import patch
 
 import pytest
 
-from batch_img.orientation import Orientation, EXIF_CW_ANGLE
+from batch_img.orientation import EXIF_CW_ANGLE, Orientation
 
 
 @pytest.fixture(

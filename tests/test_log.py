@@ -7,6 +7,7 @@ from os.path import dirname
 from unittest.mock import patch
 
 import pytest
+
 from batch_img.log import Log
 
 
