@@ -8,6 +8,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 import pytest
+
 from batch_img.const import REPLACE
 from batch_img.resize import Resize
 

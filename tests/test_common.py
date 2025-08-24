@@ -13,6 +13,7 @@ import pytest
 
 from batch_img.common import Common
 from batch_img.const import PKG_NAME, REPLACE, UNKNOWN
+
 from .helper import DotDict
 
 

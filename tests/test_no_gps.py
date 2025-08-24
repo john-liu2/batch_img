@@ -9,7 +9,7 @@ from unittest.mock import patch
 
 import pytest
 
-from batch_img.no_gps import NoGps, REPLACE
+from batch_img.no_gps import NoGps
 
 
 @pytest.fixture(
