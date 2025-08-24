@@ -33,7 +33,8 @@ EXIF_CW_ANGLE = {
     7: 90,
     8: 90,
 }
-THRESHOLD = 0.73
+FLOOR_THRESHOLD = 0.73
+SKY_THRESHOLD = 0.31
 
 
 class Orientation:
@@ -136,8 +137,8 @@ class Orientation:
         best_angle = max(scores, key=scores.get)
         score = scores[best_angle]
         log.debug(f"{best_angle=}, {score=}")
-        if score < THRESHOLD:
-            log.warning(f"{score=} is less than {THRESHOLD=}")
+        if score < FLOOR_THRESHOLD:
+            log.warning(f"{score=} is less than {FLOOR_THRESHOLD=}")
             return -1, score
         return best_angle, score
 
@@ -227,14 +228,14 @@ class Orientation:
         return ROTATION_MAP.get(max_region)
 
     @staticmethod
-    def get_cw_angle_by_sky(file: Path) -> int:
+    def get_cw_angle_by_sky(file: Path) -> tuple:
         """Get image orientation by sky, clouds
 
         Args:
             file: image file path
 
         Returns:
-            int: clockwise angle: 0, 90, 180, 270
+            tuple: clockwise angle: 0, 90, 180, 270 or -1, confidence
         """
         with Image.open(file) as img:
             opencv_img = np.array(img)
@@ -246,7 +247,7 @@ class Orientation:
         cloud_mask = cv2.inRange(hsv, np.array([0, 0, 180]), np.array([180, 70, 255]))
         sky_cloud_mask = cv2.bitwise_or(sky_mask, cloud_mask)
 
-        h, w, _ = opencv_img.shape
+        h, w = sky_cloud_mask.shape
         regions = {
             "top": sky_cloud_mask[0 : h // 3, :],
             "bottom": sky_cloud_mask[2 * h // 3 :, :],
@@ -256,5 +257,12 @@ class Orientation:
         counts = {k: cv2.countNonZero(v) for k, v in regions.items()}
         log.debug(f"Sky / Cloud: {counts=}")
         max_region = max(counts, key=counts.get)
-        log.debug(f"{max_region=}, {file.name}")
-        return ROTATION_MAP.get(max_region)
+        total_cnt = sum(v for v in counts.values())
+        max_cnt = counts[max_region]
+        confidence = round(max_cnt / total_cnt, 3)
+        log.debug(f"{total_cnt=}, {max_cnt=}, {confidence=}")
+        log.debug(f"{max_region=}, {file.name=}")
+        if confidence < SKY_THRESHOLD:
+            log.warning(f"{confidence=} is less than {SKY_THRESHOLD=}")
+            return -1, confidence
+        return ROTATION_MAP.get(max_region), confidence

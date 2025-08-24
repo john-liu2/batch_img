@@ -134,6 +134,8 @@ def test_get_orientation_by_floor(data_get_orientation_by_floor):
         (Path(f"{dirname(__file__)}/data/HEIC/IMG_2530_90cw.HEIC"), 270),
         (Path(f"{dirname(__file__)}/data/HEIC/IMG_2530_270cw.HEIC"), 90),
         (Path(f"{dirname(__file__)}/data/JPG/IMG_2527.jpg"), 90),
+        (Path(f"{dirname(__file__)}/data/HEIC/IMG_0070.HEIC"), 0),
+        (Path(f"{dirname(__file__)}/data/HEIC/Cartoon.heic"), -1),
     ]
 )
 def data_get_cw_angle_by_sky(request):
@@ -143,4 +145,4 @@ def data_get_cw_angle_by_sky(request):
 def test_get_cw_angle_by_sky(data_get_cw_angle_by_sky):
     file, expected = data_get_cw_angle_by_sky
     actual = Orientation().get_cw_angle_by_sky(file)
-    assert actual == expected
+    assert actual[0] == expected
