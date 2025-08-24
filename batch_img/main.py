@@ -5,12 +5,13 @@ Copyright © 2025 John Liu
 import json
 from pathlib import Path
 
+from loguru import logger as log
+
 from batch_img.auto import Auto
 from batch_img.border import Border
 from batch_img.common import Common
 from batch_img.const import PKG_NAME, REPLACE
 from batch_img.log import Log
-from batch_img.log import logger as log
 from batch_img.no_gps import NoGps
 from batch_img.resize import Resize
 from batch_img.rotate import Rotate

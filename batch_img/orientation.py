@@ -9,11 +9,11 @@ import cv2
 import numpy as np
 import piexif
 import pillow_heif
+from loguru import logger as log
 from PIL import Image
 
 from batch_img.common import Common
 from batch_img.const import EXIF
-from batch_img.log import logger as log
 
 pillow_heif.register_heif_opener()
 

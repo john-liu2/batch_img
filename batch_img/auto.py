@@ -9,11 +9,11 @@ import os
 from pathlib import Path
 
 import pillow_heif
+from loguru import logger as log
 from PIL import Image
 
 from batch_img.common import Common
 from batch_img.const import BD_COLOR, BD_WIDTH, EXIF, MAX_LENGTH, REPLACE
-from batch_img.log import logger as log
 from batch_img.orientation import Orientation
 from batch_img.rotate import Rotate
 

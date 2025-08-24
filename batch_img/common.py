@@ -17,6 +17,7 @@ from time import time
 import httpx
 import piexif
 import pillow_heif
+from loguru import logger as log
 from packaging import version  # compare versions safely
 from PIL import Image, ImageChops
 from PIL.TiffImagePlugin import IFDRational
@@ -33,7 +34,6 @@ from batch_img.const import (
     VER,
 )
 from batch_img.log import Log
-from batch_img.log import logger as log
 
 pillow_heif.register_heif_opener()
 VER_CACHE = Path(f"~/.{PKG_NAME}_version_cache.json").expanduser()
