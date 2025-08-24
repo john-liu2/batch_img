@@ -6,11 +6,11 @@ import os
 from pathlib import Path
 
 import pillow_heif
+from loguru import logger as log
 from PIL import Image
 
 from batch_img.common import Common
 from batch_img.const import EXIF, REPLACE
-from batch_img.log import logger
 
 pillow_heif.register_heif_opener()
 
@@ -34,7 +34,7 @@ class NoGps:
             with Image.open(in_path) as img:
                 if EXIF not in img.info:
                     msg = f"Skip as no EXIF in {in_path}"
-                    logger.debug(msg)
+                    log.debug(msg)
                     return True, f"Skip as no EXIF in {in_path}"
                 removed, exif_bytes = Common.remove_exif_gps(img.info[EXIF])
                 if removed:
@@ -42,17 +42,17 @@ class NoGps:
                     img.save(file, img.format, optimize=True, exif=exif_bytes)
                 else:
                     msg = f"No 'GPS' in EXIF of {in_path}"
-                    logger.debug(msg)
+                    log.debug(msg)
                     return True, msg
 
-            logger.debug(f"Saved the no GPS info image to {file}")
+            log.debug(f"Saved the no GPS info image to {file}")
             if out_path == REPLACE:
                 os.replace(file, in_path)
-                logger.debug(f"Replaced {in_path} with the new tmp_file")
+                log.debug(f"Replaced {in_path} with the new tmp_file")
                 file = in_path
             return True, file
         except (AttributeError, FileNotFoundError, ValueError) as e:
-            logger.error(e)
+            log.error(e)
             return False, f"{in_path}:\n{e}"
 
     @staticmethod
@@ -70,12 +70,12 @@ class NoGps:
         tasks = [(f, out_path) for f in image_files]
         files_cnt = len(tasks)
         if files_cnt == 0:
-            logger.error(f"No image files at {in_path}")
+            log.error(f"No image files at {in_path}")
             return False
 
-        logger.debug(f"Remove GPS info in {files_cnt} image files in multiprocess ...")
+        log.debug(f"Remove GPS info in {files_cnt} image files in multiprocess ...")
         success_cnt = Common.multiprocess_progress_bar(
             NoGps.remove_1_image_gps, "Remove GPS in image files", files_cnt, tasks
         )
-        logger.info(f"\nSuccessfully removed GPS in {success_cnt}/{files_cnt} files")
+        log.info(f"\nSuccessfully removed GPS in {success_cnt}/{files_cnt} files")
         return True

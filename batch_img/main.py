@@ -5,11 +5,13 @@ Copyright © 2025 John Liu
 import json
 from pathlib import Path
 
+from loguru import logger as log
+
 from batch_img.auto import Auto
 from batch_img.border import Border
 from batch_img.common import Common
 from batch_img.const import PKG_NAME, REPLACE
-from batch_img.log import Log, logger
+from batch_img.log import Log
 from batch_img.no_gps import NoGps
 from batch_img.resize import Resize
 from batch_img.rotate import Rotate
@@ -30,7 +32,7 @@ class Main:
             bool: True - Success. False - Error
         """
         Log.init_log_file()
-        logger.debug(f"{json.dumps(options, indent=2)}")
+        log.debug(f"{json.dumps(options, indent=2)}")
         in_path = Path(options["src_path"])
         auto_rotate = options.get("auto_rotate")
         output = options.get("output")
@@ -53,15 +55,15 @@ class Main:
             bool: True - Success. False - Error
         """
         Log.init_log_file()
-        logger.debug(f"{json.dumps(options, indent=2)}")
+        log.debug(f"{json.dumps(options, indent=2)}")
         in_path = Path(options["src_path"])
         bd_width = options.get("border_width")
         if not bd_width or bd_width == 0:
-            logger.error(f"Bad border width: {bd_width=}")
+            log.error(f"Bad border width: {bd_width=}")
             return False
         bd_color = options.get("border_color")
         if not bd_color:
-            logger.error(f"Bad border color: {bd_color=}")
+            log.error(f"Bad border color: {bd_color=}")
             return False
         output = options.get("output")
         out = Path(output) if output else REPLACE
@@ -83,7 +85,7 @@ class Main:
             bool: True - Success. False - Error
         """
         Log.init_log_file()
-        logger.debug(f"{json.dumps(options, indent=2)}")
+        log.debug(f"{json.dumps(options, indent=2)}")
         in_path = Path(options["src_path"])
         output = options.get("output")
         out = Path(output) if output else REPLACE
@@ -105,11 +107,11 @@ class Main:
             bool: True - Success. False - Error
         """
         Log.init_log_file()
-        logger.debug(f"{json.dumps(options, indent=2)}")
+        log.debug(f"{json.dumps(options, indent=2)}")
         in_path = Path(options["src_path"])
         length = options.get("length")
         if not length or length == 0:
-            logger.error(f"No resize due to bad {length=}")
+            log.error(f"No resize due to bad {length=}")
             return False
         output = options.get("output")
         out = Path(output) if output else REPLACE
@@ -131,11 +133,11 @@ class Main:
             bool: True - Success. False - Error
         """
         Log.init_log_file()
-        logger.debug(f"{json.dumps(options, indent=2)}")
+        log.debug(f"{json.dumps(options, indent=2)}")
         in_path = Path(options["src_path"])
         angle = options.get("angle")
         if not angle or angle == 0:
-            logger.error(f"No rotate due to bad {angle=}")
+            log.error(f"No rotate due to bad {angle=}")
             return False
         output = options.get("output")
         out = Path(output) if output else REPLACE

@@ -4,6 +4,7 @@ Copyright © 2025 John Liu
 """
 
 import json
+import subprocess
 from os.path import dirname
 from pathlib import Path
 from unittest.mock import MagicMock, patch
@@ -17,7 +18,7 @@ from batch_img.const import PKG_NAME, REPLACE, UNKNOWN
 from .helper import DotDict
 
 
-@pytest.fixture(params=[(PKG_NAME, "0.1.9"), ("", "0.1.9")])
+@pytest.fixture(params=[(PKG_NAME, "0.2.0"), ("", "0.2.0")])
 def ver_data(request):
     return request.param
 
@@ -33,7 +34,7 @@ def test_get_version(ver_data):
         (
             "0.9.9",
             PKG_NAME,
-            f"🔔 Update available: 0.1.9  →  0.9.9\nRun '{PKG_NAME} --update'",
+            f"🔔 Update available: 0.2.0  →  0.9.9\nRun '{PKG_NAME} --update'",
         ),
     ]
 )
@@ -51,7 +52,7 @@ def test_check_latest_version(mock_get_latest_pypi, data_check_latest_version):
 
 @pytest.fixture(
     params=[
-        (PKG_NAME, 0, "0.1.8"),
+        (PKG_NAME, 0, "0.1.9"),
         ("bad_bogus", 1, UNKNOWN),
     ]
 )
@@ -87,6 +88,35 @@ def test_error1_check_latest_version(mock_get_latest_pypi):
     mock_get_latest_pypi.side_effect = httpx.RequestError("RErr")
     actual = Common.check_latest_version(PKG_NAME)
     assert actual == "Error get PyPI data: RErr"
+
+
+@pytest.fixture(
+    params=[
+        ((0, "out", "err"), "Update available ...", PKG_NAME, "✅ Update completed."),
+        ((0, "out", "err"), "No update", PKG_NAME, "No update"),
+        (
+            (),
+            "Update available ...",
+            PKG_NAME,
+            f"❌ Failed to update {PKG_NAME}: Command 'cmd' returned non-zero exit status 1.",
+        ),
+    ]
+)
+def data_update_package(request):
+    return request.param
+
+
+@patch("batch_img.common.Common.check_latest_version")
+@patch("batch_img.common.Common.run_cmd")
+def test_update_package(mock_run_cmd, mock_check_latest_version, data_update_package):
+    v_1, v_2, pkg_name, expected = data_update_package
+    if v_1:
+        mock_run_cmd.return_value = v_1
+    else:
+        mock_run_cmd.side_effect = subprocess.CalledProcessError(1, "cmd")
+    mock_check_latest_version.return_value = v_2
+    actual = Common.update_package(pkg_name)
+    assert actual == expected
 
 
 @pytest.fixture(
@@ -476,7 +506,7 @@ def test_calculate_new_size(data_calculate_new_size):
 
 @pytest.fixture(
     params=[
-        (Path(f"{dirname(__file__)}/data/JPG"), REPLACE, 5),
+        (Path(f"{dirname(__file__)}/data/JPG"), REPLACE, 6),
         (Path(f"{dirname(__file__)}/data/PNG"), Path(f"{dirname(__file__)}/.out/"), 2),
     ]
 )

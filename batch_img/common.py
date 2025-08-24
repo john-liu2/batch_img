@@ -17,6 +17,7 @@ from time import time
 import httpx
 import piexif
 import pillow_heif
+from loguru import logger as log
 from packaging import version  # compare versions safely
 from PIL import Image, ImageChops
 from PIL.TiffImagePlugin import IFDRational
@@ -32,7 +33,7 @@ from batch_img.const import (
     UNKNOWN,
     VER,
 )
-from batch_img.log import Log, logger
+from batch_img.log import Log
 
 pillow_heif.register_heif_opener()
 VER_CACHE = Path(f"~/.{PKG_NAME}_version_cache.json").expanduser()
@@ -52,8 +53,8 @@ class Common:
         try:
             return importlib.metadata.version(pkg_name)
         except (FileNotFoundError, ImportError, ValueError) as e:
-            logger.warning(f"importlib.metadata.version() Error: {e}")
-            logger.debug("Get version from pyproject.toml file")
+            log.warning(f"importlib.metadata.version() Error: {e}")
+            log.debug("Get version from pyproject.toml file")
             pyproject = Path(__file__).parent.parent / "pyproject.toml"
             with open(pyproject, "rb") as f:
                 return tomllib.load(f)["project"][VER]
@@ -81,7 +82,7 @@ class Common:
                 response = httpx.get(jsn_url, timeout=5)
                 if response.status_code != 200:
                     msg = f"⚠️ Error get data from PyPI: {jsn_url}"
-                    logger.error(msg)
+                    log.error(msg)
                     return UNKNOWN
                 latest_ver = response.json()["info"]["version"]
                 d_cache = {"timestamp": int(time()), "version": latest_ver}
@@ -110,10 +111,10 @@ class Common:
                     f"🔔 Update available: {cur_ver}  →  {latest_ver}\n"
                     f"Run '{pkg_name} --update'"
                 )
-                logger.info(msg)
+                log.info(msg)
         except (httpx.RequestError, KeyError, json.JSONDecodeError) as e:
             msg = f"Error get PyPI data: {e}"
-            logger.error(msg)
+            log.error(msg)
         return msg
 
     @staticmethod
@@ -130,15 +131,15 @@ class Common:
         msg = Common.check_latest_version(pkg_name)
         if "Update available" not in msg:
             return msg
-        logger.info(f"🔄 Updating {pkg_name} ...")
+        log.info(f"🔄 Updating {pkg_name} ...")
         cmd = f"uv pip install --upgrade {pkg_name}"
         try:
             Common.run_cmd(cmd)
             msg = "✅ Update completed."
-            logger.info(msg)
+            log.info(msg)
         except subprocess.CalledProcessError as e:
             msg = f"❌ Failed to update {pkg_name}: {e}"
-            logger.error(msg)
+            log.error(msg)
         return msg
 
     @staticmethod
@@ -151,7 +152,7 @@ class Common:
         Returns:
             tuple: returnCode, StdOut, StdErr
         """
-        logger.debug(f"{cmd=}")
+        log.debug(f"{cmd=}")
         try:
             p = subprocess.run(
                 cmd, capture_output=True, text=True, shell=True, check=True
@@ -159,10 +160,10 @@ class Common:
             r_code = p.returncode
             stdout = p.stdout
             stderr = p.stderr
-            logger.debug(f"'{cmd}'\n {r_code=}\n {stdout=}\n {stderr=}")
+            log.debug(f"'{cmd}'\n {r_code=}\n {stdout=}\n {stderr=}")
             return r_code, stdout, stderr
         except subprocess.CalledProcessError as e:
-            logger.exception(e)
+            log.exception(e)
             raise e
 
     @staticmethod
@@ -209,9 +210,9 @@ class Common:
         if "GPS" in exif_dict and exif_dict["GPS"]:
             exif_dict.pop("GPS")
             exif_bytes = piexif.dump(exif_dict)
-            logger.debug("Removed GPS info in EXIF")
+            log.debug("Removed GPS info in EXIF")
             return True, exif_bytes
-        logger.debug("No GPS in EXIF")
+        log.debug("No GPS in EXIF")
         return False, exif_data
 
     @staticmethod
@@ -234,7 +235,7 @@ class Common:
             for tag_id, value in val.items():
                 tag_name = piexif.TAGS[ifd_name].get(tag_id, {}).get("name", tag_id)
                 _dict[tag_name] = value
-        # logger.info(f"{_dict=}")
+        # log.info(f"{_dict=}")
         for key in (
             "FNumber",
             "FocalLength",
@@ -264,7 +265,7 @@ class Common:
         _res = {
             k: (v.decode() if isinstance(v, bytes) else v) for k, v in _dict.items()
         }
-        logger.debug(f"{_res=}")
+        log.debug(f"{_res=}")
         return _res
 
     @staticmethod
@@ -324,11 +325,11 @@ class Common:
         data2, meta2 = Common.get_image_data(path2)
 
         s1 = f"{path1}:\n{json.dumps(meta1, indent=2, default=Common.jsn_serial)}"
-        logger.debug(s1)
+        log.debug(s1)
         s2 = f"{path2}:\n{json.dumps(meta2, indent=2, default=Common.jsn_serial)}"
-        logger.debug(s2)
+        log.debug(s2)
         is_equal = ImageChops.difference(data1, data2).getbbox() is None
-        logger.debug(f"{is_equal=}")
+        log.debug(f"{is_equal=}")
         return is_equal
 
     @staticmethod

@@ -7,11 +7,11 @@ from pathlib import Path
 
 import piexif
 import pillow_heif
+from loguru import logger as log
 from PIL import Image
 
 from batch_img.common import Common
 from batch_img.const import EXIF, REPLACE
-from batch_img.log import logger
 
 pillow_heif.register_heif_opener()
 
@@ -33,7 +33,7 @@ class Rotate:
         in_path, out_path, angle_cw = args
         Common.set_log_by_process()
         if angle_cw == 0:
-            logger.debug(f"No rotate as {angle_cw=}")
+            log.debug(f"No rotate as {angle_cw=}")
             return False, in_path
         if angle_cw not in {90, 180, 270}:
             return False, f"Bad {angle_cw=}. Only allow 90, 180, 270"
@@ -56,14 +56,14 @@ class Rotate:
                     rotated_img = img.transpose(Image.ROTATE_90)
 
                 rotated_img.save(file, img.format, exif=exif_bytes, optimize=True)
-            logger.debug(f"Saved ({angle_cw}°) clockwise rotated to {file}")
+            log.debug(f"Saved ({angle_cw}°) clockwise rotated to {file}")
             if out_path == REPLACE:
                 os.replace(file, in_path)
-                logger.debug(f"Replaced {in_path} with the new tmp_file")
+                log.debug(f"Replaced {in_path} with the new tmp_file")
                 file = in_path
             return True, file
         except (AttributeError, FileNotFoundError, ValueError) as e:
-            logger.error(e)
+            log.error(e)
             return False, f"{in_path}:\n{e}"
 
     @staticmethod
@@ -79,18 +79,18 @@ class Rotate:
             bool: True - Success. False - Error
         """
         if angle_cw not in {90, 180, 270}:
-            logger.error(f"Bad {angle_cw=}. Only allow 90, 180, 270")
+            log.error(f"Bad {angle_cw=}. Only allow 90, 180, 270")
             return False
         image_files = Common.prepare_all_files(in_path, out_path)
         tasks = [(f, out_path, angle_cw) for f in image_files]
         files_cnt = len(tasks)
         if files_cnt == 0:
-            logger.error(f"No image files at {in_path}")
+            log.error(f"No image files at {in_path}")
             return False
 
-        logger.debug(f"Rotate {files_cnt} image files in multiprocess ...")
+        log.debug(f"Rotate {files_cnt} image files in multiprocess ...")
         success_cnt = Common.multiprocess_progress_bar(
             Rotate.rotate_1_image, "Rotate image files", files_cnt, tasks
         )
-        logger.info(f"\nSuccessfully rotated {success_cnt}/{files_cnt} files")
+        log.info(f"\nSuccessfully rotated {success_cnt}/{files_cnt} files")
         return True

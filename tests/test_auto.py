@@ -60,6 +60,11 @@ def test_error_process_an_image(mock_open):
             Path(f"{dirname(__file__)}/.out/"),
             (False, Path(f"{dirname(__file__)}/data/HEIC/chef_show2.heic")),
         ),
+        (
+            Path(f"{dirname(__file__)}/data/HEIC/IMG_0070.HEIC"),
+            Path(f"{dirname(__file__)}/.out/"),
+            (False, Path(f"{dirname(__file__)}/data/HEIC/IMG_0070.HEIC")),
+        ),
     ]
 )
 def data_rotate_if_needed(request):
