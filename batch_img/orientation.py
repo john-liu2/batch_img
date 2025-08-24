@@ -247,7 +247,7 @@ class Orientation:
         cloud_mask = cv2.inRange(hsv, np.array([0, 0, 180]), np.array([180, 70, 255]))
         sky_cloud_mask = cv2.bitwise_or(sky_mask, cloud_mask)
 
-        h, w = sky_cloud_mask.shape
+        h, w, _ = opencv_img.shape
         regions = {
             "top": sky_cloud_mask[0 : h // 3, :],
             "bottom": sky_cloud_mask[2 * h // 3 :, :],
