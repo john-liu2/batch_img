@@ -25,7 +25,7 @@ class Auto:
     def process_an_image(in_path: Path, out_path: Path | str) -> tuple:
         """Process an image file:
         * Resize to 1280 pixels as the max length
-        * Add the border of 9 pixel width in gray color
+        * Add the border of 5 pixel width in black color
         * Remove GPS location info
 
         Args:
@@ -92,11 +92,7 @@ class Auto:
 
     @staticmethod
     def auto_do_1_image(args: tuple) -> tuple:
-        """Auto process an image file:
-        * Resize to 1280 pixels as the max length
-        * Add the border of 9 pixel width in gray color
-        * Remove GPS location info
-
+        """Auto process an image file
         Args:
             args: tuple of the below params:
             in_path: image file path
