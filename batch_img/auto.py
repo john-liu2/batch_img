@@ -79,13 +79,14 @@ class Auto:
         Returns:
             tuple: bool, file path
         """
-        cw_angle = Orientation().get_cw_angle_by_face(in_path)
-        log.debug(f"By face: {cw_angle=}")
-        if cw_angle in {-1, 0}:
-            log.warning(f"Found no face in {in_path.name=}. Try check by floor...")
-            cw_angle, _ = Orientation().detect_floor_by_edge(in_path)
+        cw_angle, _ = Orientation().detect_floor_by_edge(in_path)
+        log.debug(f"Check by floor: {cw_angle=} in {in_path.name=}.")
+        if cw_angle == -1:
+            log.warning(f"Found no floor in {in_path.name=}. Try by face...")
+            cw_angle = Orientation().get_cw_angle_by_face(in_path)
+            log.debug(f"By face: {cw_angle=}")
             if cw_angle == -1:
-                log.warning(f"Found no floor in {in_path.name=}. Skip.")
+                log.warning(f"Found no face in {in_path.name=}. Skip.")
                 return False, in_path
         ok, out_file = Rotate.rotate_1_image((in_path, out_path, cw_angle))
         return ok, out_file
