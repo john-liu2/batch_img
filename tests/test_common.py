@@ -506,7 +506,7 @@ def test_calculate_new_size(data_calculate_new_size):
 
 @pytest.fixture(
     params=[
-        (Path(f"{dirname(__file__)}/data/JPG"), REPLACE, 5),
+        (Path(f"{dirname(__file__)}/data/JPG"), REPLACE, 6),
         (Path(f"{dirname(__file__)}/data/PNG"), Path(f"{dirname(__file__)}/.out/"), 2),
     ]
 )
