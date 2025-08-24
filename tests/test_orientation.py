@@ -133,6 +133,7 @@ def test_get_orientation_by_floor(data_get_orientation_by_floor):
         (Path(f"{dirname(__file__)}/data/HEIC/IMG_2530_180cw.HEIC"), 180),
         (Path(f"{dirname(__file__)}/data/HEIC/IMG_2530_90cw.HEIC"), 270),
         (Path(f"{dirname(__file__)}/data/HEIC/IMG_2530_270cw.HEIC"), 90),
+        (Path(f"{dirname(__file__)}/data/JPG/IMG_2527.jpg"), 90),
     ]
 )
 def data_get_cw_angle_by_sky(request):
