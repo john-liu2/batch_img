@@ -166,11 +166,17 @@ class Main:
         if not transparency or transparency < 0 or transparency > 255:
             log.error(f"Skip due to bad data {transparency=}")
             return False
+        white = options.get("white", False)
         output = options.get("output")
         out = Path(output) if output else REPLACE
         if in_path.is_file():
-            ok, _ = Transparent.do_1_image_transparency((in_path, out, transparency))
+            ok, _ = Transparent.do_1_image_transparency((
+                in_path,
+                out,
+                transparency,
+                white,
+            ))
         else:
-            ok = Transparent.all_images_transparency(in_path, out, transparency)
+            ok = Transparent.all_images_transparency(in_path, out, transparency, white)
         Common.check_latest_version(PKG_NAME)
         return ok

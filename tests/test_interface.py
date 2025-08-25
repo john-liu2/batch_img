@@ -164,9 +164,9 @@ def test_error_rotate(mock_rotate):
 
 @pytest.fixture(
     params=[
-        ("src_path -t 123 -o out/dir", True, MSG_OK),
+        ("src_path -t 123 -o out/dir -w", True, MSG_OK),
         ("img/file --transparency 255 --output out/file", False, MSG_BAD),
-        ("src_path -t 0", True, MSG_OK),
+        ("src_path -t 0 --white", True, MSG_OK),
     ]
 )
 def data_transparent(request):

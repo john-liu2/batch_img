@@ -180,16 +180,6 @@ def rotate(src_path, angle, output):
     required=True,
 )
 @click.option(
-    "-t",
-    "--transparency",
-    is_flag=False,
-    default=0,
-    show_default=True,
-    type=click.IntRange(min=0, max=255),
-    help="Set transparency on image file(s)."
-    " 0 = fully transparent, 255 = completely opaque.",
-)
-@click.option(
     "-o",
     "--output",
     default="",
@@ -199,11 +189,28 @@ def rotate(src_path, angle, output):
     " If the input file is JPEG, it will be saved as PNG file because"
     " JPEG does not support transparency",
 )
-def transparent(src_path, transparency, output):
+@click.option(
+    "-t",
+    "--transparency",
+    is_flag=False,
+    default=127,
+    show_default=True,
+    type=click.IntRange(min=0, max=255),
+    help="Set transparency on image file(s)."
+    " 0 - fully transparent, 255 - completely opaque.",
+)
+@click.option(
+    "-w",
+    "--white",
+    is_flag=True,
+    help="Make white pixels fully transparent.",
+)
+def transparent(src_path, output, transparency, white):
     options = {
         "src_path": src_path,
-        "transparency": transparency,
         "output": output,
+        "transparency": transparency,
+        "white": white,
     }
     res = Main.transparent(options)
     msg = MSG_OK if res else MSG_BAD

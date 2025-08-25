@@ -165,13 +165,14 @@ Usage: batch_img transparent [OPTIONS] SRC_PATH
   Set transparency on image file(s).
 
 Options:
-  -t, --transparency INTEGER RANGE
-                                  Set transparency on image file(s). 0 = fully
-                                  transparent, 255 = completely opaque.
-                                  [default: 0; 0<=x<=255]
   -o, --output TEXT               Output file path. If not specified, replace
                                   the input file. If the input file is JPEG,
                                   it will be saved as PNG file because JPEG
                                   does not support transparency  [default: ""]
+  -t, --transparency INTEGER RANGE
+                                  Set transparency on image file(s). 0 - fully
+                                  transparent, 255 - completely opaque.
+                                  [default: 127; 0<=x<=255]
+  -w, --white                     Make white pixels fully transparent.
   --help                          Show this message and exit.
 ```
