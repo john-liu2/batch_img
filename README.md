@@ -7,7 +7,7 @@ Tested on **macOS** and **Windows**.
 
 ### Installation
 
-#### One Time Setup
+#### One-time Setup
 
 One time installation of the `uv` tool to prepare for **All** future Python tools installation.
 Install `uv` tool by its standalone installers:

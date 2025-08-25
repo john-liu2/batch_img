@@ -1,3 +1,0 @@
-curl --header 'Accept: application/json' -v "https://pypistats.org/api/packages/batch-img/recent?period=week" > ~/Downloads/stats.json
-
-curl --header 'Accept: application/json' -v "https://pypi.org/pypi/batch-img/json" > ~/Downloads/versions.json
