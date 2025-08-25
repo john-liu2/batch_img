@@ -29,7 +29,7 @@ For example, if the pull request fixes issue #10, then please add the following 
 description:
 
 ```
-Fixes #10
+Fixes #8
 ```
 
 GitHub will use this tag to [auto-close the
@@ -52,7 +52,7 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
 After **git clone** the repo to your local disk, go to the local project folder
-and run the command:
+and run the `uv` command:
 
 ```
 uv pip install -e '.[dev]'
@@ -76,16 +76,16 @@ source .venv/bin/activate
 
 The **dev** dependencies have [pre-commit](https://pre-commit.com/#installation)
 installed. This is the tool to automatically trigger actions when making a
-**git commit**. To use the tool, please run the one-time command:
+**git commit**. To activate the tool, please run the **one-time** command:
 
-```bash
+```
 pre-commit install
 ```
 
-After the installation, the plugin will run every time you commit a change. If there
-are any error during the run, fix them and commit the change again. Optionally, you
-can manually run the plugin:
+After the installation, the plugin will run every time you commit a change. If any
+error during the run, the **git commit** will fail. Please fix the error and commit
+the change again. Optionally, you can manually run the plugin:
 
-```bash
+```
 pre-commit run --all-files --show-diff-on-failure
 ```
