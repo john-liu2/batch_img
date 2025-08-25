@@ -19,9 +19,8 @@ from batch_img.transparent import Transparent
             Path(f"{dirname(__file__)}/data/HEIC/IMG_0070.HEIC"),
             Path(f"{dirname(__file__)}/.out/"),
             255,
-            # Non PNG got err on white pixels: not enough values to unpack (expected 4, got 3)
             True,
-            (True, Path(f"{dirname(__file__)}/.out/IMG_0070_a255.HEIC")),
+            (True, Path(f"{dirname(__file__)}/.out/IMG_0070_a255w.HEIC")),
         ),
         (
             Path(f"{dirname(__file__)}/data/HEIC/IMG_0070.HEIC"),
@@ -50,6 +49,13 @@ from batch_img.transparent import Transparent
             127,
             False,
             (True, Path(f"{dirname(__file__)}/.out/IMG_2527_a127.png")),
+        ),
+        (
+            Path(f"{dirname(__file__)}/data/JPG/IMG_2527.jpg"),
+            Path(f"{dirname(__file__)}/.out/"),
+            127,
+            True,
+            (True, Path(f"{dirname(__file__)}/.out/IMG_2527_a127w.png")),
         ),
         (
             Path(f"{dirname(__file__)}/data/PNG/Checkmark.PNG"),
@@ -114,7 +120,7 @@ def test_error_do_1_image_transparency(mock_open):
         (
             Path(f"{dirname(__file__)}/data/PNG"),
             Path(f"{dirname(__file__)}/.out/"),
-            128,
+            234,
             True,
             True,
         )
