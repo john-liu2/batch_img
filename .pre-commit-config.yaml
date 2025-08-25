@@ -4,12 +4,12 @@ repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v5.0.0  # Use the ref you want to point at
     hooks:
-      - id: check-ast  # simply checks whether the files parse as valid python
+      - id: check-ast  # if the files parsed as valid python
       - id: check-added-large-files
-      - id: check-builtin-literals  # requires literal syntax when initializing empty or zero python builtin types
-      - id: check-merge-conflict  # checks for files that contain merge conflict strings
+      - id: check-builtin-literals  # requires literal syntax when initializing empty
+      - id: check-merge-conflict  # if the files that contain merge conflict
       - id: check-toml
-      - id: check-yaml  # Instead of loading the files, simply parse them for syntax.
+      - id: check-yaml
         args: [ --unsafe ]
       - id: trailing-whitespace
       - id: end-of-file-fixer  # ensures files end with a newline
@@ -42,7 +42,7 @@ repos:
       - id: run-pytest
         name: Run Pytest
         entry: pytest
-        language: system  # pytest is in the venv
+        language: system  # pytest is in the dev .venv
         types: [ python ]
         pass_filenames: false
 

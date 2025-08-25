@@ -123,7 +123,8 @@ def no_gps(src_path, output):
     default=0,
     show_default=True,
     type=click.IntRange(min=0),
-    help="Resize image file(s) on original aspect ratio to the length. 0 - no resize.",
+    help="Resize image file(s) on original aspect ratio to"
+    " the max side length. 0 - no resize.",
 )
 @click.option(
     "-o",
@@ -169,5 +170,48 @@ def rotate(src_path, angle, output):
         "output": output,
     }
     res = Main.rotate(options)
+    msg = MSG_OK if res else MSG_BAD
+    click.secho(msg)
+
+
+@cli.command(help="Set transparency on image file(s).")
+@click.argument(
+    "src_path",
+    required=True,
+)
+@click.option(
+    "-o",
+    "--output",
+    default="",
+    show_default=True,
+    type=str,
+    help="Output file path. If not specified, replace the input file."
+    " If the input file is JPEG, it will be saved as PNG file because"
+    " JPEG does not support transparency",
+)
+@click.option(
+    "-t",
+    "--transparency",
+    is_flag=False,
+    default=127,
+    show_default=True,
+    type=click.IntRange(min=0, max=255),
+    help="Set transparency on image file(s)."
+    " 0 - fully transparent, 255 - completely opaque.",
+)
+@click.option(
+    "-w",
+    "--white",
+    is_flag=True,
+    help="Make white pixels fully transparent.",
+)
+def transparent(src_path, output, transparency, white):
+    options = {
+        "src_path": src_path,
+        "output": output,
+        "transparency": transparency,
+        "white": white,
+    }
+    res = Main.transparent(options)
     msg = MSG_OK if res else MSG_BAD
     click.secho(msg)

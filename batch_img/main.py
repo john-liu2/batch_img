@@ -15,6 +15,7 @@ from batch_img.log import Log
 from batch_img.no_gps import NoGps
 from batch_img.resize import Resize
 from batch_img.rotate import Rotate
+from batch_img.transparent import Transparent
 
 
 class Main:
@@ -145,5 +146,37 @@ class Main:
             ok, _ = Rotate.rotate_1_image((in_path, out, angle))
         else:
             ok = Rotate.rotate_all_in_dir(in_path, out, angle)
+        Common.check_latest_version(PKG_NAME)
+        return ok
+
+    @staticmethod
+    def transparent(options: dict) -> bool:
+        """Set transparency the image file(s)
+
+        Args:
+            options: input options dict
+
+        Returns:
+            bool: True - Success. False - Error
+        """
+        Log.init_log_file()
+        log.debug(f"{json.dumps(options, indent=2)}")
+        in_path = Path(options["src_path"])
+        transparency = options.get("transparency")
+        if not transparency or transparency < 0 or transparency > 255:
+            log.error(f"Skip due to bad data {transparency=}")
+            return False
+        white = options.get("white", False)
+        output = options.get("output")
+        out = Path(output) if output else REPLACE
+        if in_path.is_file():
+            ok, _ = Transparent.do_1_image_transparency((
+                in_path,
+                out,
+                transparency,
+                white,
+            ))
+        else:
+            ok = Transparent.all_images_transparency(in_path, out, transparency, white)
         Common.check_latest_version(PKG_NAME)
         return ok
