@@ -308,3 +308,60 @@ def test_rotate_all_in_dir(data_rotate_all):
     options, expected = data_rotate_all
     actual = Main.rotate(options)
     assert actual == expected
+
+
+@pytest.fixture(
+    params=[
+        ("any", "any", {"src_path": "src/file"}, False),
+        ("any", "any", {"src_path": "src/file", "transparency": -9}, False),
+        ("v_1", "v_2", {"src_path": "src/file", "transparency": 11}, "v_2"),
+        (
+            "v_1",
+            "v_2",
+            {"src_path": "src/file", "transparency": 20, "output": "out/path"},
+            "v_2",
+        ),
+    ]
+)
+def data_transparent(request):
+    return request.param
+
+
+@patch("batch_img.common.Common.check_latest_version")
+@patch("batch_img.transparent.Transparent.all_images_transparency")
+@patch("batch_img.transparent.Transparent.do_1_image_transparency")
+def test_transparent(
+    mock_do_1_image_transparency,
+    mock_all_images_transparency,
+    mock_check_latest_version,
+    data_transparent,
+):
+    v_1, v_2, options, expected = data_transparent
+    mock_do_1_image_transparency.return_value = v_1
+    mock_all_images_transparency.return_value = v_2
+    mock_check_latest_version.return_value = "ok"
+    actual = Main.transparent(options)
+    assert actual == expected
+
+
+@pytest.fixture(
+    params=[
+        (
+            {
+                "src_path": f"{dirname(__file__)}/data/PNG",
+                "output": f"{dirname(__file__)}/.out/",
+                "transparency": 0,
+            },
+            True,
+        )
+    ]
+)
+def data_all_transparent(request):
+    return request.param
+
+
+@pytest.mark.slow(reason="This test is not ready.")
+def test_all_images_transparent(data_all_transparent):
+    options, expected = data_all_transparent
+    actual = Main.transparent(options)
+    assert actual == expected

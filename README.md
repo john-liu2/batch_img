@@ -1,10 +1,10 @@
 ## batch_img
 
-Batch processing (**resize, rotate, remove GPS, add border, auto do all**) image
-files (**HEIC, JPG, PNG**) by utilizing
+Batch processing (**resize, rotate, remove GPS, add border, set transparency,
+auto do all**) image files (**HEIC, JPG, PNG**) by utilizing
 **[Pillow / PIL](https://github.com/python-pillow/Pillow)** library.
-Resize, remove GPS, rotate, add border to a single image file or all image files
-in a folder / dir. Tested on **macOS** and **Windows**.
+Resize, remove GPS, rotate, set transparency, add border to a single image file
+or all image files in a folder / dir. Tested on **macOS** and **Windows**.
 
 ### Installation
 
@@ -66,11 +66,12 @@ Options:
   --help     Show this message and exit.
 
 Commands:
-  auto    Auto process (resize to 1280, remove GPS, add border) image...
-  border  Add internal border to image file(s), not expand the size.
-  no-gps  Remove GPS location info in image file(s).
-  resize  Resize image file(s).
-  rotate  Rotate image file(s).
+  auto         Auto process (resize to 1280, remove GPS, add border)...
+  border       Add internal border to image file(s), not expand the size.
+  no-gps       Remove GPS location info in image file(s).
+  resize       Resize image file(s).
+  rotate       Rotate image file(s).
+  transparent  Set transparency on image file(s).
 ```
 
 #### The `auto` sub-command CLI options:
@@ -132,7 +133,8 @@ Usage: batch_img resize [OPTIONS] SRC_PATH
 
 Options:
   -l, --length INTEGER RANGE  Resize image file(s) on original aspect ratio to
-                              the length. 0 - no resize.  [default: 0; x>=0]
+                              the max side length. 0 - no resize.  [default:
+                              0; x>=0]
   -o, --output TEXT           Output file path. If not specified, replace the
                               input file.  [default: ""]
   --help                      Show this message and exit.
@@ -152,4 +154,24 @@ Options:
   -o, --output TEXT           Output file path. If not specified, replace the
                               input file.  [default: ""]
   --help                      Show this message and exit.
+```
+
+#### The `transparent` sub-command CLI options:
+
+```
+✗ batch_img transparent --help
+Usage: batch_img transparent [OPTIONS] SRC_PATH
+
+  Set transparency on image file(s).
+
+Options:
+  -t, --transparency INTEGER RANGE
+                                  Set transparency on image file(s). 0 = fully
+                                  transparent, 255 = completely opaque.
+                                  [default: 0; 0<=x<=255]
+  -o, --output TEXT               Output file path. If not specified, replace
+                                  the input file. If the input file is JPEG,
+                                  it will be saved as PNG file because JPEG
+                                  does not support transparency  [default: ""]
+  --help                          Show this message and exit.
 ```

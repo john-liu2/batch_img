@@ -9,7 +9,7 @@ import pytest
 from click.testing import CliRunner
 
 from batch_img.const import MSG_BAD, MSG_OK
-from batch_img.interface import auto, border, no_gps, resize, rotate
+from batch_img.interface import auto, border, no_gps, resize, rotate, transparent
 
 
 @pytest.fixture(
@@ -158,5 +158,38 @@ def test_error_rotate(mock_rotate):
     mock_rotate.return_value = True
     runner = CliRunner()
     result = runner.invoke(rotate, args=_input.split())
+    print(result.output)
+    assert result.exception
+
+
+@pytest.fixture(
+    params=[
+        ("src_path -t 123 -o out/dir", True, MSG_OK),
+        ("img/file --transparency 255 --output out/file", False, MSG_BAD),
+        ("src_path -t 0", True, MSG_OK),
+    ]
+)
+def data_transparent(request):
+    return request.param
+
+
+@patch("batch_img.main.Main.transparent")
+def test_transparent(mock_rotate, data_transparent):
+    _input, res, expected = data_transparent
+    mock_rotate.return_value = res
+    expected += "\n"
+    runner = CliRunner()
+    result = runner.invoke(transparent, args=_input.split())
+    print(result.output)
+    assert not result.exception
+    assert result.output == expected
+
+
+@patch("batch_img.main.Main.transparent")
+def test_error_transparent(mock_transparent):
+    _input = "img/file --transparency -1"
+    mock_transparent.return_value = True
+    runner = CliRunner()
+    result = runner.invoke(transparent, args=_input.split())
     print(result.output)
     assert result.exception
