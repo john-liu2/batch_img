@@ -18,6 +18,54 @@ pillow_heif.register_heif_opener()
 
 class Transparent:
     @staticmethod
+    def set_white_pixel_transparent(img: Image.Image) -> None:
+        """Set white pixels in RGBA image transparent in-place
+        Non PNG white pixels Err: not enough values to unpack (expected 4, got 3)
+
+        Args:
+            img: RGBA image
+
+        Returns:
+            None
+        """
+        new_data = []
+        for t_pixel in img.getdata():
+            if len(t_pixel) == 4:
+                r, g, b, a = t_pixel
+                if (r, g, b) == (255, 255, 255):
+                    new_data.append((r, g, b, 0))
+                else:
+                    new_data.append((r, g, b, a))
+            else:
+                # Fallback in case of RGB pixel (shouldn't happen after convert)
+                r, g, b = t_pixel
+                if (r, g, b) == (255, 255, 255):
+                    new_data.append((r, g, b, 0))
+                else:
+                    new_data.append((r, g, b, 255))
+        img.putdata(new_data)
+
+    @staticmethod
+    def set_transparency(img: Image.Image, transparency: int) -> None:
+        """Set RGBA image transparency in-place
+
+        Args:
+            img: RGBA image
+            transparency: 0 (fully transparent) <= int <= 255 (completely opaque)
+
+        Returns:
+            None
+        """
+        new_data = []
+        for t_pixel in img.getdata():
+            if len(t_pixel) == 4:
+                r, g, b, _ = t_pixel
+            else:
+                r, g, b = t_pixel
+            new_data.append((r, g, b, transparency))
+        img.putdata(new_data)
+
+    @staticmethod
     def do_1_image_transparency(args: tuple) -> tuple:
         """Set transparency on an image file.
         If the input file is JPEG, it will be saved as PNG file because JPEG does
@@ -38,19 +86,13 @@ class Transparent:
         try:
             with Image.open(in_path) as img:
                 a_img = img.convert("RGBA")
-                a_img.putdata([
-                    (r, g, b, transparency) for r, g, b, a in a_img.getdata()
-                ])
+                Transparent.set_transparency(a_img, transparency)
                 extra = f"a{transparency}"
-                i_format = img.format
-                # Non PNG white pixels: not enough values to unpack (expected 4, got 3)
-                if white and i_format == "PNG":
-                    a_img.putdata([
-                        ((r, g, b, 0) if (r, g, b) == (255, 255, 255) else (r, g, b, a))
-                        for r, g, b, a in img.getdata()
-                    ])
+                if white:
+                    Transparent.set_white_pixel_transparent(a_img)
                     extra = f"a{transparency}w"
                 file = Common.set_out_file(in_path, out_path, extra)
+                i_format = img.format
                 if i_format == "JPEG":
                     i_format = "PNG"
                     file = Path(f"{file.parent}/{file.stem}.png")
