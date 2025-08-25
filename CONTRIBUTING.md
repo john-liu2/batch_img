@@ -39,27 +39,28 @@ when the pull request is merged.
 ### One-time Development Setup
 
 The project was developed on **macOS** using **PyCharm** IDE. The commands below
-should be run in **Terminal** windows on **macOS**.
+should be run in **Terminal** window on **macOS**.
 
-#### One-time Toolchain Setup
+#### One-time `uv` Setup
 
-One time installation of the `uv` tool to prepare for **All** future Python tools
-installation. Install `uv` tool by its standalone installers:
+Install the [`uv`](https://github.com/astral-sh/uv) tool one-time to prepare for
+**all** Python tools and packages installation. Install
+[`uv`](https://github.com/astral-sh/uv) by its standalone installers:
 
 ```
 # On macOS and Linux.
 curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
-After **git clone** the repo to your local disk, go to the local project folder
-and run the `uv` command:
+After `git clone ...` the repo to your local disk, go to the local project folder
+and run the [`uv`](https://github.com/astral-sh/uv) command:
 
 ```
 uv pip install -e '.[dev]'
 ```
 
-This will create a hidden virtualenv in the local project folder `.venv` and install
-all dependencies defined in `pyproject.toml` file in this virtualenv.
+This will create a hidden virtualenv dir in the local project folder - `.venv` and
+install all dependencies defined in the `pyproject.toml` file in this virtualenv.
 
 If the `.venv` exists, this command will update the project version and dependencies
 in the existing `.venv` virtualenv.
@@ -72,20 +73,70 @@ Run the command to activate the development virtualenv:
 source .venv/bin/activate
 ```
 
-#### One-time Pre-commit Plugin Installation
+#### Activate `pre-commit`
 
-The **dev** dependencies have [pre-commit](https://pre-commit.com/#installation)
-installed. This is the tool to automatically trigger actions when making a
-**git commit**. To activate the tool, please run the **one-time** command:
+The [`pre-commit`](https://pre-commit.com/#installation) tool is installed as part
+of **dev** dependencies. It is the tool to automatically trigger actions when making
+a `git commit ...`. To activate the tool, please run the **one-time** command:
 
 ```
 pre-commit install
 ```
 
-After the installation, the plugin will run every time you commit a change. If any
-error during the run, the **git commit** will fail. Please fix the error and commit
-the change again. Optionally, you can manually run the plugin:
+After the activation, the plugin will run every time you commit a change. If any
+error during the run, the `git commit ...` will fail. Please fix the error and
+commit the change again. Optionally, you can manually run the plugin:
 
 ```
 pre-commit run --all-files --show-diff-on-failure
+```
+
+#### Run `ruff`
+
+The [`ruff`](https://github.com/astral-sh/ruff) tool is installed as part of
+**dev** dependencies. It is to check and fix Python code format and lint.
+Run the [`ruff`](https://github.com/astral-sh/ruff) linter command:
+
+```
+ruff check --fix --exit-non-zero-on-fix
+```
+
+Run the [`ruff`](https://github.com/astral-sh/ruff) formater command:
+
+```
+ruff format --diff --check
+```
+
+#### Run `pylint`
+
+The [`pylint`](https://github.com/pylint-dev/pylint) tool is installed as part
+of **dev** dependencies. It is a static code analyser checking the Python code
+without running it. The `pylint` is slower than `ruff`. They are complementary
+to each other.
+Run the [`pylint`](https://github.com/pylint-dev/pylint) command:
+
+```
+pylint $(git ls-files '*.py')
+```
+
+#### Run `pytest`
+
+The [`pytest`](https://github.com/pytest-dev/pytest) tool is installed as part of
+**dev** dependencies. It will run all the **unit tests** and integration tests.
+Run the [`pytest`](https://github.com/pytest-dev/pytest) command:
+
+```
+pytest
+```
+
+Run the [`pytest`](https://github.com/pytest-dev/pytest) with code coverage:
+
+```
+pytest --cov-report=term --cov=batch_img tests
+```
+
+Run command defined in [`Makefile`](https://github.com/john-liu2/batch_img/blob/main/Makefile):
+
+```
+make test
 ```
