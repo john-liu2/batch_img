@@ -1,16 +1,18 @@
 ## batch_img
 
-Batch processing (**resize, rotate, remove GPS, add border, auto do all**) image files (**HEIC, JPG, PNG**) by
-utilizing **[Pillow / PIL](https://github.com/python-pillow/Pillow)** library.
-Resize, rotate, or add border to a single image file or all image files in a folder.
-Tested on **macOS** and **Windows**.
+Batch processing (**resize, rotate, remove GPS, add border, auto do all**) image
+files (**HEIC, JPG, PNG**) by utilizing
+**[Pillow / PIL](https://github.com/python-pillow/Pillow)** library.
+Resize, remove GPS, rotate, add border to a single image file or all image files
+in a folder / dir. Tested on **macOS** and **Windows**.
 
 ### Installation
 
 #### One-time Setup
 
-One time installation of the `uv` tool to prepare for **All** future Python tools installation.
-Install `uv` tool by its standalone installers:
+Install the [`uv`](https://github.com/astral-sh/uv) tool one-time to prepare for
+**all** Python tools and packages installation. Install
+[`uv`](https://github.com/astral-sh/uv) by its standalone installers:
 
 ```
 # On macOS and Linux.
@@ -30,7 +32,8 @@ uv venv
 
 #### Install the `batch_img` tool
 
-Install the `batch_img` tool from PyPI:
+Install the `batch_img` tool from PyPI by the
+[`uv`](https://github.com/astral-sh/uv) command:
 
 ```
 uv pip install --upgrade batch_img
