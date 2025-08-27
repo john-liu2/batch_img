@@ -2,10 +2,10 @@
 
 ### Before Contributing
 
-Welcome to [batch_img](https://github.com/john-liu2/batch_img)! Before submitting a
-pull request, please ensure that you __read the whole guidelines__. If you have any
-question about this contributing guide, please [open an issue and state it
-clearly](https://github.com/john-liu2/batch_img/issues/new).
+Welcome to [batch_img](https://github.com/john-liu2/batch_img). Before submitting a
+pull request, please __read the whole contributing guidelines__! If you have any
+_question_ about this _contributing guidelines_, please [open an issue with the
+detailed question](https://github.com/john-liu2/batch_img/issues/new).
 
 #### Contribution
 
@@ -20,12 +20,12 @@ not understand the failure, please ask for help.
 #### Issues
 
 To resolve an [open issue](https://github.com/john-liu2/batch_img/issues), simply make
-a pull request with your proposed fix. __We do not assign issues in this repo__ so
-please do not ask for permission to work on an issue.
+a _pull request_ with your fix. __No issue is assigned in this repo__. Please
+__do not__ ask for permission to work on an issue.
 
 Please add `Fixes #{$ISSUE_NUMBER}` to the pull request description that resolves
 the open issue.
-For example, if the pull request fixes issue #10, then please add the following to its
+For example, if the pull request fixes __issue #8__, then please add the following to its
 description:
 
 ```
@@ -76,16 +76,16 @@ source .venv/bin/activate
 #### Activate `pre-commit`
 
 The [`pre-commit`](https://pre-commit.com/#installation) tool is installed as part
-of **dev** dependencies. It is the tool to automatically trigger actions when making
-a `git commit ...`. To activate the tool, please run the **one-time** command:
+of **dev** dependencies. This tool will automatically trigger actions when making
+a `git commit ...`. To activate the tool, please run the _one-time_ command:
 
 ```
 pre-commit install
 ```
 
-After the activation, the plugin will run every time you commit a change. If any
+After the activation, the tool will run every time you commit a change. If any
 error during the run, the `git commit ...` will fail. Please fix the error and
-commit the change again. Optionally, you can manually run the plugin:
+commit the change again. _Optionally,_ you can manually run the tool:
 
 ```
 pre-commit run --all-files --show-diff-on-failure
@@ -123,19 +123,33 @@ pylint $(git ls-files '*.py')
 
 The [`pytest`](https://github.com/pytest-dev/pytest) tool is installed as part of
 **dev** dependencies. It will run all the **unit tests** and integration tests.
-Run the [`pytest`](https://github.com/pytest-dev/pytest) command:
+
+* Run test on one single test in a test file, e.g. `test_auto.py`:
+
+```
+pytest -sv tests/test_auto.py -k test_process_an_image
+```
+
+* Run test on a test file, e.g. `test_auto.py`:
+
+```
+pytest -sv tests/test_auto.py
+```
+
+* Run test on all test files:
 
 ```
 pytest
 ```
 
-Run the [`pytest`](https://github.com/pytest-dev/pytest) with code coverage:
+* Run test on all test files with code coverage:
 
 ```
 pytest --cov-report=term --cov=batch_img tests
 ```
 
-Run command defined in [`Makefile`](https://github.com/john-liu2/batch_img/blob/main/Makefile):
+* Run __test__ command defined
+  in [`Makefile`](https://github.com/john-liu2/batch_img/blob/main/Makefile):
 
 ```
 make test

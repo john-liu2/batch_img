@@ -23,9 +23,9 @@ PATTERNS = (
 )
 REPLACE = "replace"
 EXIF = "exif"
-# Resize to 1280 pixels as the max length
-# Add the border of 5 pixel width in black color
+# Resize to 1920-pixel max length
+# Add 5-pixel width black color border
 # Remove GPS location info
-MAX_LENGTH = 1280
+MAX_LENGTH = 1920
 BD_WIDTH = 5
 BD_COLOR = "black"

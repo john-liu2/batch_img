@@ -22,8 +22,8 @@ class Main:
     @staticmethod
     def auto(options: dict) -> bool:
         """Auto process image file(s):
-        * Resize to 1280 pixels as the max length
-        * Add the border of 9 pixel width in gray color
+        * Resize to 1920-pixel max length
+        * Add 5-pixel width black color border
         * Remove GPS location info
 
         Args:
@@ -38,6 +38,10 @@ class Main:
         auto_rotate = options.get("auto_rotate")
         output = options.get("output")
         out = Path(output) if output else REPLACE
+        log.info(
+            "Resize to 1920-pixel max length. Remove GPS location info."
+            " Add 5-pixel width black color border."
+        )
         if in_path.is_file():
             ok, _ = Auto.auto_do_1_image((in_path, out, auto_rotate))
         else:
@@ -170,12 +174,8 @@ class Main:
         output = options.get("output")
         out = Path(output) if output else REPLACE
         if in_path.is_file():
-            ok, _ = Transparent.do_1_image_transparency((
-                in_path,
-                out,
-                transparency,
-                white,
-            ))
+            args = (in_path, out, transparency, white)
+            ok, _ = Transparent.do_1_image_transparency(args)
         else:
             ok = Transparent.all_images_transparency(in_path, out, transparency, white)
         Common.check_latest_version(PKG_NAME)

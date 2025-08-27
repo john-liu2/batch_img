@@ -138,7 +138,7 @@ class Common:
             msg = "✅ Update completed."
             log.info(msg)
         except subprocess.CalledProcessError as e:
-            msg = f"❌ Failed to update {pkg_name}: {e}"
+            msg = f"❌ Update {pkg_name}: {e}"
             log.error(msg)
         return msg
 
