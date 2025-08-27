@@ -101,7 +101,7 @@ def test_do_1_image_transparency(data_1_image_transparency):
 
 @pytest.mark.slow(reason="This test modifies test data file.")
 def test_do_1_image_transparency_replace():
-    in_path = Path(f"~/Downloads/Cartoon_1024.heic").expanduser()
+    in_path = Path("~/Downloads/Cartoon_1024.heic").expanduser()
     actual = Transparent.do_1_image_transparency((in_path, REPLACE, 0, False))
     assert actual == (True, in_path)
 

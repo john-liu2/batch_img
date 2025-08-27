@@ -18,7 +18,7 @@ from batch_img.const import PKG_NAME, REPLACE, UNKNOWN
 from .helper import DotDict
 
 
-@pytest.fixture(params=[(PKG_NAME, "0.2.2"), ("", "0.2.2")])
+@pytest.fixture(params=[(PKG_NAME, "0.2.3"), ("", "0.2.3")])
 def ver_data(request):
     return request.param
 
@@ -34,7 +34,7 @@ def test_get_version(ver_data):
         (
             "0.9.9",
             PKG_NAME,
-            f"🔔 Update available: 0.2.2  →  0.9.9\nRun '{PKG_NAME} --update'",
+            f"🔔 Update available: 0.2.3  →  0.9.9\nRun '{PKG_NAME} --update'",
         ),
     ]
 )
@@ -52,7 +52,7 @@ def test_check_latest_version(mock_get_latest_pypi, data_check_latest_version):
 
 @pytest.fixture(
     params=[
-        (PKG_NAME, 0, "0.2.1"),
+        (PKG_NAME, 0, "0.2.2"),
         ("bad_bogus", 1, UNKNOWN),
     ]
 )
@@ -98,7 +98,7 @@ def test_error1_check_latest_version(mock_get_latest_pypi):
             (),
             "Update available ...",
             PKG_NAME,
-            f"❌ Failed to update {PKG_NAME}: Command 'cmd' returned non-zero exit status 1.",
+            f"❌ Update {PKG_NAME}: Command 'cmd' returned non-zero exit status 1.",
         ),
     ]
 )
@@ -492,6 +492,7 @@ def test_get_crop_box(data_get_crop_box):
         (1024, 768, 1280, (1280, 960)),
         (960, 1280, 1024, (768, 1024)),
         (640, 480, 1024, (1024, 768)),
+        (480, 640, 1920, (1440, 1920)),
     ]
 )
 def data_calculate_new_size(request):

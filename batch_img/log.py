@@ -77,8 +77,7 @@ class Log:
         )
         if not to_file:
             return Log._file
-        pid = os.getpid()
-        Log._file = f"run_{PKG_NAME}_{pid}_{datetime.now().strftime(TS_FORMAT)}.log"
+        Log._file = f"run_{PKG_NAME}_{datetime.now().strftime(TS_FORMAT)}.log"
         log_f = f"{os.getcwd()}/{Log._file}"
         logger.add(
             log_f, level=level, format=logformat, backtrace=backtrace, diagnose=diagnose

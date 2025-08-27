@@ -1,6 +1,6 @@
 """class Auto - do auto actions to the image file(s):
-    * Resize to 1280 pixels as the max length
-    * Add the border of 5 pixel width in black color
+    * Resize to 1920-pixel max length
+    * Add 5-pixel width black color border
     * Remove GPS location info
 Copyright © 2025 John Liu
 """
@@ -24,8 +24,8 @@ class Auto:
     @staticmethod
     def process_an_image(in_path: Path, out_path: Path | str) -> tuple:
         """Process an image file:
-        * Resize to 1280 pixels as the max length
-        * Add the border of 5 pixel width in black color
+        * Resize to 1920-pixel max length
+        * Add 5-pixel width black color border
         * Remove GPS location info
 
         Args:

@@ -22,7 +22,7 @@ def cli(ctx, update, version):  # pragma: no cover
 
 
 @cli.command(
-    help="Auto process (resize to 1280, remove GPS, add border) image file(s)."
+    help="Auto process (resize to 1920, remove GPS, add border) image file(s)."
 )
 @click.argument(
     "src_path",
