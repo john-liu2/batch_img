@@ -66,7 +66,7 @@ Options:
   --help     Show this message and exit.
 
 Commands:
-  auto         Auto process (resize to 1280, remove GPS, add border)...
+  auto         Auto process (resize to 1920, remove GPS, add border)...
   border       Add internal border to image file(s), not expand the size.
   no-gps       Remove GPS location info in image file(s).
   resize       Resize image file(s).
@@ -80,7 +80,7 @@ Commands:
 ✗ batch_img auto --help
 Usage: batch_img auto [OPTIONS] SRC_PATH
 
-  Auto process (resize to 1280, remove GPS, add border) image file(s).
+  Auto process (resize to 1920, remove GPS, add border) image file(s).
 
 Options:
   -ar, --auto_rotate  Auto-rotate image (experimental)
