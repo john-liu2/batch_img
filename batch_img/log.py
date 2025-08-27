@@ -100,10 +100,10 @@ class Log:
             backtrace=backtrace,
             diagnose=diagnose,
         )
-        # Not log to file in prod: too many run_{pid}_batch_img_*.log files
+        # Not log to file in prod for better user experience
         if not to_file:
             return logger
-        f = f"run_{os.getpid()}_{PKG_NAME}_{datetime.now().strftime(TS_FORMAT)}.log"
+        f = f"run_{PKG_NAME}_{datetime.now().strftime(TS_FORMAT)}.log"
         log_file = f"{os.getcwd()}/{f}"
         logger.add(
             log_file,
