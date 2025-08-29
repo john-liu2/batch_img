@@ -50,8 +50,8 @@ class Log:
             backtrace = True
             diagnose = True
         else:
-            # prod output
-            logformat = "{time:HH:mm:ss} | {process} | {level} | {message}"
+            # Simplify production log output
+            logformat = "<level>{message}</level>"
             backtrace = False
             diagnose = False
         return level, logformat, backtrace, diagnose, to_file
