@@ -10,17 +10,21 @@ or all image files in a folder / dir. Tested on **macOS** and **Windows**.
 
 #### One-time Setup
 
-Install the [`uv`](https://github.com/astral-sh/uv) tool one-time to prepare for
-**all** Python tools and packages installation. Install
+Install the Astral's [`uv`](https://github.com/astral-sh/uv) tool one-time to
+prepare for **all** Python tools and packages installation. Install the Astral's
 [`uv`](https://github.com/astral-sh/uv) by its standalone installers:
 
 ```
-# On macOS and Linux.
+# On macOS and Linux
 curl -LsSf https://astral.sh/uv/install.sh | sh
+
+uv venv
+
+source .venv/bin/activate
 ```
 
 ```
-# On Windows (PowerShell).
+# On Windows (PowerShell)
 powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
 
 $env:Path = "C:\Users\{your_user_name}\.local\bin:$env:Path"
@@ -32,7 +36,7 @@ uv venv
 
 #### Install the `batch_img` tool
 
-Install the `batch_img` tool from PyPI by the
+Install the `batch_img` tool from PyPI by the Astral's
 [`uv`](https://github.com/astral-sh/uv) command:
 
 ```
@@ -41,14 +45,17 @@ uv pip install --upgrade batch_img
 
 ### Usage
 
-#### Sample command lines:
+#### Sample command line usage:
 
 ```
 ✗ batch_img --version
-0.0.8
+0.2.5
 
-✗ batch_img rotate --angle 90 ~/Downloads/IMG_0070.HEIC
+
+✗ batch_img auto ~/Documents
+Resize to 1920-pixel max length. Remove GPS location info. Add 5-pixel width black color border.
 ...
+Auto processed 8/8 files
 ✅ Processed the image file(s)
 ```
 
