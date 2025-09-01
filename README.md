@@ -18,8 +18,13 @@ prepare for **all** Python tools and packages installation. Install the Astral's
 # On macOS and Linux
 curl -LsSf https://astral.sh/uv/install.sh | sh
 
+# Install the latest Python by uv command
+uv python install 3.13
+
+# Create the Python virtualenv by uv command
 uv venv
 
+# Activate the Python virtualenv
 source .venv/bin/activate
 ```
 
@@ -27,10 +32,13 @@ source .venv/bin/activate
 # On Windows (PowerShell)
 powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
 
+# Add uv command into environment search path
 $env:Path = "C:\Users\{your_user_name}\.local\bin:$env:Path"
 
+# Create the Python virtualenv by uv command
 uv venv
 
+# Activate the Python virtualenv
 .venv\Scripts\activate
 ```
 
