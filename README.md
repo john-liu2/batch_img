@@ -1,10 +1,10 @@
 ## batch_img
 
-Batch processing (**resize, rotate, remove GPS, add border, set transparency,
+Batch process (**resize, rotate, remove GPS, add border, set transparency,
 auto do all**) image files (**HEIC, JPG, PNG**) by utilizing
 **[Pillow / PIL](https://github.com/python-pillow/Pillow)** library.
-Resize, remove GPS, rotate, set transparency, add border to a single image file
-or all image files in a folder / dir. Tested on **macOS** and **Windows**.
+It can apply the action(s) on a single image file or all image files in the input
+folder / directory. Tested working on **macOS** and **Windows**.
 
 ### Installation
 
