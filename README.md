@@ -191,3 +191,8 @@ Options:
   -w, --white                     Make white pixels fully transparent.
   --help                          Show this message and exit.
 ```
+
+### Contribution
+
+Contributions are welcome!
+Please see the details in [Contribution Guidelines](https://github.com/john-liu2/batch_img/blob/main/CONTRIBUTING.md)
