@@ -390,20 +390,20 @@ class Common:
         return _files
 
     @staticmethod
-    def multiprocess_progress_bar(func, desc: str, all_cnt: int, tasks: list) -> int:
+    def multiprocess_progress_bar(func, desc: str, tasks: list) -> int:
         """Run task in multiprocess with progress bar
 
         Args:
             func: function to be run in multiprocess
             desc: description str
-            all_cnt: all tasks cnt int
             tasks: tasks list for multiprocess pool
 
         Returns:
             int: success_cnt
         """
         success_cnt = 0
-        workers = max(cpu_count(), 4)
+        all_cnt = len(tasks)
+        workers = min(max(cpu_count(), 4), all_cnt)
 
         with Pool(workers) as pool:
             with tqdm(total=all_cnt, desc=desc) as pbar:
@@ -427,15 +427,13 @@ class Common:
         Returns:
             Path:
         """
+        if not out_path:
+            return Path(f"{in_path.parent}/{in_path.stem}_{extra}{in_path.suffix}")
         if out_path == REPLACE:
-            out_file = Path(f"{in_path.parent}/{in_path.stem}_tmp{in_path.suffix}")
-            return out_file
-        out_path.mkdir(parents=True, exist_ok=True)
-        out_file = out_path
-        if out_path.is_dir():
-            filename = f"{in_path.stem}_{extra}{in_path.suffix}"
-            out_file = Path(f"{out_path}/{filename}")
-        return out_file
+            return Path(f"{in_path.parent}/{in_path.stem}_tmp{in_path.suffix}")
+        out_path.expanduser().mkdir(parents=True, exist_ok=True)
+        filename = f"{in_path.stem}_{extra}{in_path.suffix}"
+        return Path(f"{out_path}/{filename}")
 
     @staticmethod
     def set_log_by_process() -> None:

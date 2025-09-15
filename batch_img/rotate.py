@@ -90,7 +90,7 @@ class Rotate:
 
         log.debug(f"Rotate {files_cnt} image files in multiprocess ...")
         success_cnt = Common.multiprocess_progress_bar(
-            Rotate.rotate_1_image, "Rotate image files", files_cnt, tasks
+            Rotate.rotate_1_image, "Rotate image files", tasks
         )
         log.info(f"\nSuccessfully rotated {success_cnt}/{files_cnt} files")
         return True

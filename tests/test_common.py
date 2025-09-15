@@ -535,6 +535,18 @@ def test_prepare_all_files(data_prepare_all_files):
             "90cw",
             Path(f"{dirname(__file__)}/data/HEIC/Cartoon_tmp.heic"),
         ),
+        (
+            Path(f"{dirname(__file__)}/data/HEIC/Cartoon.heic"),
+            "",
+            "neon",
+            Path(f"{dirname(__file__)}/data/HEIC/Cartoon_neon.heic"),
+        ),
+        (
+            Path(f"{dirname(__file__)}/data/HEIC/Cartoon.heic"),
+            Path("~/tmp/HEIC"),
+            "neon",
+            Path("~/tmp/HEIC/Cartoon_neon.heic"),
+        ),
     ]
 )
 def data_set_out_file(request):

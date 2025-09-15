@@ -25,6 +25,7 @@ dependencies = [
     "click",
     "httpx",
     "loguru",
+    "matplotlib",
     "numpy",
     "opencv-python",
     "packaging",
