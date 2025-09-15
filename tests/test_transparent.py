@@ -93,9 +93,12 @@ def data_1_image_transparency(request):
 
 def test_do_1_image_transparency(data_1_image_transparency):
     in_path, out_path, transparency, white, expected = data_1_image_transparency
-    actual = Transparent.do_1_image_transparency(
-        (in_path, out_path, transparency, white)
-    )
+    actual = Transparent.do_1_image_transparency((
+        in_path,
+        out_path,
+        transparency,
+        white,
+    ))
     assert actual == expected
 
 
@@ -109,9 +112,12 @@ def test_do_1_image_transparency_replace():
 @patch("PIL.Image.open")
 def test_error_do_1_image_transparency(mock_open):
     mock_open.side_effect = ValueError("VE")
-    actual = Transparent.do_1_image_transparency(
-        (Path("img/file"), Path("out/path"), 33, True)
-    )
+    actual = Transparent.do_1_image_transparency((
+        Path("img/file"),
+        Path("out/path"),
+        33,
+        True,
+    ))
     assert "img/file" in actual[1]
 
 

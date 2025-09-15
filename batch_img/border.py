@@ -82,7 +82,7 @@ class Border:
 
         log.debug(f"Add border to {files_cnt} image files in multiprocess ...")
         success_cnt = Common.multiprocess_progress_bar(
-            Border.border_1_image, "Add border to image files", files_cnt, tasks
+            Border.border_1_image, "Add border to image files", tasks
         )
         log.info(f"\nSuccessfully added border to {success_cnt}/{files_cnt} files")
         return True

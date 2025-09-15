@@ -67,6 +67,11 @@ Auto processed 8/8 files
 ✅ Processed the image file(s)
 ```
 
+### Contribution
+
+Contributions are welcome!
+Please see the details in [Contribution Guidelines](https://github.com/john-liu2/batch_img/blob/main/CONTRIBUTING.md)
+
 ### Help
 
 #### Top level commands help:
@@ -191,3 +196,8 @@ Options:
   -w, --white                     Make white pixels fully transparent.
   --help                          Show this message and exit.
 ```
+
+### License
+
+**batch_img** is distributed under MIT License. Please see details in
+[LICENSE](https://github.com/john-liu2/batch_img/blob/main/LICENSE).

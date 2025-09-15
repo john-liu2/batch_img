@@ -18,7 +18,7 @@ from batch_img.const import PKG_NAME, REPLACE, UNKNOWN
 from .helper import DotDict
 
 
-@pytest.fixture(params=[(PKG_NAME, "0.2.7"), ("", "0.2.7")])
+@pytest.fixture(params=[(PKG_NAME, "0.2.8"), ("", "0.2.8")])
 def ver_data(request):
     return request.param
 
@@ -34,7 +34,7 @@ def test_get_version(ver_data):
         (
             "0.9.9",
             PKG_NAME,
-            f"🔔 Update available: 0.2.7  →  0.9.9\nRun '{PKG_NAME} --update'",
+            f"🔔 Update available: 0.2.8  →  0.9.9\nRun '{PKG_NAME} --update'",
         ),
     ]
 )
@@ -52,7 +52,7 @@ def test_check_latest_version(mock_get_latest_pypi, data_check_latest_version):
 
 @pytest.fixture(
     params=[
-        (PKG_NAME, 0, "0.2.6"),
+        (PKG_NAME, 0, "0.2.7"),
         ("bad_bogus", 1, UNKNOWN),
     ]
 )
@@ -534,6 +534,18 @@ def test_prepare_all_files(data_prepare_all_files):
             REPLACE,
             "90cw",
             Path(f"{dirname(__file__)}/data/HEIC/Cartoon_tmp.heic"),
+        ),
+        (
+            Path(f"{dirname(__file__)}/data/HEIC/Cartoon.heic"),
+            "",
+            "neon",
+            Path(f"{dirname(__file__)}/data/HEIC/Cartoon_neon.heic"),
+        ),
+        (
+            Path(f"{dirname(__file__)}/data/HEIC/Cartoon.heic"),
+            Path("~/tmp/HEIC"),
+            "neon",
+            Path("~/tmp/HEIC/Cartoon_neon.heic"),
         ),
     ]
 )

@@ -131,7 +131,7 @@ class Auto:
 
         log.debug(f"Auto process {files_cnt} files in multiprocess ...")
         success_cnt = Common.multiprocess_progress_bar(
-            Auto.auto_do_1_image, "Auto process image files", files_cnt, tasks
+            Auto.auto_do_1_image, "Auto process image files", tasks
         )
         log.info(f"\nAuto processed {success_cnt}/{files_cnt} files")
         return True
