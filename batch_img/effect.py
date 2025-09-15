@@ -11,7 +11,8 @@ import numpy as np
 
 EFFECTS = {
     "neon": {"glow_intensity": 2.0, "edge_thickness": 2},
-    "hdr": {"gamma": 1.2, "saturation": 1.1},
+    "hdr": {"gamma": 1.2, "saturation": 1.0},
+    "blur": {"ksize": (12, 12), "sigmaX": 0},
 }
 
 
@@ -30,7 +31,6 @@ class Effect:
         kernel = np.ones((edge_thickness, edge_thickness), np.uint8)
         thick_edges = cv2.dilate(edges, kernel, iterations=1)
 
-        # Apply Gaussian blur for glow effect
         glow = cv2.GaussianBlur(thick_edges, (15, 15), 0)
 
         # Normalize and apply color
@@ -104,6 +104,8 @@ class Effect:
             new_img = self.neon_glow_effect(opencv_img, **val)
         elif effect_name == "hdr":
             new_img = self.hdr_effect(opencv_img, **val)
+        elif effect_name == "blur":
+            new_img = cv2.GaussianBlur(opencv_img, **val)
         if new_img is not None:
             rgb_img = cv2.cvtColor(new_img, cv2.COLOR_BGR2RGB)
         return rgb_img, out_file

@@ -13,7 +13,7 @@ from loguru import logger as log
 from PIL import Image
 
 from batch_img.common import Common
-from batch_img.const import BD_COLOR, BD_WIDTH, EXIF, MAX_LENGTH, REPLACE
+from batch_img.const import EXIF, REPLACE, Conf
 from batch_img.orientation import Orientation
 from batch_img.rotate import Rotate
 
@@ -39,18 +39,18 @@ class Auto:
             with Image.open(in_path) as img:
                 width, height = img.size
                 log.debug(f"{width=}, {height=}")
-                new_size = Common.calculate_new_size(width, height, MAX_LENGTH)
+                new_size = Common.calculate_new_size(width, height, Conf.max_length)
                 new_img = img.resize(new_size, Image.Resampling.LANCZOS, reducing_gap=3)
 
                 # Add border
                 width, height = new_img.size
                 log.debug(f"new_img: {width=}, {height=}")
-                box = Common.get_crop_box(width, height, BD_WIDTH)
+                box = Common.get_crop_box(width, height, Conf.bd_width)
                 cropped_img = new_img.crop(box)
-                bd_img = Image.new(new_img.mode, (width, height), BD_COLOR)
-                bd_img.paste(cropped_img, (BD_WIDTH, BD_WIDTH))
+                bd_img = Image.new(new_img.mode, (width, height), Conf.bd_color)
+                bd_img.paste(cropped_img, (Conf.bd_width, Conf.bd_width))
 
-                file = Common.set_out_file(in_path, out_path, f"bw{BD_WIDTH}")
+                file = Common.set_out_file(in_path, out_path, f"bw{Conf.bd_width}")
 
                 if EXIF not in img.info:
                     log.debug(f"No EXIF in {in_path}")
