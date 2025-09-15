@@ -15,10 +15,10 @@ from batch_img.do_effect import DoEffect
 @pytest.fixture(
     params=[
         # (
-        #     Path("~/Documents/IMG_0696.HEIC"),
+        #     Path("~/Documents/IMG_0231.HEIC"),
         #     "",
-        #     "hdr",
-        #     (True, Path("~/Documents/IMG_0696_hdr.HEIC").expanduser()),
+        #     "blur",
+        #     (True, Path("~/Documents/IMG_0231_blur.HEIC").expanduser()),
         # ),
         (
             Path(f"{dirname(__file__)}/data/HEIC/IMG_0070.HEIC"),
@@ -31,6 +31,12 @@ from batch_img.do_effect import DoEffect
             Path(f"{dirname(__file__)}/.out/"),
             "hdr",
             (True, Path(f"{dirname(__file__)}/.out/IMG_0070_hdr.HEIC")),
+        ),
+        (
+            Path(f"{dirname(__file__)}/data/JPG/152.JPG"),
+            Path(f"{dirname(__file__)}/.out/"),
+            "blur",
+            (True, Path(f"{dirname(__file__)}/.out/152_blur.JPG")),
         ),
     ]
 )

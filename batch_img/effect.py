@@ -1,6 +1,5 @@
-"""class Effect: OpenCV advanced image effects operations
-  * neon glow
-  * hdr
+"""class Effect: OpenCV advanced image effects operations:
+  ** neon glow, hdr, blur **
 Copyright © 2025 John Liu
 """
 
@@ -11,7 +10,8 @@ import numpy as np
 
 EFFECTS = {
     "neon": {"glow_intensity": 2.0, "edge_thickness": 2},
-    "hdr": {"gamma": 1.2, "saturation": 1.1},
+    "hdr": {"gamma": 1.2, "saturation": 1.0},
+    "blur": {"ksize": (29, 29), "sigmaX": 0},
 }
 
 
@@ -30,7 +30,6 @@ class Effect:
         kernel = np.ones((edge_thickness, edge_thickness), np.uint8)
         thick_edges = cv2.dilate(edges, kernel, iterations=1)
 
-        # Apply Gaussian blur for glow effect
         glow = cv2.GaussianBlur(thick_edges, (15, 15), 0)
 
         # Normalize and apply color
@@ -104,6 +103,9 @@ class Effect:
             new_img = self.neon_glow_effect(opencv_img, **val)
         elif effect_name == "hdr":
             new_img = self.hdr_effect(opencv_img, **val)
+        elif effect_name == "blur":
+            tmp = cv2.cvtColor(opencv_img, cv2.COLOR_RGB2BGR)
+            new_img = cv2.GaussianBlur(tmp, **val)
         if new_img is not None:
             rgb_img = cv2.cvtColor(new_img, cv2.COLOR_BGR2RGB)
         return rgb_img, out_file
