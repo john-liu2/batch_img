@@ -1,5 +1,4 @@
 """class DoEffect: apply OpenCV advanced image effects to image file(s).
-Must separate this file from effect.py to avoid HEIC image saving error due to cv2.
 Copyright © 2025 John Liu
 """
 

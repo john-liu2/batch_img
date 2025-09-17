@@ -382,7 +382,7 @@ class Common:
         Returns:
             iterable: files list generator
         """
-        if out_path != REPLACE:
+        if out_path and out_path != REPLACE:
             out_path.mkdir(parents=True, exist_ok=True)
         # Fix Path.glob() got 2x count on Windows 10
         tmp = [in_path.glob(p, case_sensitive=True) for p in PATTERNS]
@@ -416,7 +416,7 @@ class Common:
         return success_cnt
 
     @staticmethod
-    def set_out_file(in_path: Path, out_path: Path, extra: str = "") -> Path:
+    def set_out_file(in_path: Path, out_path: Path | str, extra: str = "") -> Path:
         """Set the output file path
 
         Args:

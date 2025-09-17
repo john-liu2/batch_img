@@ -11,6 +11,7 @@ from batch_img.auto import Auto
 from batch_img.border import Border
 from batch_img.common import Common
 from batch_img.const import PKG_NAME, REPLACE
+from batch_img.do_effect import DoEffect
 from batch_img.log import Log
 from batch_img.no_gps import NoGps
 from batch_img.resize import Resize
@@ -76,6 +77,32 @@ class Main:
             ok, _ = Border.border_1_image((in_path, out, bd_width, bd_color))
         else:
             ok = Border.border_all_in_dir(in_path, out, bd_width, bd_color)
+        Common.check_latest_version(PKG_NAME)
+        return ok
+
+    @staticmethod
+    def do_effect(options: dict) -> bool:
+        """Add a special effect to the image file(s)
+
+        Args:
+            options: input options dict
+
+        Returns:
+            bool: True - Success. False - Error
+        """
+        Log.init_log_file()
+        log.debug(f"{json.dumps(options, indent=2)}")
+        in_path = Path(options["src_path"])
+        effect = options.get("effect")
+        if not effect:
+            log.error(f"Bad border width: {effect=}")
+            return False
+        output = options.get("output")
+        out = Path(output) if output else ""
+        if in_path.is_file():
+            ok, _ = DoEffect.apply_1_image((in_path, out, effect))
+        else:
+            ok = DoEffect.apply_all_in_dir(in_path, out, effect)
         Common.check_latest_version(PKG_NAME)
         return ok
 
