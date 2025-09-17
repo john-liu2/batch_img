@@ -91,6 +91,36 @@ def border(src_path, border_width, border_color, output):
     click.secho(msg)
 
 
+@cli.command(help="Do special effect to image file(s).")
+@click.argument(
+    "src_path",
+    required=True,
+)
+@click.option(
+    "-e",
+    "--effect",
+    is_flag=False,
+    default="neon",
+    show_default=True,
+    type=click.Choice(["blur", "hdr", "neon"]),
+    help="Do special effect to image file(s): blur, hdr, neon.",
+)
+@click.option(
+    "-o",
+    "--output",
+    default="",
+    show_default=True,
+    type=str,
+    help="Output dir path. If not specified, add special effect image file(s)"
+    " to the same path as the input file(s).",
+)
+def do_effect(src_path, effect, output):
+    options = {"src_path": src_path, "effect": effect, "output": output}
+    res = Main.do_effect(options)
+    msg = MSG_OK if res else MSG_BAD
+    click.secho(msg)
+
+
 @cli.command(help="Remove GPS location info in image file(s).")
 @click.argument(
     "src_path",

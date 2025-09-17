@@ -9,7 +9,15 @@ import pytest
 from click.testing import CliRunner
 
 from batch_img.const import MSG_BAD, MSG_OK
-from batch_img.interface import auto, border, no_gps, resize, rotate, transparent
+from batch_img.interface import (
+    auto,
+    border,
+    do_effect,
+    no_gps,
+    resize,
+    rotate,
+    transparent,
+)
 
 
 @pytest.fixture(
@@ -71,6 +79,29 @@ def test_error_border(mock_border, data_error_border):
     result = runner.invoke(border, args=_input.split())
     print(result.output)
     assert result.exception
+
+
+@pytest.fixture(
+    params=[
+        ("src_path -e blur", True, MSG_OK),
+        ("img/file --effect hdr", False, MSG_BAD),
+        ("src_path -e neon", True, MSG_OK),
+    ]
+)
+def data_effect(request):
+    return request.param
+
+
+@patch("batch_img.main.Main.do_effect")
+def test_do_effect(mock_border, data_effect):
+    _input, res, expected = data_effect
+    mock_border.return_value = res
+    expected += "\n"
+    runner = CliRunner()
+    result = runner.invoke(do_effect, args=_input.split())
+    print(result.output)
+    assert not result.exception
+    assert result.output == expected
 
 
 @pytest.fixture(

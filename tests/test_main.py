@@ -125,6 +125,47 @@ def test_border_all_in_dir(data_border_all):
             "v_2",
             {
                 "src_path": "src/file",
+                "effect": "blur",
+                "output": f"{dirname(__file__)}/.out/",
+            },
+            "v_2",
+        ),
+        (
+            "v_1",
+            "v_2",
+            {
+                "src_path": "src/file",
+                "effect": "neon",
+            },
+            "v_2",
+        ),
+    ]
+)
+def data_do_effect(request):
+    return request.param
+
+
+@patch("batch_img.common.Common.check_latest_version")
+@patch("batch_img.do_effect.DoEffect.apply_all_in_dir")
+@patch("batch_img.do_effect.DoEffect.apply_1_image")
+def test_do_effect(
+    mock_apply_1_image, mock_apply_all_in_dir, mock_check_latest_version, data_do_effect
+):
+    v_1, v_2, options, expected = data_do_effect
+    mock_apply_1_image.return_value = v_1
+    mock_apply_all_in_dir.return_value = v_2
+    mock_check_latest_version.return_value = "ok"
+    actual = Main.do_effect(options)
+    assert actual == expected
+
+
+@pytest.fixture(
+    params=[
+        (
+            "v_1",
+            "v_2",
+            {
+                "src_path": "src/file",
                 "output": f"{dirname(__file__)}/.out/",
             },
             "v_2",

@@ -88,6 +88,7 @@ Options:
 Commands:
   auto         Auto process (resize to 1920, remove GPS, add border)...
   border       Add internal border to image file(s), not expand the size.
+  do-effect    Do special effect to image file(s).
   no-gps       Remove GPS location info in image file(s).
   resize       Resize image file(s).
   rotate       Rotate image file(s).
@@ -141,6 +142,23 @@ Options:
   -o, --output TEXT  Output file path. If not specified, replace the input
                      file.  [default: ""]
   --help             Show this message and exit.
+```
+
+#### The `do-effect` sub-command CLI options:
+
+```
+✗ batch_img do-effect --help
+Usage: batch_img do-effect [OPTIONS] SRC_PATH
+
+  Do special effect to image file(s).
+
+Options:
+  -e, --effect [blur|hdr|neon]  Do special effect to image file(s): blur, hdr,
+                                neon.  [default: neon]
+  -o, --output TEXT             Output dir path. If not specified, add special
+                                effect image file(s) to the same path as the
+                                input file(s).  [default: ""]
+  --help                        Show this message and exit.
 ```
 
 #### The `resize` sub-command CLI options:
