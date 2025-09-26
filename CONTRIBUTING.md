@@ -19,14 +19,14 @@ not understand the failure, please ask for help.
 
 #### Issues
 
-To resolve an [open issue](https://github.com/john-liu2/batch_img/issues), simply make
-a _pull request_ with your fix. __No issue is assigned in this repo__. Please
-__do not__ ask for permission to work on an issue.
+To resolve an [open issue](https://github.com/john-liu2/batch_img/issues),
+simply make a _pull request_ with your fix. __No issue is assigned in this repo__.
+Please __do not__ ask for permission to work on an issue.
 
 Please add `Fixes #{$ISSUE_NUMBER}` to the pull request description that resolves
 the open issue.
-For example, if the pull request fixes __issue #8__, then please add the following to its
-description:
+For example, if the pull request fixes __issue #8__, then please add the following to
+the pull request's description:
 
 ```
 Fixes #8
