@@ -74,7 +74,7 @@ class NoGps:
             return False
 
         log.debug(f"Remove GPS info in {files_cnt} image files in multiprocess ...")
-        success_cnt = Common.multiprocess_progress_bar(
+        success_cnt = Common.executor_progress(
             NoGps.remove_1_image_gps, "Remove GPS in image files", tasks
         )
         log.info(f"\nSuccessfully removed GPS in {success_cnt}/{files_cnt} files")

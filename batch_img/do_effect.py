@@ -76,7 +76,7 @@ class DoEffect:
             return False
 
         log.debug(f"Apply special effect to {files_cnt} image files ...")
-        success_cnt = Common.multiprocess_progress_bar(
+        success_cnt = Common.executor_progress(
             DoEffect.apply_1_image, "Apply special effect to image files", tasks
         )
         log.info(f"\nCompleted the special effect to {success_cnt}/{files_cnt} files")

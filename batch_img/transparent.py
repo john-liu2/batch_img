@@ -138,7 +138,7 @@ class Transparent:
             return False
 
         log.debug(f"Set transparency on {files_cnt} image files in multiprocess ...")
-        success_cnt = Common.multiprocess_progress_bar(
+        success_cnt = Common.executor_progress(
             Transparent.do_1_image_transparency, "Set transparency", tasks
         )
         log.info(f"\nDone - set transparency on {success_cnt}/{files_cnt} files")

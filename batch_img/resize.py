@@ -80,7 +80,7 @@ class Resize:
             return False
 
         log.debug(f"Resize {files_cnt} image files in multiprocess ...")
-        success_cnt = Common.multiprocess_progress_bar(
+        success_cnt = Common.executor_progress(
             Resize.resize_an_image, "Resize image files", tasks
         )
         log.info(f"\nSuccessfully resized {success_cnt}/{files_cnt} files")
