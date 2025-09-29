@@ -89,7 +89,7 @@ class Rotate:
             return False
 
         log.debug(f"Rotate {files_cnt} image files in multiprocess ...")
-        success_cnt = Common.multiprocess_progress_bar(
+        success_cnt = Common.executor_progress(
             Rotate.rotate_1_image, "Rotate image files", tasks
         )
         log.info(f"\nSuccessfully rotated {success_cnt}/{files_cnt} files")

@@ -8,6 +8,7 @@ import json
 import subprocess
 import tomllib
 from base64 import b64encode
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timedelta
 from multiprocessing import Pool, cpu_count, current_process
 from os.path import getmtime, getsize
@@ -421,6 +422,35 @@ class Common:
                         success_cnt += 1
                     else:
                         tqdm.write(f"Error: {res}")
+                    pbar.update(1)
+        return success_cnt
+
+    @staticmethod
+    def executor_progress(func, desc: str, tasks: list) -> int:
+        """ProcessPoolExecutor / ThreadPoolExecutor + progress bar
+
+        Args:
+            func: function to be run in multiprocess
+            desc: description str
+            tasks: tasks list for multiprocess pool
+
+        Returns:
+            int: success_cnt
+        """
+        success_cnt = 0
+        all_cnt = len(tasks)
+        workers = min(max(cpu_count(), 4), all_cnt)
+
+        with ThreadPoolExecutor(max_workers=workers) as executor:
+            futures = [executor.submit(func, task) for task in tasks]
+            with tqdm(total=len(futures), desc=desc) as pbar:
+                # as_completed to iterate over futures as they finish
+                for future in as_completed(futures):
+                    ok, res = future.result()
+                    if ok:
+                        success_cnt += 1
+                    else:
+                        tqdm.write(f"error: {res}")
                     pbar.update(1)
         return success_cnt
 
