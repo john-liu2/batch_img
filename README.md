@@ -57,7 +57,7 @@ uv pip install --upgrade batch_img
 
 ```
 ✗ batch_img --version
-0.2.5
+0.3.0
 
 
 ✗ batch_img auto ~/Documents

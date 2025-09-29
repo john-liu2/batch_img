@@ -8,7 +8,7 @@ import json
 import subprocess
 import tomllib
 from base64 import b64encode
-from datetime import datetime
+from datetime import datetime, timedelta
 from multiprocessing import Pool, cpu_count, current_process
 from os.path import getmtime, getsize
 from pathlib import Path
@@ -165,6 +165,15 @@ class Common:
         except subprocess.CalledProcessError as e:
             log.exception(e)
             raise e
+
+    @staticmethod
+    def human_readable_time(seconds: float) -> str:
+        """
+        Convert duration in seconds to human-readable duration string
+        :param seconds: seconds float
+        :return: duration string
+        """
+        return str(timedelta(seconds=round(seconds)))
 
     @staticmethod
     def file_to_base64(file: Path) -> str:
