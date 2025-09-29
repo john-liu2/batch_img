@@ -18,7 +18,7 @@ from batch_img.const import PKG_NAME, REPLACE, UNKNOWN
 from .helper import DotDict
 
 
-@pytest.fixture(params=[(PKG_NAME, "0.3.0"), ("", "0.3.0")])
+@pytest.fixture(params=[(PKG_NAME, "0.3.1"), ("", "0.3.1")])
 def ver_data(request):
     return request.param
 
@@ -34,7 +34,7 @@ def test_get_version(ver_data):
         (
             "0.9.9",
             PKG_NAME,
-            f"🔔 Update available: 0.3.0  →  0.9.9\nRun '{PKG_NAME} --update'",
+            f"🔔 Update available: 0.3.1  →  0.9.9\nRun '{PKG_NAME} --update'",
         ),
     ]
 )
@@ -52,7 +52,7 @@ def test_check_latest_version(mock_get_latest_pypi, data_check_latest_version):
 
 @pytest.fixture(
     params=[
-        (PKG_NAME, 0, "0.2.9"),
+        (PKG_NAME, 0, "0.3.0"),
         ("bad_bogus", 1, UNKNOWN),
     ]
 )
@@ -154,6 +154,29 @@ def test_run_cmd(mock_s_run, run_cmd_data):
         mock_s_run.side_effect = KeyError("KE")
         with pytest.raises(KeyError):
             Common.run_cmd(cmd)
+
+
+@pytest.fixture(
+    params=[
+        (238.25177, "0:03:58"),
+        (638.185_673_952_102_7, "0:10:38"),
+        (60 * 60 * 23 + 3599, "23:59:59"),
+        (60 * 60 * 24 + 1, "1 day, 0:00:01"),
+        (60 * 60 * 24 * 7 + 2, "7 days, 0:00:02"),
+        (0.4, "0:00:00"),
+        (0.5, "0:00:00"),
+        (0, "0:00:00"),
+        (-1, "-1 day, 23:59:59"),
+    ]
+)
+def time_data(request):
+    return request.param
+
+
+def test_human_readable_time(time_data):
+    seconds, expected = time_data
+    actual = Common.human_readable_time(seconds)
+    assert actual == expected
 
 
 @pytest.fixture(

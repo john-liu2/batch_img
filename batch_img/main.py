@@ -4,6 +4,7 @@ Copyright © 2025 John Liu
 
 import json
 from pathlib import Path
+from time import time
 
 from loguru import logger as log
 
@@ -21,6 +22,35 @@ from batch_img.transparent import Transparent
 
 class Main:
     @staticmethod
+    def _prepare(options: dict) -> float:
+        """Prepare the start for all (internal helper)
+
+        Args:
+            options: input options dict
+
+        Returns:
+            float: start timestamp in seconds
+        """
+        Log.init_log_file()
+        log.debug(f"{json.dumps(options, indent=2)}")
+        return time()
+
+    @staticmethod
+    def _conclude(start_ts: float) -> str:
+        """Conclude the end for all (internal helper)
+
+        Args:
+            start_ts: float
+
+        Returns:
+            str: human-readable elapsed time string
+        """
+        Common.check_latest_version(PKG_NAME)
+        duration = Common.human_readable_time(time() - start_ts)
+        log.info(f"Elapsed time: {duration}")
+        return duration
+
+    @staticmethod
     def auto(options: dict) -> bool:
         """Auto process image file(s):
         * Resize to 1920-pixel max length
@@ -33,8 +63,7 @@ class Main:
         Returns:
             bool: True - Success. False - Error
         """
-        Log.init_log_file()
-        log.debug(f"{json.dumps(options, indent=2)}")
+        start_ts = Main._prepare(options)
         in_path = Path(options["src_path"])
         auto_rotate = options.get("auto_rotate")
         output = options.get("output")
@@ -47,7 +76,7 @@ class Main:
             ok, _ = Auto.auto_do_1_image((in_path, out, auto_rotate))
         else:
             ok = Auto.auto_on_all(in_path, out, auto_rotate)
-        Common.check_latest_version(PKG_NAME)
+        Main._conclude(start_ts)
         return ok
 
     @staticmethod
@@ -60,8 +89,7 @@ class Main:
         Returns:
             bool: True - Success. False - Error
         """
-        Log.init_log_file()
-        log.debug(f"{json.dumps(options, indent=2)}")
+        start_ts = Main._prepare(options)
         in_path = Path(options["src_path"])
         bd_width = options.get("border_width")
         if not bd_width or bd_width == 0:
@@ -77,7 +105,7 @@ class Main:
             ok, _ = Border.border_1_image((in_path, out, bd_width, bd_color))
         else:
             ok = Border.border_all_in_dir(in_path, out, bd_width, bd_color)
-        Common.check_latest_version(PKG_NAME)
+        Main._conclude(start_ts)
         return ok
 
     @staticmethod
@@ -90,8 +118,7 @@ class Main:
         Returns:
             bool: True - Success. False - Error
         """
-        Log.init_log_file()
-        log.debug(f"{json.dumps(options, indent=2)}")
+        start_ts = Main._prepare(options)
         in_path = Path(options["src_path"])
         effect = options.get("effect")
         if not effect:
@@ -103,7 +130,7 @@ class Main:
             ok, _ = DoEffect.apply_1_image((in_path, out, effect))
         else:
             ok = DoEffect.apply_all_in_dir(in_path, out, effect)
-        Common.check_latest_version(PKG_NAME)
+        Main._conclude(start_ts)
         return ok
 
     @staticmethod
@@ -116,8 +143,7 @@ class Main:
         Returns:
             bool: True - Success. False - Error
         """
-        Log.init_log_file()
-        log.debug(f"{json.dumps(options, indent=2)}")
+        start_ts = Main._prepare(options)
         in_path = Path(options["src_path"])
         output = options.get("output")
         out = Path(output) if output else REPLACE
@@ -125,7 +151,7 @@ class Main:
             ok, _ = NoGps.remove_1_image_gps((in_path, out))
         else:
             ok = NoGps.remove_all_images_gps(in_path, out)
-        Common.check_latest_version(PKG_NAME)
+        Main._conclude(start_ts)
         return ok
 
     @staticmethod
@@ -138,8 +164,7 @@ class Main:
         Returns:
             bool: True - Success. False - Error
         """
-        Log.init_log_file()
-        log.debug(f"{json.dumps(options, indent=2)}")
+        start_ts = Main._prepare(options)
         in_path = Path(options["src_path"])
         length = options.get("length")
         if not length or length == 0:
@@ -151,7 +176,7 @@ class Main:
             ok, _ = Resize.resize_an_image((in_path, out, length))
         else:
             ok = Resize.resize_all_progress_bar(in_path, out, length)
-        Common.check_latest_version(PKG_NAME)
+        Main._conclude(start_ts)
         return ok
 
     @staticmethod
@@ -164,8 +189,7 @@ class Main:
         Returns:
             bool: True - Success. False - Error
         """
-        Log.init_log_file()
-        log.debug(f"{json.dumps(options, indent=2)}")
+        start_ts = Main._prepare(options)
         in_path = Path(options["src_path"])
         angle = options.get("angle")
         if not angle or angle == 0:
@@ -177,7 +201,7 @@ class Main:
             ok, _ = Rotate.rotate_1_image((in_path, out, angle))
         else:
             ok = Rotate.rotate_all_in_dir(in_path, out, angle)
-        Common.check_latest_version(PKG_NAME)
+        Main._conclude(start_ts)
         return ok
 
     @staticmethod
@@ -190,8 +214,7 @@ class Main:
         Returns:
             bool: True - Success. False - Error
         """
-        Log.init_log_file()
-        log.debug(f"{json.dumps(options, indent=2)}")
+        start_ts = Main._prepare(options)
         in_path = Path(options["src_path"])
         transparency = options.get("transparency")
         if not transparency or transparency < 0 or transparency > 255:
@@ -205,5 +228,5 @@ class Main:
             ok, _ = Transparent.do_1_image_transparency(args)
         else:
             ok = Transparent.all_images_transparency(in_path, out, transparency, white)
-        Common.check_latest_version(PKG_NAME)
+        Main._conclude(start_ts)
         return ok
