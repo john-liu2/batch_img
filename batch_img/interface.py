@@ -22,7 +22,7 @@ def cli(ctx, update, version):  # pragma: no cover
 
 
 @cli.command(
-    help="Auto process (resize to 1920, remove GPS, add border) image file(s)."
+    help="Auto process (resize to 1920-px, remove GPS, add border) image file(s)."
 )
 @click.argument(
     "src_path",
@@ -121,6 +121,26 @@ def do_effect(src_path, effect, output):
     click.secho(msg)
 
 
+@cli.command(help="Remove background (make background transparent) in image file(s).")
+@click.argument(
+    "src_path",
+    required=True,
+)
+@click.option(
+    "-o",
+    "--output",
+    default="",
+    show_default=True,
+    type=str,
+    help="Output file path. If not specified, replace the input file.",
+)
+def remove_bg(src_path, output):
+    options = {"src_path": src_path, "output": output}
+    res = Main.remove_bg(options)
+    msg = MSG_OK if res else MSG_BAD
+    click.secho(msg)
+
+
 @cli.command(help="Remove GPS location info in image file(s).")
 @click.argument(
     "src_path",
@@ -134,9 +154,9 @@ def do_effect(src_path, effect, output):
     type=str,
     help="Output file path. If not specified, replace the input file.",
 )
-def no_gps(src_path, output):
+def remove_gps(src_path, output):
     options = {"src_path": src_path, "output": output}
-    res = Main.no_gps(options)
+    res = Main.remove_gps(options)
     msg = MSG_OK if res else MSG_BAD
     click.secho(msg)
 

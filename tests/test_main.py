@@ -187,7 +187,7 @@ def data_no_gps(request):
 @patch("batch_img.common.Common.check_latest_version")
 @patch("batch_img.no_gps.NoGps.remove_all_images_gps")
 @patch("batch_img.no_gps.NoGps.remove_1_image_gps")
-def test_no_gps(
+def test_remove_gps(
     mock_remove_1_image_gps,
     mock_remove_all_images_gps,
     mock_check_latest_version,
@@ -197,7 +197,7 @@ def test_no_gps(
     mock_remove_1_image_gps.return_value = v_1
     mock_remove_all_images_gps.return_value = v_2
     mock_check_latest_version.return_value = "ok"
-    actual = Main.no_gps(options)
+    actual = Main.remove_gps(options)
     assert actual == expected
 
 
@@ -233,9 +233,9 @@ def data_no_gps_all(request):
     return request.param
 
 
-def test_all_in_dir_no_gps(data_no_gps_all):
+def test_all_in_dir_remove_gps(data_no_gps_all):
     options, expected = data_no_gps_all
-    actual = Main.no_gps(options)
+    actual = Main.remove_gps(options)
     assert actual == expected
 
 

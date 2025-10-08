@@ -4,8 +4,8 @@ requires = ["setuptools>=80.0"]
 
 [project]
 name = "batch_img"
-version = "0.3.2"
-description = "Batch process (resize, rotate, remove GPS, add border, set transparency, auto do all) image files (HEIC, JPG, PNG)"
+version = "0.3.3"
+description = "Batch process (resize, rotate, remove background, remove GPS, add border, set transparency, auto do all) image files (HEIC, JPG, PNG)"
 readme = "README.md"
 authors = [{ name = "John Liu", email = "rim2rim@gmail.com" }]
 license = "MIT"
@@ -26,11 +26,13 @@ dependencies = [
     "httpx",
     "loguru",
     "numpy",
+    "onnxruntime",
     "opencv-python",
     "packaging",
     "piexif",
     "pillow",
     "pillow-heif",
+    "rembg",
     "tqdm",
 ]
 [project.scripts]
