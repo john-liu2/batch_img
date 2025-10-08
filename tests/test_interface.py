@@ -13,7 +13,8 @@ from batch_img.interface import (
     auto,
     border,
     do_effect,
-    no_gps,
+    remove_bg,
+    remove_gps,
     resize,
     rotate,
     transparent,
@@ -111,17 +112,40 @@ def test_do_effect(mock_border, data_effect):
         ("src_path", True, MSG_OK),
     ]
 )
+def data_remove_bg(request):
+    return request.param
+
+
+@patch("batch_img.main.Main.remove_bg")
+def test_remove_bg(mock_remove_bg, data_remove_bg):
+    _input, res, expected = data_remove_bg
+    mock_remove_bg.return_value = res
+    expected += "\n"
+    runner = CliRunner()
+    result = runner.invoke(remove_bg, args=_input.split())
+    print(result.output)
+    assert not result.exception
+    assert result.output == expected
+
+
+@pytest.fixture(
+    params=[
+        ("src_path -o out/dir", True, MSG_OK),
+        ("img/file --output out/file", False, MSG_BAD),
+        ("src_path", True, MSG_OK),
+    ]
+)
 def data_no_gps(request):
     return request.param
 
 
-@patch("batch_img.main.Main.no_gps")
-def test_no_gps(mock_no_gps, data_no_gps):
+@patch("batch_img.main.Main.remove_gps")
+def test_remove_gps(mock_remove_gps, data_no_gps):
     _input, res, expected = data_no_gps
-    mock_no_gps.return_value = res
+    mock_remove_gps.return_value = res
     expected += "\n"
     runner = CliRunner()
-    result = runner.invoke(no_gps, args=_input.split())
+    result = runner.invoke(remove_gps, args=_input.split())
     print(result.output)
     assert not result.exception
     assert result.output == expected

@@ -15,6 +15,7 @@ from batch_img.const import PKG_NAME, REPLACE
 from batch_img.do_effect import DoEffect
 from batch_img.log import Log
 from batch_img.no_gps import NoGps
+from batch_img.remove_bg import RemoveBg
 from batch_img.resize import Resize
 from batch_img.rotate import Rotate
 from batch_img.transparent import Transparent
@@ -134,7 +135,28 @@ class Main:
         return ok
 
     @staticmethod
-    def no_gps(options) -> bool:
+    def remove_bg(options) -> bool:
+        """Remove background (make background transparent)
+
+        Args:
+            options: input options dict
+
+        Returns:
+            bool: True - Success. False - Error
+        """
+        start_ts = Main._prepare(options)
+        in_path = Path(options["src_path"])
+        output = options.get("output")
+        out = Path(output) if output else REPLACE
+        if in_path.is_file():
+            ok, _ = RemoveBg.remove_bg_image((in_path, out))
+        else:
+            ok = RemoveBg.remove_all_images_bg(in_path, out)
+        Main._conclude(start_ts)
+        return ok
+
+    @staticmethod
+    def remove_gps(options) -> bool:
         """Remove GPS location info in image file(s)
 
         Args:

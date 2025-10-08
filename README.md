@@ -1,12 +1,18 @@
 ## batch_img
 
 Batch process (**resize, rotate, remove GPS, add border, set transparency,
-auto do all**) image files (**HEIC, JPG, PNG**) by utilizing
-**[Pillow / PIL](https://github.com/python-pillow/Pillow)** library.
+remove background, auto do all**) image files (**HEIC, JPG, PNG**) by
+utilizing **[Pillow / PIL](https://github.com/python-pillow/Pillow)** library.
 It can apply the action(s) on a single image file or all image files in the input
 folder / directory. Tested working on **macOS** and **Windows**.
 
 ### Installation
+
+#### Requirements
+
+```
+python: >=3.12, <=3.14
+```
 
 #### One-time Setup
 
@@ -57,7 +63,7 @@ uv pip install --upgrade batch_img
 
 ```
 ✗ batch_img --version
-0.3.0
+0.3.3
 
 
 ✗ batch_img auto ~/Documents
@@ -86,10 +92,11 @@ Options:
   --help     Show this message and exit.
 
 Commands:
-  auto         Auto process (resize to 1920, remove GPS, add border)...
+  auto         Auto process (resize to 1920-px, remove GPS, add border)...
   border       Add internal border to image file(s), not expand the size.
   do-effect    Do special effect to image file(s).
-  no-gps       Remove GPS location info in image file(s).
+  remove-bg    Remove background (make background transparent) in image...
+  remove-gps   Remove GPS location info in image file(s).
   resize       Resize image file(s).
   rotate       Rotate image file(s).
   transparent  Set transparency on image file(s).
@@ -130,20 +137,6 @@ Options:
   --help                          Show this message and exit.
 ```
 
-#### The `no-gps` sub-command CLI options:
-
-```
-✗ batch_img no-gps --help
-Usage: batch_img no-gps [OPTIONS] SRC_PATH
-
-  Remove GPS location info in image file(s).
-
-Options:
-  -o, --output TEXT  Output file path. If not specified, replace the input
-                     file.  [default: ""]
-  --help             Show this message and exit.
-```
-
 #### The `do-effect` sub-command CLI options:
 
 ```
@@ -159,6 +152,34 @@ Options:
                                 effect image file(s) to the same path as the
                                 input file(s).  [default: ""]
   --help                        Show this message and exit.
+```
+
+#### The `remove-bg` sub-command CLI options:
+
+```
+✗ batch_img remove-bg --help
+Usage: batch_img remove-bg [OPTIONS] SRC_PATH
+
+  Remove background (make background transparent) in image file(s).
+
+Options:
+  -o, --output TEXT  Output file path. If not specified, replace the input
+                     file.  [default: ""]
+  --help             Show this message and exit.
+```
+
+#### The `remove-gps` sub-command CLI options:
+
+```
+✗ batch_img remove-gps --help
+Usage: batch_img remove-gps [OPTIONS] SRC_PATH
+
+  Remove GPS location info in image file(s).
+
+Options:
+  -o, --output TEXT  Output file path. If not specified, replace the input
+                     file.  [default: ""]
+  --help             Show this message and exit.
 ```
 
 #### The `resize` sub-command CLI options:
