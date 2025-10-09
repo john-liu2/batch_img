@@ -22,12 +22,12 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install pylint ruff click httpx loguru piexif pillow pillow-heif tqdm numpy opencv-python packaging onnxruntime rembg
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
       - name: Analysing the code with pylint
         run: |
           pylint $(git ls-files '*.py')
           ruff check
       - name: Run PyTest
         run: |
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
           pip install pytest-cov pytest-asyncio
           pytest --cov-report=term --cov=batch_img tests
