@@ -1,4 +1,4 @@
-name: Windows PyTest
+name: Win PyTest
 
 on:
   pull_request:
@@ -9,7 +9,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ windows-latest ]
+        os: [ windows-2022, windows-2019 ]
         python-version: [ "3.13" ]
     name: Python ${{ matrix.python-version }} on ${{ matrix.os }}
     steps:
