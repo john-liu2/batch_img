@@ -9,7 +9,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ windows-latest, windows-2022, windows-2019 ]
+        os: [ windows-latest, windows-2022 ]
         python-version: [ "3.13" ]
     name: Python ${{ matrix.python-version }} on ${{ matrix.os }}
     steps:

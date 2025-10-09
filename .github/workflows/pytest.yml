@@ -29,6 +29,6 @@ jobs:
           python -m pip install --upgrade pip
           pip install pytest-cov click httpx loguru piexif pillow pillow-heif tqdm numpy opencv-python packaging onnxruntime rembg
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-      - name: Run PyTest
+      - name: Do PyTest
         run: |
           pytest --cov-report=term --cov=batch_img tests
