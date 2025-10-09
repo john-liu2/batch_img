@@ -10,15 +10,17 @@ import pytest
 
 from batch_img.log import Log
 
+_dir = dirname(__file__)
+
 
 @pytest.fixture(
     params=[
         (
-            f"{dirname(__file__)}/../batch_img/config.json",
+            f"{_dir}/../batch_img/config.json",
             {"mode": "dev", "level": "DEBUG", "to_file": True},
         ),
         (
-            f"{dirname(__file__)}/../batch_img/config_prod.json",
+            f"{_dir}/../batch_img/config_prod.json",
             {"mode": "prod", "level": "INFO", "to_file": False},
         ),
     ]

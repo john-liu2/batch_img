@@ -12,78 +12,80 @@ import pytest
 from batch_img.const import REPLACE
 from batch_img.transparent import Transparent
 
+_dir = dirname(__file__)
+
 
 @pytest.fixture(
     params=[
         (
-            Path(f"{dirname(__file__)}/data/HEIC/IMG_0070.HEIC"),
-            Path(f"{dirname(__file__)}/.out/"),
+            Path(f"{_dir}/data/HEIC/IMG_0070.HEIC"),
+            Path(f"{_dir}/.out/"),
             255,
             True,
-            (True, Path(f"{dirname(__file__)}/.out/IMG_0070_a255w.HEIC")),
+            (True, Path(f"{_dir}/.out/IMG_0070_a255w.HEIC")),
         ),
         (
-            Path(f"{dirname(__file__)}/data/HEIC/IMG_0070.HEIC"),
-            Path(f"{dirname(__file__)}/.out/"),
+            Path(f"{_dir}/data/HEIC/IMG_0070.HEIC"),
+            Path(f"{_dir}/.out/"),
             127,
             False,
-            (True, Path(f"{dirname(__file__)}/.out/IMG_0070_a127.HEIC")),
+            (True, Path(f"{_dir}/.out/IMG_0070_a127.HEIC")),
         ),
         (
-            Path(f"{dirname(__file__)}/data/HEIC/IMG_0070.HEIC"),
-            Path(f"{dirname(__file__)}/.out/"),
+            Path(f"{_dir}/data/HEIC/IMG_0070.HEIC"),
+            Path(f"{_dir}/.out/"),
             64,
             False,
-            (True, Path(f"{dirname(__file__)}/.out/IMG_0070_a64.HEIC")),
+            (True, Path(f"{_dir}/.out/IMG_0070_a64.HEIC")),
         ),
         (
-            Path(f"{dirname(__file__)}/data/HEIC/IMG_0070.HEIC"),
-            Path(f"{dirname(__file__)}/.out/"),
+            Path(f"{_dir}/data/HEIC/IMG_0070.HEIC"),
+            Path(f"{_dir}/.out/"),
             0,
             False,
-            (True, Path(f"{dirname(__file__)}/.out/IMG_0070_a0.HEIC")),
+            (True, Path(f"{_dir}/.out/IMG_0070_a0.HEIC")),
         ),
         (
-            Path(f"{dirname(__file__)}/data/JPG/IMG_2527.jpg"),
-            Path(f"{dirname(__file__)}/.out/"),
+            Path(f"{_dir}/data/JPG/IMG_2527.jpg"),
+            Path(f"{_dir}/.out/"),
             127,
             False,
-            (True, Path(f"{dirname(__file__)}/.out/IMG_2527_a127.png")),
+            (True, Path(f"{_dir}/.out/IMG_2527_a127.png")),
         ),
         (
-            Path(f"{dirname(__file__)}/data/JPG/IMG_2527.jpg"),
-            Path(f"{dirname(__file__)}/.out/"),
+            Path(f"{_dir}/data/JPG/IMG_2527.jpg"),
+            Path(f"{_dir}/.out/"),
             127,
             True,
-            (True, Path(f"{dirname(__file__)}/.out/IMG_2527_a127w.png")),
+            (True, Path(f"{_dir}/.out/IMG_2527_a127w.png")),
         ),
         (
-            Path(f"{dirname(__file__)}/data/PNG/Checkmark.PNG"),
-            Path(f"{dirname(__file__)}/.out/"),
+            Path(f"{_dir}/data/PNG/Checkmark.PNG"),
+            Path(f"{_dir}/.out/"),
             0,
             False,
-            (True, Path(f"{dirname(__file__)}/.out/Checkmark_a0.PNG")),
+            (True, Path(f"{_dir}/.out/Checkmark_a0.PNG")),
         ),
         (
-            Path(f"{dirname(__file__)}/data/PNG/Checkmark.PNG"),
-            Path(f"{dirname(__file__)}/.out/"),
+            Path(f"{_dir}/data/PNG/Checkmark.PNG"),
+            Path(f"{_dir}/.out/"),
             64,
             True,
-            (True, Path(f"{dirname(__file__)}/.out/Checkmark_a64w.PNG")),
+            (True, Path(f"{_dir}/.out/Checkmark_a64w.PNG")),
         ),
         (
-            Path(f"{dirname(__file__)}/data/PNG/Checkmark.PNG"),
-            Path(f"{dirname(__file__)}/.out/"),
+            Path(f"{_dir}/data/PNG/Checkmark.PNG"),
+            Path(f"{_dir}/.out/"),
             127,
             False,
-            (True, Path(f"{dirname(__file__)}/.out/Checkmark_a127.PNG")),
+            (True, Path(f"{_dir}/.out/Checkmark_a127.PNG")),
         ),
         (
-            Path(f"{dirname(__file__)}/data/PNG/Checkmark.PNG"),
-            Path(f"{dirname(__file__)}/.out/"),
+            Path(f"{_dir}/data/PNG/Checkmark.PNG"),
+            Path(f"{_dir}/.out/"),
             255,
             True,
-            (True, Path(f"{dirname(__file__)}/.out/Checkmark_a255w.PNG")),
+            (True, Path(f"{_dir}/.out/Checkmark_a255w.PNG")),
         ),
     ]
 )
@@ -118,14 +120,15 @@ def test_error_do_1_image_transparency(mock_open):
         33,
         True,
     ))
-    assert "img/file" in actual[1]
+    # For Windows & macOS
+    assert str(Path("img/file")) in actual[1]
 
 
 @pytest.fixture(
     params=[
         (
-            Path(f"{dirname(__file__)}/data/PNG"),
-            Path(f"{dirname(__file__)}/.out/"),
+            Path(f"{_dir}/data/PNG"),
+            Path(f"{_dir}/.out/"),
             234,
             True,
             True,

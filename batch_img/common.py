@@ -2,6 +2,7 @@
 Copyright © 2025 John Liu
 """
 
+import hashlib
 import importlib.metadata
 import itertools
 import json
@@ -187,7 +188,10 @@ class Common:
             str:
         """
         with open(file, "rb") as f:
-            return b64encode(f.read()).decode("utf-8")
+            data = f.read().replace(b"\r\n", b"\n")
+            sha256 = hashlib.sha256(data).hexdigest()
+            log.debug(f"{file} - {sha256=}")
+            return b64encode(data).decode("utf-8")
 
     @staticmethod
     def readable_file_size(in_bytes: int) -> str:

@@ -12,29 +12,31 @@ import pytest
 from batch_img.border import Border
 from batch_img.const import REPLACE
 
+_dir = dirname(__file__)
+
 
 @pytest.fixture(
     params=[
         (
-            Path(f"{dirname(__file__)}/data/HEIC/IMG_0070.HEIC"),
-            Path(f"{dirname(__file__)}/.out/"),
+            Path(f"{_dir}/data/HEIC/IMG_0070.HEIC"),
+            Path(f"{_dir}/.out/"),
             9,
             "green",
-            (True, Path(f"{dirname(__file__)}/.out/IMG_0070_bw9.HEIC")),
+            (True, Path(f"{_dir}/.out/IMG_0070_bw9.HEIC")),
         ),
         (
-            Path(f"{dirname(__file__)}/data/PNG/Checkmark.PNG"),
-            Path(f"{dirname(__file__)}/.out/"),
+            Path(f"{_dir}/data/PNG/Checkmark.PNG"),
+            Path(f"{_dir}/.out/"),
             18,
             "purple",
-            (True, Path(f"{dirname(__file__)}/.out/Checkmark_bw18.PNG")),
+            (True, Path(f"{_dir}/.out/Checkmark_bw18.PNG")),
         ),
         (
-            Path(f"{dirname(__file__)}/data/JPG/152.JPG"),
-            Path(f"{dirname(__file__)}/.out/"),
+            Path(f"{_dir}/data/JPG/152.JPG"),
+            Path(f"{_dir}/.out/"),
             4,
             "#AABBCC",
-            (True, Path(f"{dirname(__file__)}/.out/152_bw4.JPG")),
+            (True, Path(f"{_dir}/.out/152_bw4.JPG")),
         ),
     ]
 )
@@ -50,7 +52,7 @@ def test_border_1_image(data_border_1_image):
 
 @pytest.mark.slow(reason="This test modifies test data file.")
 def test_border_1_image_replace():
-    in_path = Path(f"{dirname(__file__)}/data/PNG/Checkmark.PNG")
+    in_path = Path(f"{_dir}/data/PNG/Checkmark.PNG")
     actual = Border.border_1_image((in_path, REPLACE, 9, "red"))
     assert actual == (True, in_path)
 
@@ -59,21 +61,22 @@ def test_border_1_image_replace():
 def test_error_add_border_1_image(mock_open):
     mock_open.side_effect = ValueError("VE")
     actual = Border.border_1_image((Path("img/file"), Path("out/path"), 9, "red"))
-    assert "img/file" in actual[1]
+    # For Windows & macOS
+    assert str(Path("img/file")) in actual[1]
 
 
 @pytest.fixture(
     params=[
         (
-            Path(f"{dirname(__file__)}/data/mixed"),
-            Path(f"{dirname(__file__)}/.out/"),
+            Path(f"{_dir}/data/mixed"),
+            Path(f"{_dir}/.out/"),
             9,
             "#CCBBAA",
             True,
         ),
         (
-            Path(f"{dirname(__file__)}/data/JPG"),
-            Path(f"{dirname(__file__)}/.out/"),
+            Path(f"{_dir}/data/JPG"),
+            Path(f"{_dir}/.out/"),
             5,
             "green",
             True,

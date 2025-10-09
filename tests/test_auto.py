@@ -11,13 +11,15 @@ import pytest
 
 from batch_img.auto import Auto
 
+_dir = dirname(__file__)
+
 
 @pytest.fixture(
     params=[
         (
-            Path(f"{dirname(__file__)}/data/HEIC/IMG_2530.HEIC"),
-            Path(f"{dirname(__file__)}/.out/"),
-            (True, Path(f"{dirname(__file__)}/.out/IMG_2530_bw5.HEIC")),
+            Path(f"{_dir}/data/HEIC/IMG_2530.HEIC"),
+            Path(f"{_dir}/.out/"),
+            (True, Path(f"{_dir}/.out/IMG_2530_bw5.HEIC")),
         ),
     ]
 )
@@ -35,35 +37,36 @@ def test_process_an_image(data_process_an_image):
 def test_error_process_an_image(mock_open):
     mock_open.side_effect = ValueError("VE")
     actual = Auto.process_an_image(Path("img/file"), Path("out/path"))
-    assert "img/file" in actual[1]
+    # For Windows & macOS
+    assert str(Path("img/file")) in actual[1]
 
 
 @pytest.fixture(
     params=[
         (
-            Path(f"{dirname(__file__)}/data/HEIC/chef_180cw.heic"),
-            Path(f"{dirname(__file__)}/.out/"),
-            (True, Path(f"{dirname(__file__)}/.out/chef_180cw_180cw.heic")),
+            Path(f"{_dir}/data/HEIC/chef_180cw.heic"),
+            Path(f"{_dir}/.out/"),
+            (True, Path(f"{_dir}/.out/chef_180cw_180cw.heic")),
         ),
         (
-            Path(f"{dirname(__file__)}/data/HEIC/chef2_90cw.heic"),
-            Path(f"{dirname(__file__)}/.out/"),
-            (True, Path(f"{dirname(__file__)}/.out/chef2_90cw_270cw.heic")),
+            Path(f"{_dir}/data/HEIC/chef2_90cw.heic"),
+            Path(f"{_dir}/.out/"),
+            (True, Path(f"{_dir}/.out/chef2_90cw_270cw.heic")),
         ),
         (
-            Path(f"{dirname(__file__)}/data/HEIC/IMG_0131.HEIC"),
-            Path(f"{dirname(__file__)}/.out/"),
-            (True, Path(f"{dirname(__file__)}/.out/IMG_0131_270cw.HEIC")),
+            Path(f"{_dir}/data/HEIC/IMG_0131.HEIC"),
+            Path(f"{_dir}/.out/"),
+            (True, Path(f"{_dir}/.out/IMG_0131_270cw.HEIC")),
         ),
         (
-            Path(f"{dirname(__file__)}/data/HEIC/chef_show2.heic"),
-            Path(f"{dirname(__file__)}/.out/"),
-            (False, Path(f"{dirname(__file__)}/data/HEIC/chef_show2.heic")),
+            Path(f"{_dir}/data/HEIC/chef_show2.heic"),
+            Path(f"{_dir}/.out/"),
+            (False, Path(f"{_dir}/data/HEIC/chef_show2.heic")),
         ),
         (
-            Path(f"{dirname(__file__)}/data/HEIC/IMG_0070.HEIC"),
-            Path(f"{dirname(__file__)}/.out/"),
-            (False, Path(f"{dirname(__file__)}/data/HEIC/IMG_0070.HEIC")),
+            Path(f"{_dir}/data/HEIC/IMG_0070.HEIC"),
+            Path(f"{_dir}/.out/"),
+            (False, Path(f"{_dir}/data/HEIC/IMG_0070.HEIC")),
         ),
     ]
 )
@@ -80,21 +83,21 @@ def test_rotate_if_needed(data_rotate_if_needed):
 @pytest.fixture(
     params=[
         (
-            Path(f"{dirname(__file__)}/data/HEIC/Cartoon.heic"),
-            Path(f"{dirname(__file__)}/.out/"),
+            Path(f"{_dir}/data/HEIC/Cartoon.heic"),
+            Path(f"{_dir}/.out/"),
             False,
             (
                 True,
-                Path(f"{dirname(__file__)}/.out/Cartoon_bw5.heic"),
+                Path(f"{_dir}/.out/Cartoon_bw5.heic"),
             ),
         ),
         (
-            Path(f"{dirname(__file__)}/data/HEIC/IMG_0131.HEIC"),
-            Path(f"{dirname(__file__)}/.out/"),
+            Path(f"{_dir}/data/HEIC/IMG_0131.HEIC"),
+            Path(f"{_dir}/.out/"),
             True,
             (
                 True,
-                Path(f"{dirname(__file__)}/.out/IMG_0131_bw5_270cw.HEIC"),
+                Path(f"{_dir}/.out/IMG_0131_bw5_270cw.HEIC"),
             ),
         ),
     ]
@@ -112,14 +115,14 @@ def test_auto_do_1_image(data_auto_1_image):
 @pytest.fixture(
     params=[
         (
-            Path(f"{dirname(__file__)}"),
-            Path(f"{dirname(__file__)}/.out/"),
+            Path(f"{_dir}"),
+            Path(f"{_dir}/.out/"),
             True,
             False,
         ),
         (
-            Path(f"{dirname(__file__)}/data/PNG"),
-            Path(f"{dirname(__file__)}/.out/"),
+            Path(f"{_dir}/data/PNG"),
+            Path(f"{_dir}/.out/"),
             False,
             True,
         ),

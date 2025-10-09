@@ -17,8 +17,10 @@ from batch_img.const import PKG_NAME, REPLACE, UNKNOWN
 
 from .helper import DotDict
 
+_dir = dirname(__file__)
 
-@pytest.fixture(params=[(PKG_NAME, "0.3.3"), ("", "0.3.3")])
+
+@pytest.fixture(params=[(PKG_NAME, "0.3.4"), ("", "0.3.4")])
 def ver_data(request):
     return request.param
 
@@ -34,7 +36,7 @@ def test_get_version(ver_data):
         (
             "0.9.9",
             PKG_NAME,
-            f"🔔 Update available: 0.3.3  →  0.9.9\nRun '{PKG_NAME} --update'",
+            f"🔔 Update available: 0.3.4  →  0.9.9\nRun '{PKG_NAME} --update'",
         ),
     ]
 )
@@ -52,7 +54,7 @@ def test_check_latest_version(mock_get_latest_pypi, data_check_latest_version):
 
 @pytest.fixture(
     params=[
-        (PKG_NAME, 0, "0.3.2"),
+        (PKG_NAME, 0, "0.3.3"),
         ("bad_bogus", 1, UNKNOWN),
     ]
 )
@@ -182,7 +184,7 @@ def test_human_readable_time(time_data):
 @pytest.fixture(
     params=[
         (
-            Path(f"{dirname(__file__)}/conftest.py"),
+            Path(f"{_dir}/conftest.py"),
             "IiIiY29uZnRlc3QucHkKMS4gU2V0IGEgZmxhZyBzbyBhcyB0byBleGNsdWRlIHNvbWUgaW50ZWdyYXRpb24gdGVzdHMKMi4gUnVuIHRoZSBzbG93IGludGVncmF0aW9uIHRlc3QocykgaW5kaXZpZHVhbGx5CkNvcHlyaWdodCDCqSAyMDI1IEpvaG4gTGl1CiIiIgoKaW1wb3J0IHB5dGVzdAoKCmRlZiBweXRlc3RfYWRkb3B0aW9uKHBhcnNlcik6CiAgICBwYXJzZXIuYWRkb3B0aW9uKAogICAgICAgICItLXJ1bnNsb3ciLCBhY3Rpb249InN0b3JlX3RydWUiLCBkZWZhdWx0PUZhbHNlLCBoZWxwPSJydW4gc2xvdyB0ZXN0cyIKICAgICkKCgpkZWYgcHl0ZXN0X2NvbGxlY3Rpb25fbW9kaWZ5aXRlbXMoY29uZmlnLCBpdGVtcyk6CiAgICBpZiBjb25maWcuZ2V0b3B0aW9uKCItLXJ1bnNsb3ciKToKICAgICAgICAjIHNldCAtLXJ1bnNsb3cgaW4gQ0xJIG1lYW5zIGluY2x1ZGluZyBzbG93IGludGVncmF0aW9uIHRlc3QocykKICAgICAgICByZXR1cm4KICAgIHNraXBfc2xvdyA9IHB5dGVzdC5tYXJrLnNraXAocmVhc29uPSJuZWVkIC0tcnVuc2xvdyBvcHRpb24gdG8gcnVuIikKICAgIGZvciBpdGVtIGluIGl0ZW1zOgogICAgICAgIGlmICJzbG93IiBpbiBpdGVtLmtleXdvcmRzOgogICAgICAgICAgICBpdGVtLmFkZF9tYXJrZXIoc2tpcF9zbG93KQo=",
         )
     ]
@@ -406,7 +408,7 @@ def test_decode_exif(data_decode_exif):
 @pytest.fixture(
     params=[
         (
-            Path(f"{dirname(__file__)}/data/HEIC/Cartoon.heic"),
+            Path(f"{_dir}/data/HEIC/Cartoon.heic"),
             {
                 "file_size": "44.6 KB",
                 "file_ts": "2025-08-16_23-44-21",
@@ -428,7 +430,7 @@ def test_decode_exif(data_decode_exif):
             },
         ),
         (
-            Path(f"{dirname(__file__)}/data/HEIC/Cartoon_180cw.heic"),
+            Path(f"{_dir}/data/HEIC/Cartoon_180cw.heic"),
             {
                 "file_size": "42.4 KB",
                 "file_ts": "2025-08-17_11-05-21",
@@ -467,18 +469,18 @@ def test_get_image_data(data_get_image):
 @pytest.fixture(
     params=[
         (
-            Path(f"{dirname(__file__)}/data/HEIC/IMG_0070.HEIC"),
-            Path(f"{dirname(__file__)}/data/HEIC/IMG_0070.HEIC"),
+            Path(f"{_dir}/data/HEIC/IMG_0070.HEIC"),
+            Path(f"{_dir}/data/HEIC/IMG_0070.HEIC"),
             True,
         ),
         (
-            Path(f"{dirname(__file__)}/data/PNG/Checkmark.PNG"),
-            Path(f"{dirname(__file__)}/data/PNG/LagrangePoints.png"),
+            Path(f"{_dir}/data/PNG/Checkmark.PNG"),
+            Path(f"{_dir}/data/PNG/LagrangePoints.png"),
             False,
         ),
         (
-            Path(f"{dirname(__file__)}/data/JPG/152.JPG"),
-            Path(f"{dirname(__file__)}/data/JPG/P1040566.jpeg"),
+            Path(f"{_dir}/data/JPG/152.JPG"),
+            Path(f"{_dir}/data/JPG/P1040566.jpeg"),
             False,
         ),
     ]
@@ -530,8 +532,8 @@ def test_calculate_new_size(data_calculate_new_size):
 
 @pytest.fixture(
     params=[
-        (Path(f"{dirname(__file__)}/data/JPG"), REPLACE, 6),
-        (Path(f"{dirname(__file__)}/data/PNG"), Path(f"{dirname(__file__)}/.out/"), 2),
+        (Path(f"{_dir}/data/JPG"), REPLACE, 6),
+        (Path(f"{_dir}/data/PNG"), Path(f"{_dir}/.out/"), 2),
     ]
 )
 def data_prepare_all_files(request):
@@ -547,25 +549,25 @@ def test_prepare_all_files(data_prepare_all_files):
 @pytest.fixture(
     params=[
         (
-            Path(f"{dirname(__file__)}/data/HEIC/Cartoon.heic"),
-            Path(f"{dirname(__file__)}/.out/"),
+            Path(f"{_dir}/data/HEIC/Cartoon.heic"),
+            Path(f"{_dir}/.out/"),
             "90cw",
-            Path(f"{dirname(__file__)}/.out/Cartoon_90cw.heic"),
+            Path(f"{_dir}/.out/Cartoon_90cw.heic"),
         ),
         (
-            Path(f"{dirname(__file__)}/data/HEIC/Cartoon.heic"),
+            Path(f"{_dir}/data/HEIC/Cartoon.heic"),
             REPLACE,
             "90cw",
-            Path(f"{dirname(__file__)}/data/HEIC/Cartoon_tmp.heic"),
+            Path(f"{_dir}/data/HEIC/Cartoon_tmp.heic"),
         ),
         (
-            Path(f"{dirname(__file__)}/data/HEIC/Cartoon.heic"),
+            Path(f"{_dir}/data/HEIC/Cartoon.heic"),
             "",
             "neon",
-            Path(f"{dirname(__file__)}/data/HEIC/Cartoon_neon.heic"),
+            Path(f"{_dir}/data/HEIC/Cartoon_neon.heic"),
         ),
         (
-            Path(f"{dirname(__file__)}/data/HEIC/Cartoon.heic"),
+            Path(f"{_dir}/data/HEIC/Cartoon.heic"),
             Path("~/tmp/HEIC"),
             "neon",
             Path("~/tmp/HEIC/Cartoon_neon.heic"),

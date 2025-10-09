@@ -11,13 +11,15 @@ import pytest
 
 from batch_img.orientation import EXIF_CW_ANGLE, Orientation
 
+_dir = dirname(__file__)
+
 
 @pytest.fixture(
     params=[
-        (Path(f"{dirname(__file__)}/data/PNG/Checkmark.PNG"), EXIF_CW_ANGLE[1]),
-        (Path(f"{dirname(__file__)}/data/JPG/P1040566.jpeg"), -1),
-        (Path(f"{dirname(__file__)}/data/PNG/LagrangePoints.png"), -1),
-        (Path(f"{dirname(__file__)}/data/HEIC/Cartoon.heic"), EXIF_CW_ANGLE[1]),
+        (Path(f"{_dir}/data/PNG/Checkmark.PNG"), EXIF_CW_ANGLE[1]),
+        (Path(f"{_dir}/data/JPG/P1040566.jpeg"), -1),
+        (Path(f"{_dir}/data/PNG/LagrangePoints.png"), -1),
+        (Path(f"{_dir}/data/HEIC/Cartoon.heic"), EXIF_CW_ANGLE[1]),
     ]
 )
 def data_exif_orientation(request):
@@ -39,8 +41,8 @@ def test_error_get_exif_orientation(mock_open):
 
 @pytest.fixture(
     params=[
-        (Path(f"{dirname(__file__)}/data/PNG/Checkmark.PNG"), 3, True),
-        (Path(f"{dirname(__file__)}/data/PNG/LagrangePoints.png"), 8, True),
+        (Path(f"{_dir}/data/PNG/Checkmark.PNG"), 3, True),
+        (Path(f"{_dir}/data/PNG/LagrangePoints.png"), 8, True),
     ]
 )
 def data_set_exif_orientation(request):
@@ -56,14 +58,14 @@ def test_set_exif_orientation(data_set_exif_orientation):
 
 @pytest.fixture(
     params=[
-        (Path(f"{dirname(__file__)}/data/HEIC/IMG_0131.HEIC"), 270),
-        (Path(f"{dirname(__file__)}/data/HEIC/chef_180cw.heic"), 180),
-        (Path(f"{dirname(__file__)}/data/HEIC/chef_90cw.heic"), 270),
-        (Path(f"{dirname(__file__)}/data/HEIC/chef_270cw.heic"), 90),
-        (Path(f"{dirname(__file__)}/data/HEIC/chef2_180cw.heic"), 180),
-        (Path(f"{dirname(__file__)}/data/HEIC/chef2_90cw.heic"), 270),
-        (Path(f"{dirname(__file__)}/data/HEIC/chef2_270cw.heic"), 90),
-        (Path(f"{dirname(__file__)}/data/HEIC/IMG_0070.HEIC"), -1),
+        (Path(f"{_dir}/data/HEIC/IMG_0131.HEIC"), 270),
+        (Path(f"{_dir}/data/HEIC/chef_180cw.heic"), 180),
+        (Path(f"{_dir}/data/HEIC/chef_90cw.heic"), 270),
+        (Path(f"{_dir}/data/HEIC/chef_270cw.heic"), 90),
+        (Path(f"{_dir}/data/HEIC/chef2_180cw.heic"), 180),
+        (Path(f"{_dir}/data/HEIC/chef2_90cw.heic"), 270),
+        (Path(f"{_dir}/data/HEIC/chef2_270cw.heic"), 90),
+        (Path(f"{_dir}/data/HEIC/IMG_0070.HEIC"), -1),
     ]
 )
 def data_detect_floor_by_edge(request):
@@ -78,14 +80,14 @@ def test_detect_floor_by_edge(data_detect_floor_by_edge):
 
 @pytest.fixture(
     params=[
-        (Path(f"{dirname(__file__)}/data/HEIC/Cartoon.heic"), 0),
-        (Path(f"{dirname(__file__)}/data/HEIC/Cartoon_180cw.heic"), 180),
-        (Path(f"{dirname(__file__)}/data/HEIC/Cartoon_270cw.heic"), 90),
-        (Path(f"{dirname(__file__)}/data/HEIC/Cartoon_90cw.heic"), 270),
-        (Path(f"{dirname(__file__)}/data/HEIC/IMG_0070.HEIC"), -1),
-        (Path(f"{dirname(__file__)}/data/PNG/LagrangePoints.png"), -1),
-        (Path(f"{dirname(__file__)}/data/JPG/152.JPG"), -1),
-        (Path(f"{dirname(__file__)}/data/HEIC/chef2_90cw.heic"), 270),
+        (Path(f"{_dir}/data/HEIC/Cartoon.heic"), 0),
+        (Path(f"{_dir}/data/HEIC/Cartoon_180cw.heic"), 180),
+        (Path(f"{_dir}/data/HEIC/Cartoon_270cw.heic"), 90),
+        (Path(f"{_dir}/data/HEIC/Cartoon_90cw.heic"), 270),
+        (Path(f"{_dir}/data/HEIC/IMG_0070.HEIC"), -1),
+        (Path(f"{_dir}/data/PNG/LagrangePoints.png"), -1),
+        (Path(f"{_dir}/data/JPG/152.JPG"), -1),
+        (Path(f"{_dir}/data/HEIC/chef2_90cw.heic"), 270),
     ]
 )
 def data_detect_by_face(request):
@@ -100,19 +102,19 @@ def test_get_cw_angle_by_face(data_detect_by_face):
 
 @pytest.fixture(
     params=[
-        (Path(f"{dirname(__file__)}/data/HEIC/chef_180cw.heic"), 180),
-        (Path(f"{dirname(__file__)}/data/HEIC/chef_90cw.heic"), 270),
-        (Path(f"{dirname(__file__)}/data/HEIC/chef_270cw.heic"), 90),
-        (Path(f"{dirname(__file__)}/data/HEIC/chef2_180cw.heic"), 180),
-        (Path(f"{dirname(__file__)}/data/HEIC/chef2_90cw.heic"), 270),
-        (Path(f"{dirname(__file__)}/data/HEIC/chef2_270cw.heic"), 90),
+        (Path(f"{_dir}/data/HEIC/chef_180cw.heic"), 180),
+        (Path(f"{_dir}/data/HEIC/chef_90cw.heic"), 270),
+        (Path(f"{_dir}/data/HEIC/chef_270cw.heic"), 90),
+        (Path(f"{_dir}/data/HEIC/chef2_180cw.heic"), 180),
+        (Path(f"{_dir}/data/HEIC/chef2_90cw.heic"), 270),
+        (Path(f"{_dir}/data/HEIC/chef2_270cw.heic"), 90),
         # JL 2025-08-20: check sky/clouds orientation by floor
-        (Path(f"{dirname(__file__)}/data/HEIC/IMG_2529_180cw.HEIC"), 180),
-        (Path(f"{dirname(__file__)}/data/HEIC/IMG_2529_90cw.HEIC"), 270),
-        (Path(f"{dirname(__file__)}/data/HEIC/IMG_2529_270cw.HEIC"), 90),
-        (Path(f"{dirname(__file__)}/data/HEIC/IMG_2530_180cw.HEIC"), 180),
-        (Path(f"{dirname(__file__)}/data/HEIC/IMG_2530_90cw.HEIC"), 270),
-        (Path(f"{dirname(__file__)}/data/HEIC/IMG_2530_270cw.HEIC"), 90),
+        (Path(f"{_dir}/data/HEIC/IMG_2529_180cw.HEIC"), 180),
+        (Path(f"{_dir}/data/HEIC/IMG_2529_90cw.HEIC"), 270),
+        (Path(f"{_dir}/data/HEIC/IMG_2529_270cw.HEIC"), 90),
+        (Path(f"{_dir}/data/HEIC/IMG_2530_180cw.HEIC"), 180),
+        (Path(f"{_dir}/data/HEIC/IMG_2530_90cw.HEIC"), 270),
+        (Path(f"{_dir}/data/HEIC/IMG_2530_270cw.HEIC"), 90),
     ]
 )
 def data_get_orientation_by_floor(request):
@@ -127,15 +129,15 @@ def test_get_orientation_by_floor(data_get_orientation_by_floor):
 
 @pytest.fixture(
     params=[
-        (Path(f"{dirname(__file__)}/data/HEIC/IMG_2527_180cw.HEIC"), 180),
-        (Path(f"{dirname(__file__)}/data/HEIC/IMG_2527_90cw.HEIC"), 270),
-        (Path(f"{dirname(__file__)}/data/HEIC/IMG_2527_270cw.HEIC"), 90),
-        (Path(f"{dirname(__file__)}/data/HEIC/IMG_2530_180cw.HEIC"), 180),
-        (Path(f"{dirname(__file__)}/data/HEIC/IMG_2530_90cw.HEIC"), 270),
-        (Path(f"{dirname(__file__)}/data/HEIC/IMG_2530_270cw.HEIC"), 90),
-        (Path(f"{dirname(__file__)}/data/JPG/IMG_2527.jpg"), 90),
-        (Path(f"{dirname(__file__)}/data/HEIC/IMG_0070.HEIC"), 0),
-        (Path(f"{dirname(__file__)}/data/HEIC/Cartoon.heic"), -1),
+        (Path(f"{_dir}/data/HEIC/IMG_2527_180cw.HEIC"), 180),
+        (Path(f"{_dir}/data/HEIC/IMG_2527_90cw.HEIC"), 270),
+        (Path(f"{_dir}/data/HEIC/IMG_2527_270cw.HEIC"), 90),
+        (Path(f"{_dir}/data/HEIC/IMG_2530_180cw.HEIC"), 180),
+        (Path(f"{_dir}/data/HEIC/IMG_2530_90cw.HEIC"), 270),
+        (Path(f"{_dir}/data/HEIC/IMG_2530_270cw.HEIC"), 90),
+        (Path(f"{_dir}/data/JPG/IMG_2527.jpg"), 90),
+        (Path(f"{_dir}/data/HEIC/IMG_0070.HEIC"), 0),
+        (Path(f"{_dir}/data/HEIC/Cartoon.heic"), -1),
     ]
 )
 def data_get_cw_angle_by_sky(request):

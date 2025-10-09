@@ -145,6 +145,8 @@ class Main:
             bool: True - Success. False - Error
         """
         start_ts = Main._prepare(options)
+        s = "Loading u2net.onnx data file to find background... Please be patient."
+        log.info(s)
         in_path = Path(options["src_path"])
         output = options.get("output")
         out = Path(output) if output else REPLACE

@@ -1,7 +1,7 @@
 ## batch_img
 
-Batch process (**resize, rotate, remove GPS, add border, set transparency,
-remove background, auto do all**) image files (**HEIC, JPG, PNG**) by
+Batch process (**resize, rotate, remove background, remove GPS, add border,
+set transparency, auto do all**) image files (**HEIC, JPG, PNG**) by
 utilizing **[Pillow / PIL](https://github.com/python-pillow/Pillow)** library.
 It can apply the action(s) on a single image file or all image files in the input
 folder / directory. Tested working on **macOS** and **Windows**.
@@ -63,7 +63,7 @@ uv pip install --upgrade batch_img
 
 ```
 ✗ batch_img --version
-0.3.3
+0.3.4
 
 
 ✗ batch_img auto ~/Documents

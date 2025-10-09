@@ -12,26 +12,28 @@ import pytest
 from batch_img.const import REPLACE
 from batch_img.resize import Resize
 
+_dir = dirname(__file__)
+
 
 @pytest.fixture(
     params=[
         (
-            Path(f"{dirname(__file__)}/data/HEIC/IMG_0070.HEIC"),
-            Path(f"{dirname(__file__)}/.out/"),
+            Path(f"{_dir}/data/HEIC/IMG_0070.HEIC"),
+            Path(f"{_dir}/.out/"),
             1024,
-            (True, Path(f"{dirname(__file__)}/.out/IMG_0070_1024.HEIC")),
+            (True, Path(f"{_dir}/.out/IMG_0070_1024.HEIC")),
         ),
         (
-            Path(f"{dirname(__file__)}/data/PNG/Checkmark.PNG"),
-            Path(f"{dirname(__file__)}/.out/"),
+            Path(f"{_dir}/data/PNG/Checkmark.PNG"),
+            Path(f"{_dir}/.out/"),
             1024,
-            (True, Path(f"{dirname(__file__)}/.out/Checkmark_1024.PNG")),
+            (True, Path(f"{_dir}/.out/Checkmark_1024.PNG")),
         ),
         (
-            Path(f"{dirname(__file__)}/data/HEIC/Cartoon.heic"),
-            Path(f"{dirname(__file__)}/.out/"),
+            Path(f"{_dir}/data/HEIC/Cartoon.heic"),
+            Path(f"{_dir}/.out/"),
             1024,
-            (True, Path(f"{dirname(__file__)}/.out/Cartoon_1024.heic")),
+            (True, Path(f"{_dir}/.out/Cartoon_1024.heic")),
         ),
     ]
 )
@@ -47,7 +49,7 @@ def test_resize_an_image(data_resize_an_image):
 
 @pytest.mark.slow(reason="This test modifies test data file.")
 def test_resize_an_image_replace():
-    in_path = Path(f"{dirname(__file__)}/data/PNG/Checkmark.PNG")
+    in_path = Path(f"{_dir}/data/PNG/Checkmark.PNG")
     actual = Resize.resize_an_image((in_path, REPLACE, 800))
     assert actual == (True, in_path)
 
@@ -62,8 +64,8 @@ def test_error_resize_an_image(mock_open):
 @pytest.fixture(
     params=[
         (
-            Path(f"{dirname(__file__)}/data/mixed"),
-            Path(f"{dirname(__file__)}/.out/"),
+            Path(f"{_dir}/data/mixed"),
+            Path(f"{_dir}/.out/"),
             1024,
             True,
         )
