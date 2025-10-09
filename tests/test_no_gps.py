@@ -11,23 +11,25 @@ import pytest
 
 from batch_img.no_gps import NoGps
 
+_dir = dirname(__file__)
+
 
 @pytest.fixture(
     params=[
         (
-            Path(f"{dirname(__file__)}/data/JPG/P1040566.jpeg"),
-            Path(f"{dirname(__file__)}/.out/"),
+            Path(f"{_dir}/data/JPG/P1040566.jpeg"),
+            Path(f"{_dir}/.out/"),
             (
                 True,
-                f"Skip as no EXIF in {dirname(__file__)}/data/JPG/P1040566.jpeg",
+                f"Skip as no EXIF in {str(Path(f'{_dir}/data/JPG/P1040566.jpeg'))}",
             ),
         ),
         (
-            Path(f"{dirname(__file__)}/data/HEIC/IMG_0131.HEIC"),
-            Path(f"{dirname(__file__)}/.out/"),
+            Path(f"{_dir}/data/HEIC/IMG_0131.HEIC"),
+            Path(f"{_dir}/.out/"),
             (
                 True,
-                f"No 'GPS' in EXIF of {dirname(__file__)}/data/HEIC/IMG_0131.HEIC",
+                f"No 'GPS' in EXIF of {str(Path(f'{_dir}/data/HEIC/IMG_0131.HEIC'))}",
             ),
         ),
     ]
@@ -52,8 +54,8 @@ def test_error_remove_1_image_gps(mock_open):
 @pytest.fixture(
     params=[
         (
-            Path(f"{dirname(__file__)}/data/mixed"),
-            Path(f"{dirname(__file__)}/.out/"),
+            Path(f"{_dir}/data/mixed"),
+            Path(f"{_dir}/.out/"),
             True,
         ),
     ]

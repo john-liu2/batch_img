@@ -10,6 +10,8 @@ import pytest
 
 from batch_img.main import Main
 
+_dir = dirname(__file__)
+
 
 @pytest.fixture(
     params=[
@@ -18,7 +20,7 @@ from batch_img.main import Main
             "v_2",
             {
                 "src_path": "src/file",
-                "output": f"{dirname(__file__)}/.out/",
+                "output": f"{_dir}/.out/",
             },
             "v_2",
         ),
@@ -99,8 +101,8 @@ def test_border(
     params=[
         (
             {
-                "src_path": f"{dirname(__file__)}/data/mixed",
-                "output": f"{dirname(__file__)}/.out/",
+                "src_path": f"{_dir}/data/mixed",
+                "output": f"{_dir}/.out/",
                 "border_width": 10,
                 "border_color": "red",
             },
@@ -126,7 +128,7 @@ def test_border_all_in_dir(data_border_all):
             {
                 "src_path": "src/file",
                 "effect": "blur",
-                "output": f"{dirname(__file__)}/.out/",
+                "output": f"{_dir}/.out/",
             },
             "v_2",
         ),
@@ -166,7 +168,7 @@ def test_do_effect(
             "v_2",
             {
                 "src_path": "src/file",
-                "output": f"{dirname(__file__)}/.out/",
+                "output": f"{_dir}/.out/",
             },
             "v_2",
         ),
@@ -205,25 +207,25 @@ def test_remove_gps(
     params=[
         (
             {
-                "src_path": f"{dirname(__file__)}/data/mixed",
+                "src_path": f"{_dir}/data/mixed",
             },
             True,
         ),
         (
             {
-                "src_path": f"{dirname(__file__)}/data/HEIC",
+                "src_path": f"{_dir}/data/HEIC",
             },
             True,
         ),
         (
             {
-                "src_path": f"{dirname(__file__)}/data/JPG",
+                "src_path": f"{_dir}/data/JPG",
             },
             True,
         ),
         (
             {
-                "src_path": f"{dirname(__file__)}/data/PNG",
+                "src_path": f"{_dir}/data/PNG",
             },
             True,
         ),
@@ -277,8 +279,8 @@ def test_resize(
     params=[
         (
             {
-                "src_path": f"{dirname(__file__)}/data/mixed",
-                "output": f"{dirname(__file__)}/.out/",
+                "src_path": f"{_dir}/data/mixed",
+                "output": f"{_dir}/.out/",
                 "length": 1024,
             },
             True,
@@ -333,8 +335,8 @@ def test_rotate(
     params=[
         (
             {
-                "src_path": f"{dirname(__file__)}/data/mixed",
-                "output": f"{dirname(__file__)}/.out/",
+                "src_path": f"{_dir}/data/mixed",
+                "output": f"{_dir}/.out/",
                 "angle": 180,
             },
             True,
@@ -389,8 +391,8 @@ def test_transparent(
     params=[
         (
             {
-                "src_path": f"{dirname(__file__)}/data/PNG",
-                "output": f"{dirname(__file__)}/.out/",
+                "src_path": f"{_dir}/data/PNG",
+                "output": f"{_dir}/.out/",
                 "transparency": 0,
             },
             True,

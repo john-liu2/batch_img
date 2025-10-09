@@ -11,28 +11,30 @@ import pytest
 
 from batch_img.remove_bg import RemoveBg
 
+_dir = dirname(__file__)
+
 
 @pytest.fixture(
     params=[
         (
-            Path(f"{dirname(__file__)}/data/JPG/IMG_0131.jpg"),
-            Path(f"{dirname(__file__)}/.out/"),
-            (True, Path(f"{dirname(__file__)}/.out/IMG_0131_NoBg.png")),
+            Path(f"{_dir}/data/JPG/IMG_0131.jpg"),
+            Path(f"{_dir}/.out/"),
+            (True, Path(f"{_dir}/.out/IMG_0131_NoBg.png")),
         ),
         (
-            Path(f"{dirname(__file__)}/data/HEIC/IMG_0070.HEIC"),
-            Path(f"{dirname(__file__)}/.out/"),
-            (True, Path(f"{dirname(__file__)}/.out/IMG_0070_NoBg.HEIC")),
+            Path(f"{_dir}/data/HEIC/IMG_0070.HEIC"),
+            Path(f"{_dir}/.out/"),
+            (True, Path(f"{_dir}/.out/IMG_0070_NoBg.HEIC")),
         ),
         (
-            Path(f"{dirname(__file__)}/data/PNG/LagrangePoints.png"),
-            Path(f"{dirname(__file__)}/.out/"),
-            (True, Path(f"{dirname(__file__)}/.out/LagrangePoints_NoBg.png")),
+            Path(f"{_dir}/data/PNG/LagrangePoints.png"),
+            Path(f"{_dir}/.out/"),
+            (True, Path(f"{_dir}/.out/LagrangePoints_NoBg.png")),
         ),
         (
-            Path(f"{dirname(__file__)}/data/HEIC/Cartoon.heic"),
-            Path(f"{dirname(__file__)}/.out/"),
-            (True, Path(f"{dirname(__file__)}/.out/Cartoon_NoBg.heic")),
+            Path(f"{_dir}/data/HEIC/Cartoon.heic"),
+            Path(f"{_dir}/.out/"),
+            (True, Path(f"{_dir}/.out/Cartoon_NoBg.heic")),
         ),
     ]
 )
@@ -56,8 +58,8 @@ def test_error_remove_bg_image(mock_open):
 @pytest.fixture(
     params=[
         (
-            Path(f"{dirname(__file__)}/data/mixed"),
-            Path(f"{dirname(__file__)}/.out/"),
+            Path(f"{_dir}/data/mixed"),
+            Path(f"{_dir}/.out/"),
             True,
         ),
     ]

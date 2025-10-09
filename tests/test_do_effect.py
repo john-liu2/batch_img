@@ -11,32 +11,28 @@ import pytest
 
 from batch_img.do_effect import DoEffect
 
+_dir = dirname(__file__)
+
 
 @pytest.fixture(
     params=[
-        # (
-        #     Path("~/Documents/IMG_0231.HEIC"),
-        #     "",
-        #     "blur",
-        #     (True, Path("~/Documents/IMG_0231_blur.HEIC").expanduser()),
-        # ),
         (
-            Path(f"{dirname(__file__)}/data/HEIC/IMG_0070.HEIC"),
-            Path(f"{dirname(__file__)}/.out/"),
+            Path(f"{_dir}/data/HEIC/IMG_0070.HEIC"),
+            Path(f"{_dir}/.out/"),
             "neon",
-            (True, Path(f"{dirname(__file__)}/.out/IMG_0070_neon.HEIC")),
+            (True, Path(f"{_dir}/.out/IMG_0070_neon.HEIC")),
         ),
         (
-            Path(f"{dirname(__file__)}/data/HEIC/IMG_0070.HEIC"),
-            Path(f"{dirname(__file__)}/.out/"),
+            Path(f"{_dir}/data/HEIC/IMG_0070.HEIC"),
+            Path(f"{_dir}/.out/"),
             "hdr",
-            (True, Path(f"{dirname(__file__)}/.out/IMG_0070_hdr.HEIC")),
+            (True, Path(f"{_dir}/.out/IMG_0070_hdr.HEIC")),
         ),
         (
-            Path(f"{dirname(__file__)}/data/JPG/152.JPG"),
-            Path(f"{dirname(__file__)}/.out/"),
+            Path(f"{_dir}/data/JPG/152.JPG"),
+            Path(f"{_dir}/.out/"),
             "blur",
-            (True, Path(f"{dirname(__file__)}/.out/152_blur.JPG")),
+            (True, Path(f"{_dir}/.out/152_blur.JPG")),
         ),
     ]
 )
@@ -54,14 +50,15 @@ def test_apply_1_image(data_apply_1_image):
 def test_error_apply_1_image(mock_open):
     mock_open.side_effect = ValueError("VE")
     actual = DoEffect.apply_1_image((Path("img/file"), Path("out/path"), "any"))
-    assert "img/file" in actual[1]
+    # For Windows & macOS
+    assert str(Path("img/file")) in actual[1]
 
 
 @pytest.fixture(
     params=[
         (
-            Path(f"{dirname(__file__)}/data/mixed"),
-            Path(f"{dirname(__file__)}/.out/"),
+            Path(f"{_dir}/data/mixed"),
+            Path(f"{_dir}/.out/"),
             "neon",
             True,
         ),
