@@ -1,19 +1,23 @@
-name: Pylint
+name: Windows Pylint & PyTest
 
-on: [ push ]
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
 
 jobs:
   build:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ ubuntu-latest, macos-latest ]
+        os: [ windows-latest ]
         python-version: [ "3.13" ]
     name: Python ${{ matrix.python-version }} on ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
@@ -24,3 +28,8 @@ jobs:
         run: |
           pylint $(git ls-files '*.py')
           ruff check
+      - name: Run PyTest
+        run: |
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          pip install pytest-cov pytest-asyncio
+          pytest --cov-report=term --cov=batch_img tests
