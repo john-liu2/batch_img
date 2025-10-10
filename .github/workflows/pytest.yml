@@ -19,16 +19,17 @@ jobs:
         python-version: [ "3.13" ]
     name: Python ${{ matrix.python-version }} on ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
+          cache: "pip"
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install pytest-cov click httpx loguru piexif pillow pillow-heif tqdm numpy opencv-python packaging onnxruntime rembg
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-      - name: Test with pytest
+      - name: Do PyTest
         run: |
           pytest --cov-report=term --cov=batch_img tests
