@@ -3,6 +3,7 @@ Copyright © 2025 John Liu
 """
 
 import click
+from loguru import logger as log
 
 from batch_img.common import Common
 from batch_img.const import MSG_BAD, MSG_OK, PKG_NAME
@@ -135,6 +136,7 @@ def do_effect(src_path, effect, output):
     help="Output file path. If not specified, replace the input file.",
 )
 def remove_bg(src_path, output):
+    log.info("Loading u2net.onnx data to find background... Please be patient.")
     options = {"src_path": src_path, "output": output}
     res = Main.remove_bg(options)
     msg = MSG_OK if res else MSG_BAD
