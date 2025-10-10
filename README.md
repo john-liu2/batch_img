@@ -11,7 +11,7 @@ folder / directory. Tested working on **macOS** and **Windows**.
 #### Requirements
 
 ```
-python: >=3.12, <=3.14
+python: >=3.12, <3.14
 ```
 
 #### One-time Setup
@@ -63,7 +63,7 @@ uv pip install --upgrade batch_img
 
 ```
 ✗ batch_img --version
-0.3.4
+0.3.5
 
 
 ✗ batch_img auto ~/Documents
