@@ -136,7 +136,7 @@ def do_effect(src_path, effect, output):
     help="Output file path. If not specified, replace the input file.",
 )
 def remove_bg(src_path, output):
-    log.info("Loading u2net.onnx data to find background... Please be patient.")
+    log.info("Loading u2net.onnx to identify the background... Please be patient.")
     options = {"src_path": src_path, "output": output}
     res = Main.remove_bg(options)
     msg = MSG_OK if res else MSG_BAD
