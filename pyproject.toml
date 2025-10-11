@@ -10,6 +10,7 @@ readme = "README.md"
 authors = [{ name = "John Liu", email = "rim2rim@gmail.com" }]
 license = "MIT"
 license-files = ["LICENSE"]
+keywords = ["cli-tool", "image-processing", "batch-processing", "special-effect", "remove-background", "remove-gps", "resize-image", "rotate-image"]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: End Users/Desktop",
