@@ -1,6 +1,6 @@
 """Test common.py
 pytest -sv tests/test_common.py
-Copyright © 2025 John Liu
+Copyright © 2025 - Present John Liu
 """
 
 import json
@@ -20,7 +20,7 @@ from .helper import DotDict
 _dir = dirname(__file__)
 
 
-@pytest.fixture(params=[(PKG_NAME, "0.3.5"), ("", "0.3.5")])
+@pytest.fixture(params=[(PKG_NAME, "0.3.6"), ("", "0.3.6")])
 def ver_data(request):
     return request.param
 
@@ -36,7 +36,7 @@ def test_get_version(ver_data):
         (
             "0.9.9",
             PKG_NAME,
-            f"🔔 Update available: 0.3.5  →  0.9.9\nRun '{PKG_NAME} --update'",
+            f"🔔 Update available: 0.3.6  →  0.9.9\nRun '{PKG_NAME} --update'",
         ),
     ]
 )
@@ -54,7 +54,7 @@ def test_check_latest_version(mock_get_latest_pypi, data_check_latest_version):
 
 @pytest.fixture(
     params=[
-        (PKG_NAME, 0, "0.3.4"),
+        (PKG_NAME, 0, "0.3.6"),
         ("bad_bogus", 1, UNKNOWN),
     ]
 )

@@ -8,6 +8,9 @@ folder / directory. Tested working on **macOS** and **Windows**.
 
 ### Installation
 
+The `Remove background (make background transparent)` feature depends on `onnxruntime`
+library. It's yet to support `Python 3.14`.
+
 #### Requirements
 
 ```
@@ -16,7 +19,7 @@ python: >=3.12, <3.14
 
 #### One-time Setup
 
-Install the Astral's [`uv`](https://github.com/astral-sh/uv) tool one-time to
+Install the Astral's [`uv`](https://github.com/astral-sh/uv) tool once to
 prepare for **all** Python tools and packages installation. Install the Astral's
 [`uv`](https://github.com/astral-sh/uv) by its standalone installers:
 
@@ -63,7 +66,7 @@ uv pip install --upgrade batch_img
 
 ```
 ✗ batch_img --version
-0.3.5
+0.3.6
 
 
 ✗ batch_img auto ~/Documents
@@ -76,7 +79,8 @@ Auto processed 8/8 files
 ### Contribution
 
 Contributions are welcome!
-Please see the details in [Contribution Guidelines](https://github.com/john-liu2/batch_img/blob/main/CONTRIBUTING.md)
+Please see the details
+in [Contribution Guidelines](https://github.com/john-liu2/batch_img/blob/main/CONTRIBUTING.md)
 
 ### Help
 

@@ -1,5 +1,5 @@
 """const.py - define constants
-Copyright © 2025 John Liu
+Copyright © 2025 - Present John Liu
 """
 
 from dataclasses import dataclass

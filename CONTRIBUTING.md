@@ -43,20 +43,13 @@ should be run in **Terminal** window on **macOS**.
 
 #### One-time `uv` Setup
 
-Install the [`uv`](https://github.com/astral-sh/uv) tool one-time to prepare for
-**all** Python tools and packages installation. Install
+Install the Astral's [`uv`](https://github.com/astral-sh/uv) tool once to prepare for
+**all** Python tools and packages installation. Install the Astral's
 [`uv`](https://github.com/astral-sh/uv) by its standalone installers:
 
 ```
 # On macOS and Linux.
 curl -LsSf https://astral.sh/uv/install.sh | sh
-```
-
-After `git clone ...` the repo to your local disk, go to the local project folder
-and run the [`uv`](https://github.com/astral-sh/uv) command:
-
-```
-uv pip install -e '.[dev]'
 ```
 
 This will create a hidden virtualenv dir in the local project folder - `.venv` and
@@ -71,6 +64,20 @@ Run the command to activate the development virtualenv:
 
 ```
 source .venv/bin/activate
+```
+
+#### Install Development Dependencies
+
+Run the command to install all dependencies:
+
+```
+uv pip install -e '.[dev]'
+```
+
+Optionally, you can create the `requirements.txt` file by command:
+
+```
+uv pip compile pyproject.toml -o requirements.txt
 ```
 
 #### Activate `pre-commit`
