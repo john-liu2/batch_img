@@ -1,5 +1,5 @@
 # Makefile to clean, lint and test with code coverage
-# Copyright © 2025 John Liu
+# Copyright © 2025 - Present John Liu
 
 PYTHON_FILES = batch_img
 
