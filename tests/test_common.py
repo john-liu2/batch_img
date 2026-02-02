@@ -20,7 +20,7 @@ from .helper import DotDict
 _dir = dirname(__file__)
 
 
-@pytest.fixture(params=[(PKG_NAME, "0.3.6"), ("", "0.3.6")])
+@pytest.fixture(params=[(PKG_NAME, "0.3.7"), ("", "0.3.7")])
 def ver_data(request):
     return request.param
 
@@ -36,7 +36,7 @@ def test_get_version(ver_data):
         (
             "0.9.9",
             PKG_NAME,
-            f"🔔 Update available: 0.3.6  →  0.9.9\nRun '{PKG_NAME} --update'",
+            f"🔔 Update available: 0.3.7  →  0.9.9\nRun '{PKG_NAME} --update'",
         ),
     ]
 )
