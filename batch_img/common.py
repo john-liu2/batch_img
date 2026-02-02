@@ -138,7 +138,7 @@ class Common:
         cmd = f"uv pip install --upgrade {pkg_name}"
         if sys.prefix != sys.base_prefix:
             # inside a venv or virtualenv
-            cmd += f"pip install --upgrade {pkg_name}"
+            cmd = f"pip install --upgrade {pkg_name}"
         try:
             Common.run_cmd(cmd)
             msg = "✅ Update completed."
