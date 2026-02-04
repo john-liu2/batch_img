@@ -54,7 +54,7 @@ def test_check_latest_version(mock_get_latest_pypi, data_check_latest_version):
 
 @pytest.fixture(
     params=[
-        (PKG_NAME, 0, "0.3.7"),
+        (PKG_NAME, 0, "0.3.8"),
         ("bad_bogus", 1, UNKNOWN),
     ]
 )
