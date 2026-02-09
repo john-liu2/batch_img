@@ -4,7 +4,7 @@ requires = ["hatchling"]
 
 [project]
 name = "batch_img"
-version = "0.3.8"
+version = "0.3.9"
 description = "Batch process (resize, rotate, remove background, remove GPS, add border, set transparency, auto do all) image files (HEIC, JPG, PNG)"
 readme = "README.md"
 authors = [{ name = "John Liu", email = "rim2rim@gmail.com" }]
@@ -46,6 +46,7 @@ Homepage = "https://github.com/john-liu2/batch_img"
 [tool.hatch.build.targets.sdist]
 include = [
     "batch_img/*.py",
+    "batch_img/config.json",
     "pyproject.toml",
     "README.md",
     "LICENSE",
