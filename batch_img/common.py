@@ -434,13 +434,17 @@ class Common:
         return success_cnt
 
     @staticmethod
-    def executor_progress(func, desc: str, tasks: list) -> int:
+    def executor_progress(
+        func, desc: str, tasks: list, quiet: bool = False, results: list | None = None
+    ) -> int:
         """ProcessPoolExecutor / ThreadPoolExecutor + progress bar
 
         Args:
             func: function to be run in multiprocess
             desc: description str
             tasks: tasks list for multiprocess pool
+            quiet: suppress progress and error output
+            results: optional list to receive successful task results
 
         Returns:
             int: success_cnt
@@ -451,13 +455,15 @@ class Common:
 
         with ThreadPoolExecutor(max_workers=workers) as executor:
             futures = [executor.submit(func, task) for task in tasks]
-            with tqdm(total=len(futures), desc=desc) as pbar:
+            with tqdm(total=len(futures), desc=desc, disable=quiet) as pbar:
                 # as_completed to iterate over futures as they finish
                 for future in as_completed(futures):
                     ok, res = future.result()
                     if ok:
                         success_cnt += 1
-                    else:
+                        if results is not None:
+                            results.append(res)
+                    elif not quiet:
                         tqdm.write(f"error: {res}")
                     pbar.update(1)
         return success_cnt

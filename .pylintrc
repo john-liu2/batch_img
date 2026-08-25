@@ -10,5 +10,7 @@ ignore-paths=^(.*/)?tests?(/.*)?$
 # Module 'cv2' has no 'rotate' member (no-member)
 disable=missing-function-docstring,
         missing-class-docstring,
+        too-many-arguments,
+        too-many-positional-arguments,
         R0801,
         E1101

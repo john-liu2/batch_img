@@ -111,13 +111,16 @@ class Auto:
         return ok, file
 
     @staticmethod
-    def auto_on_all(in_path: Path, out_path: Path | str, auto_rotate: bool) -> bool:
+    def auto_on_all(
+        in_path: Path, out_path: Path | str, auto_rotate: bool, quiet: bool = False
+    ) -> bool:
         """Auto process all images in a folder
 
         Args:
             in_path: input file path
             out_path: output dir path
             auto_rotate: auto rotate image flag
+            quiet: suppress progress and error output
 
         Returns:
             bool: True - Success. False - Error
@@ -131,7 +134,7 @@ class Auto:
 
         log.debug(f"Auto process {files_cnt} files in multiprocess ...")
         success_cnt = Common.executor_progress(
-            Auto.auto_do_1_image, "Auto process image files", tasks
+            Auto.auto_do_1_image, "Auto process image files", tasks, quiet=quiet
         )
         log.info(f"\nAuto processed {success_cnt}/{files_cnt} files")
         return True

@@ -57,13 +57,16 @@ class DoEffect:
             return False, f"{in_path}:\n{e}"
 
     @staticmethod
-    def apply_all_in_dir(in_path: Path, out_path: Path | str, effect_name: str) -> bool:
+    def apply_all_in_dir(
+        in_path: Path, out_path: Path | str, effect_name: str, quiet: bool = False
+    ) -> bool:
         """Apply the special effect to all images in the given dir
 
         Args:
             in_path: input file path
             out_path: output dir path
             effect_name: effect name string, "neon", "hdr", etc.
+            quiet: suppress progress and error output
 
         Returns:
             bool: True - Success. False - Error
@@ -77,7 +80,10 @@ class DoEffect:
 
         log.debug(f"Apply special effect to {files_cnt} image files ...")
         success_cnt = Common.executor_progress(
-            DoEffect.apply_1_image, "Apply special effect to image files", tasks
+            DoEffect.apply_1_image,
+            "Apply special effect to image files",
+            tasks,
+            quiet=quiet,
         )
         log.info(f"\nCompleted the special effect to {success_cnt}/{files_cnt} files")
         return True

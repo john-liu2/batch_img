@@ -4,6 +4,7 @@ Copyright © 2025 John Liu
 """
 
 from os.path import dirname
+from pathlib import Path
 from unittest.mock import patch
 
 import pytest
@@ -53,6 +54,27 @@ def test_auto(
     mock_check_latest_version.return_value = "ok"
     actual = Main.auto(options)
     assert actual == expected
+
+
+@patch("batch_img.common.Common.check_latest_version")
+@patch("batch_img.info.Info.read_exif")
+def test_info(mock_read_exif, mock_check_latest_version):
+    mock_read_exif.return_value = True
+    mock_check_latest_version.return_value = "ok"
+    assert Main.info({"src_path": "images"})
+    mock_read_exif.assert_called_once_with(Path("images"), False)
+
+
+@patch("batch_img.main.Main._conclude", return_value="0:00:01")
+@patch("batch_img.info.Info.read_exif")
+def test_quiet_info(mock_read_exif, mock_conclude, capsys):
+    mock_read_exif.return_value = True
+    assert Main.info({"src_path": "images", "quiet": True})
+    mock_read_exif.assert_called_once_with(Path("images"), True)
+    conclude_args, conclude_kwargs = mock_conclude.call_args
+    assert len(conclude_args) == 1
+    assert conclude_kwargs == {"log_elapsed": False}
+    assert capsys.readouterr().out == "Elapsed time: 0:00:01\n"
 
 
 @pytest.fixture(

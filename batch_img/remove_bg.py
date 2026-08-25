@@ -59,12 +59,15 @@ class RemoveBg:
             return False, f"{in_path}:\n{e}"
 
     @staticmethod
-    def remove_all_images_bg(in_path: Path, out_path: Path | str) -> bool:
+    def remove_all_images_bg(
+        in_path: Path, out_path: Path | str, quiet: bool = False
+    ) -> bool:
         """Remove background for all image files in the given dir
 
         Args:
             in_path: input dir path
             out_path: output dir path or REPLACE
+            quiet: suppress progress and error output
 
         Returns:
             bool: True - Success. False - Error
@@ -78,7 +81,7 @@ class RemoveBg:
 
         log.debug(f"Remove background on {files_cnt} image files in multiprocess ...")
         success_cnt = Common.executor_progress(
-            RemoveBg.remove_bg_image, "Remove background", tasks
+            RemoveBg.remove_bg_image, "Remove background", tasks, quiet=quiet
         )
         log.info(f"\nDone - removed background on {success_cnt}/{files_cnt} files")
         return True

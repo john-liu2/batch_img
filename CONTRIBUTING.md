@@ -50,10 +50,12 @@ Install the Astral's [`uv`](https://github.com/astral-sh/uv) tool once to prepar
 ```
 # On macOS and Linux.
 curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Create the Python virtualenv by uv command
+uv venv
 ```
 
-This will create a hidden virtualenv dir in the local project folder - `.venv` and
-install all dependencies defined in the `pyproject.toml` file in this virtualenv.
+This will create a hidden virtualenv dir in the local project folder - `.venv`.
 
 If the `.venv` exists, this command will update the project version and dependencies
 in the existing `.venv` virtualenv.
@@ -160,4 +162,11 @@ pytest --cov-report=term --cov=batch_img tests
 
 ```
 make test
+```
+
+#### Run local `batch_img`
+
+* Run the local built command
+```
+batch_img --version
 ```
