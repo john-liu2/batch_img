@@ -12,5 +12,6 @@ disable=missing-function-docstring,
         missing-class-docstring,
         too-many-arguments,
         too-many-positional-arguments,
+        too-many-statements-in-try-clause,
         R0801,
         E1101
