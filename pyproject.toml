@@ -60,6 +60,7 @@ dev = [
     "ruff",
     "pre-commit", # rules are in .pre-commit-config.yaml
     "pylint",
+    "twine>=7.0.0", # to check sdist
 ]
 
 [tool.ruff]
