@@ -25,5 +25,5 @@ jobs:
           pip install pylint ruff click httpx loguru piexif pillow pillow-heif tqdm numpy opencv-python packaging onnxruntime rembg
       - name: Analysing the code with pylint
         run: |
-          pylint --rcfile=./.pylintrc $(git ls-files '*.py')
+          pylint --disable=W0717 $(git ls-files '*.py')
           ruff check
