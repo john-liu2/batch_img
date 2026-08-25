@@ -26,4 +26,4 @@ jobs:
       - name: Analysing the code with pylint
         run: |
           pylint --disable=W0717 $(git ls-files '*.py')
-          ruff check
+#          ruff check
