@@ -489,7 +489,7 @@ def test_get_image_data(data_get_image):
     # Cloud CI runs get different ts
     expected.pop("file_ts")
     actual[1].pop("file_ts")
-    assert actual[1] == expected
+    assert actual[1] == Common.sort_nested_dict(expected)
 
 
 @pytest.fixture(
