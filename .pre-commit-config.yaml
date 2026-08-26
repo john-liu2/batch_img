@@ -26,7 +26,7 @@ repos:
         args: [ "--output-format=colorized" ]
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.12.8  # the latest ruff version
+    rev: v0.16.4  # the latest ruff version
     hooks:
       # Run the linter
       - id: ruff-check

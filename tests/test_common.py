@@ -408,6 +408,32 @@ def test_decode_exif(data_decode_exif):
 @pytest.fixture(
     params=[
         (
+            {
+                "zebra": 10,
+                "apple": {"cherry": 2, "banana": 5},
+                "mango": [{"id": 2, "name": "B"}, {"id": 1, "name": "A"}],
+            },
+            {
+                "apple": {"banana": 5, "cherry": 2},
+                "mango": [{"id": 2, "name": "B"}, {"id": 1, "name": "A"}],
+                "zebra": 10,
+            },
+        )
+    ]
+)
+def data_nested_dict(request):
+    return request.param
+
+
+def test_sort_nested_dict(data_nested_dict):
+    data, expected = data_nested_dict
+    actual = Common.sort_nested_dict(data)
+    assert actual == expected
+
+
+@pytest.fixture(
+    params=[
+        (
             Path(f"{_dir}/data/HEIC/Cartoon.heic"),
             {
                 "file_size": "44.6 KB",

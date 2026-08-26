@@ -11,7 +11,7 @@ from loguru import logger as log
 from PIL import Image
 
 from batch_img.common import Common
-from batch_img.const import EXIF
+from batch_img.const import EXIF, TS_2_MINUTE
 
 INFO_TXT_FILE = "img_meta_info.txt"
 
@@ -32,9 +32,12 @@ class Info:
         try:
             with Image.open(file) as image:
                 # Get file info
+                m_ts = datetime.fromtimestamp(file.stat().st_mtime).strftime(
+                    TS_2_MINUTE
+                )
                 file_info = {
                     "file_size": file.stat().st_size,
-                    "last_modified": datetime.fromtimestamp(file.stat().st_mtime),
+                    "last_modified": m_ts,
                     "format": image.format or "Unknown",
                     "dimensions": f"{image.width}x{image.height}",
                     "bit_depth": image.info.get("bits", "Unknown"),

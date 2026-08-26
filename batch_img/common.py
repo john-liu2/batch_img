@@ -12,7 +12,7 @@ import tomllib
 from base64 import b64encode
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timedelta
-from multiprocessing import Pool, cpu_count, current_process
+from multiprocessing import cpu_count, current_process
 from os.path import getmtime, getsize
 from pathlib import Path
 from time import time
@@ -32,7 +32,7 @@ from batch_img.const import (
     PATTERNS,
     PKG_NAME,
     REPLACE,
-    TS_FORMAT,
+    TS_2_MINUTE,
     UNKNOWN,
     VER,
 )
@@ -287,6 +287,20 @@ class Common:
         return _res
 
     @staticmethod
+    def sort_nested_dict(data):
+        """Sort nested dict for deterministic output"""
+        # If it's a dictionary, sort its keys and recursively sort its values
+        if isinstance(data, dict):
+            return {k: Common.sort_nested_dict(v) for k, v in sorted(data.items())}
+
+        # If it's a list, check if there are dictionaries inside the list
+        if isinstance(data, list):
+            return [Common.sort_nested_dict(item) for item in data]
+
+        # Base case: return the value as-is if it's not a dict or list
+        return data
+
+    @staticmethod
     def get_image_data(file: Path) -> tuple:
         """Get image file data
 
@@ -297,7 +311,7 @@ class Common:
             tuple: data, info
         """
         size = getsize(file)
-        m_ts = datetime.fromtimestamp(getmtime(file)).strftime(TS_FORMAT)
+        m_ts = datetime.fromtimestamp(getmtime(file)).strftime(TS_2_MINUTE)
         with Image.open(file) as img:
             data = img.convert("RGB")
             d_info = {
@@ -315,7 +329,7 @@ class Common:
                 exif_data = img.info.pop(EXIF)
                 d_info[EXIF] = Common.decode_exif(exif_data)
 
-        return data, d_info
+        return data, Common.sort_nested_dict(d_info)
 
     @staticmethod
     def jsn_serial(obj):
@@ -406,32 +420,6 @@ class Common:
         tmp = [in_path.glob(p, case_sensitive=True) for p in PATTERNS]
         _files = itertools.chain.from_iterable(set(tmp))
         return _files
-
-    @staticmethod
-    def multiprocess_progress_bar(func, desc: str, tasks: list) -> int:
-        """Run task in multiprocess with progress bar
-
-        Args:
-            func: function to be run in multiprocess
-            desc: description str
-            tasks: tasks list for multiprocess pool
-
-        Returns:
-            int: success_cnt
-        """
-        success_cnt = 0
-        all_cnt = len(tasks)
-        workers = min(max(cpu_count(), 4), all_cnt)
-
-        with Pool(workers) as pool:
-            with tqdm(total=all_cnt, desc=desc) as pbar:
-                for ok, res in pool.imap_unordered(func, tasks):
-                    if ok:
-                        success_cnt += 1
-                    else:
-                        tqdm.write(f"Error: {res}")
-                    pbar.update(1)
-        return success_cnt
 
     @staticmethod
     def executor_progress(

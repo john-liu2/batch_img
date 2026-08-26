@@ -1,5 +1,5 @@
 """class RemoveBg - Remove background (make background transparent) in image file(s)
-Copyright © 2025 John Liu
+Copyright © 2025 - Present, John Liu
 """
 
 import os
@@ -40,7 +40,8 @@ class RemoveBg:
                 i_format = img.format
                 if i_format == "JPEG":
                     i_format = "PNG"
-                    file = Path(f"{file.parent}/{file.stem}.png")
+                    # Use native pathlib method instead of string interpolation
+                    file = file.with_suffix(".png")
                     log.debug(f"Revised {file=}")
                 if EXIF in img.info:
                     exif_dict = piexif.load(img.info[EXIF])
