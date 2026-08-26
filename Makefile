@@ -18,7 +18,7 @@ clean:
 	rm -fr docs/build out_*.yaml tmp_*
 
 lint: clean
-	pylint $(PYTHON_FILES) --ignore=venv,tests
+	pylint $(git ls-files '*.py')
 	ruff check --fix --exit-non-zero-on-fix
 
 test: lint

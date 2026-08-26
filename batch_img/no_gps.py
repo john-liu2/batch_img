@@ -1,5 +1,5 @@
 """class NoGps - Remove GPS location info in image file(s)
-Copyright © 2025 John Liu
+Copyright © 2025 - Present, John Liu
 """
 
 import os

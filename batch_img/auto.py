@@ -2,7 +2,7 @@
     * Resize to 1920-pixel max length
     * Add 5-pixel width black color border
     * Remove GPS location info
-Copyright © 2025 John Liu
+Copyright © 2025 - Present, John Liu
 """
 
 import os

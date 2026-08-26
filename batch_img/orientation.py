@@ -1,5 +1,5 @@
 """class Orientation: detect if the image file(s) is upside down or sideways
-Copyright © 2025 John Liu
+Copyright © 2025 - Present, John Liu
 """
 
 import os

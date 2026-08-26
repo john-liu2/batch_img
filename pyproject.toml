@@ -28,7 +28,7 @@ dependencies = [
     "loguru",
     "numpy",
     "onnxruntime",
-    "opencv-python",
+    "opencv-python==4.13.0.92", # 4.x version has cv2.CascadeClassifier()
     "packaging",
     "piexif",
     "pillow",
