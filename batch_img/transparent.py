@@ -1,5 +1,5 @@
 """class Transparent: set transparency on image file(s)
-Copyright © 2025 John Liu
+Copyright © 2025 - Present, John Liu
 """
 
 import os
@@ -29,20 +29,15 @@ class Transparent:
             None
         """
         new_data = []
-        for t_pixel in img.getdata():
-            if len(t_pixel) == 4:
-                r, g, b, a = t_pixel
-                if (r, g, b) == (255, 255, 255):
-                    new_data.append((r, g, b, 0))
-                else:
-                    new_data.append((r, g, b, a))
+        for p in img.get_flattened_data():
+            r, g, b = p[:3]
+            a = p[3] if len(p) == 4 else 255
+
+            if (r, g, b) == (255, 255, 255):
+                new_data.append((r, g, b, 0))
             else:
-                # Fallback in case of RGB pixel (shouldn't happen after convert)
-                r, g, b = t_pixel
-                if (r, g, b) == (255, 255, 255):
-                    new_data.append((r, g, b, 0))
-                else:
-                    new_data.append((r, g, b, 255))
+                new_data.append((r, g, b, a))
+
         img.putdata(new_data)
 
     @staticmethod
@@ -57,12 +52,10 @@ class Transparent:
             None
         """
         new_data = []
-        for t_pixel in img.getdata():
-            if len(t_pixel) == 4:
-                r, g, b, _ = t_pixel
-            else:
-                r, g, b = t_pixel
+        for p in img.get_flattened_data():
+            r, g, b = p[:3]
             new_data.append((r, g, b, transparency))
+
         img.putdata(new_data)
 
     @staticmethod

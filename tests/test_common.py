@@ -21,7 +21,7 @@ from .helper import DotDict
 _dir = dirname(__file__)
 
 
-@pytest.fixture(params=[(PKG_NAME, "0.4.0"), ("", "0.4.0")])
+@pytest.fixture(params=[(PKG_NAME, "0.4.0"), ("", "0.4.1")])
 def ver_data(request):
     return request.param
 
