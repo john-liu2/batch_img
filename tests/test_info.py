@@ -70,12 +70,26 @@ def mock_meta_data():
                 },
                 EXIF: {
                     "ColorSpace": 65535,
+                    "DateTime": "2023:12:31 15:57:52",
+                    "DateTimeDigitized": "2023:12:31 15:57:52",
+                    "DateTimeOriginal": "2023:12:31 15:57:52",
                     "ExifTag": 242,
                     "ExifVersion": "0232",
                     "ExposureMode": 0,
                     "ExposureProgram": 2,
-                    "ExposureTime": (1, 28571),
+                    "ExposureTime": (
+                        1,
+                        28571,
+                    ),
+                    "FNumber": (
+                        1244236,
+                        699009,
+                    ),
                     "Flash": 16,
+                    "FocalLength": (
+                        251773,
+                        37217,
+                    ),
                     "FocalLengthIn35mmFilm": 24,
                     "ISOSpeedRatings": 64,
                     "Make": "Apple",

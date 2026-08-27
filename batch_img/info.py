@@ -40,7 +40,7 @@ class Info:
                     "colorspace": meta.get("mode", UNKNOWN),
                     "chroma_format": meta["info"].get("chroma", UNKNOWN),
                 },
-                EXIF: meta[EXIF],
+                EXIF: meta.get(EXIF, {}),
             }
             return True, (file, result)
         except (OSError, ValueError) as exc:
@@ -113,7 +113,7 @@ class Info:
             if file in results:
                 Info._output_exif_info(file, results[file], idx, len(files))
 
-        log.info(f"Read EXIF from {success_count}/{len(files)} files")
+        log.info(f"\nRead meta info from {success_count}/{len(files)} files")
         return success_count == len(files)
 
     @staticmethod
@@ -158,16 +158,14 @@ class Info:
         _out(f"{file} [{index}/{total}]")
 
         # Output file info
-        _out(
-            f"  File Size       : {Common.easy_file_sz(file_info.get('file_size', 0))}"
-        )
-        _out(f"  Last Modified   : {file_info.get('last_modified', 'Unknown')}")
-        _out(f"  Format          : {file_info.get('format', 'Unknown')}")
-        _out(f"  Dimensions      : {file_info.get('dimensions', 'Unknown')}")
-        _out(f"  Bit Depth       : {file_info.get('bit_depth', 'Unknown')}")
-        _out(f"  Alpha Channel   : {file_info.get('alpha_channel', 'Unknown')}")
-        _out(f"  Colorspace      : {file_info.get('colorspace', 'Unknown')}")
-        _out(f"  Chroma Format   : {file_info.get('chroma_format', 'Unknown')}")
+        _out(f"  File Size       : {file_info.get('file_size', UNKNOWN)}")
+        _out(f"  Last Modified   : {file_info.get('last_modified', UNKNOWN)}")
+        _out(f"  Format          : {file_info.get('format', UNKNOWN)}")
+        _out(f"  Dimensions      : {file_info.get('dimensions', UNKNOWN)}")
+        _out(f"  Bit Depth       : {file_info.get('bit_depth', UNKNOWN)}")
+        _out(f"  Alpha Channel   : {file_info.get('alpha_channel', UNKNOWN)}")
+        _out(f"  Colorspace      : {file_info.get('colorspace', UNKNOWN)}")
+        _out(f"  Chroma Format   : {file_info.get('chroma_format', UNKNOWN)}")
 
         # Output EXIF metadata
         _out("")
@@ -185,28 +183,31 @@ class Info:
             "ExposureTime": "Exposure",
             "FNumber": "Aperture",
             "FocalLength": "Focal Length",
-            "FocalLengthIn35mmFilm": "Focal Length",
-            "GPSInfo": "GPS Data",
+            "GPSLatitude": "GPS Data",
+            "GPSLongitude": "GPS Data",
         }
         for key, label in exif_map.items():
-            if key in exif:
-                value = exif[key]
-                if key == "GPSInfo":
-                    value = "Available" if value else "None"
-                elif key == "ExposureTime" and isinstance(value, tuple):
-                    value = f"{value[0]}/{value[1]} s"
-                elif key == "ExposureTime" and isinstance(value, float):
-                    if value < 1:
-                        value = f"1/{int(1 / value)} s"
-                    else:
-                        value = f"{value} s"
-                elif key == "FNumber" and isinstance(value, (float, int)):
-                    value = f"f/{value:.2f}"
-                elif key == "FocalLength" and isinstance(value, (float, int)):
-                    value = f"{value:.2f} mm"
-                elif key == "FocalLengthIn35mmFilm" and isinstance(value, (float, int)):
-                    value = f"{value / 3.55:.3f} mm"
-                elif key == "ISOSpeedRatings" and isinstance(value, (int, str)):
-                    value = f"ISO {value}"
+            if key not in exif:
+                continue
+            value = exif[key]
+            if key in {"GPSLongitude", "GPSLatitude"}:
+                value = "Present" if value else "None"
+            elif key == "ExposureTime" and isinstance(value, tuple):
+                value = f"{value[0]}/{value[1]} s"
+            elif key == "ExposureTime" and isinstance(value, float):
+                if value < 1:
+                    value = f"1/{int(1 / value)} s"
+                else:
+                    value = f"{value} s"
+            elif key == "FNumber" and isinstance(value, tuple):
+                value = f"f/{value[0] / value[1]:.2f}"
+            elif key == "FNumber" and isinstance(value, (float, int)):
+                value = f"f/{value:.2f}"
+            elif key == "FocalLength" and isinstance(value, tuple):
+                value = f"{value[0] / value[1]:.2f} mm"
+            elif key == "FocalLength" and isinstance(value, (float, int)):
+                value = f"{value:.2f} mm"
+            elif key == "ISOSpeedRatings" and isinstance(value, (int, str)):
+                value = f"ISO {value}"
 
-                _out(f"    {label:<15}: {value}")
+            _out(f"    {label:<15}: {value}")

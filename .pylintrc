@@ -4,21 +4,13 @@ max-line-length=88
 [MAIN]
 ignore=tests, data, venv
 ignore-paths=^(.*/)?tests?(/.*)?$
-# Load the extension that contains the max-try-statements option
-load-plugins=pylint.extensions.broad_try_clause
-
-[DESIGN]
-max-try-statements=30
 
 [MESSAGES CONTROL]
 # Similar lines in 2 files
 # Module 'cv2' has no 'rotate' member (no-member)
-# R0910: too-many-statements
-# R0912: too-many-statements-in-try-clause
+# R0912: too-many-branches
 disable=missing-function-docstring,
         missing-class-docstring,
-        too-many-arguments,
-        too-many-positional-arguments,
-        too-many-statements,
+        R0912,
         R0801,
         E1101

@@ -1,7 +1,7 @@
 ## batch_img
 
 Batch process (**resize, rotate, remove background, remove GPS, add border,
-set transparency, auto do all, inspect EXIF**) image files (**HEIC, JPG, PNG**) by
+set transparency, auto do all, get meta info**) image files (**HEIC, JPG, PNG**) by
 utilizing **[Pillow / PIL](https://github.com/python-pillow/Pillow)** library.
 It can apply the action(s) on a single image file or all image files in the input
 folder / directory. Tested working on **macOS** and **Windows**.
@@ -76,19 +76,17 @@ Auto processed 8/8 files
 ✅ Processed the image file(s)
 
 
-✗ batch_img --info -i ~/Documents
-Read EXIF from image files: 100%|██████████| 8/8 [00:00<00:00, ...]
-... EXIF metadata for each image ...
-Read EXIF from 8/8 files
-Elapsed time: 0:00:00
+✗ batch_img info -i ~/Documents
+...
+Read meta info from 10/10 files
+Elapsed time: 0.42 s
 ```
 
 All image operations accept `-i` / `--input` for the input file or directory,
-for example `batch_img resize -i ~/Pictures -l 1920`. The existing positional
-input path remains supported for compatibility. You can inspect EXIF data without
-changing files with `batch_img --info -i <file-or-directory>`.
-Use `--quiet` with `--info` to write the metadata to a local text file:
-`batch_img --info --quiet -i ~/Downloads/*.heic` writes `batch_img_exif_info`
+for example `batch_img resize -i ~/Pictures -l 1920`. You can get metadata info
+from files with `batch_img info -i <file-or-directory>`.
+Use `--quiet` with `info` sub-command to write the metadata to a local text file:
+`batch_img --quiet info -i ~/Downloads` writes `img_meta_info.txt`
 in the working directory.
 
 ### Contribution

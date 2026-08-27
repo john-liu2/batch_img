@@ -179,7 +179,9 @@ class Common:
         :param seconds: seconds float
         :return: duration string
         """
-        return str(timedelta(seconds=round(seconds)))
+        if seconds > 60.0:
+            return str(timedelta(seconds=round(seconds)))
+        return f"{str(round(seconds, 2))} s"
 
     @staticmethod
     def file_to_base64(file: Path) -> str:
@@ -255,8 +257,6 @@ class Common:
                 _dict[tag_name] = value
         # log.info(f"{_dict=}")
         for key in (
-            "FNumber",
-            "FocalLength",
             "MakerNote",
             "SceneType",
             "SubjectArea",
@@ -268,7 +268,6 @@ class Common:
                 _dict.pop(key)
         keys = list(_dict.keys())
         for keyword in (
-            "DateTime",
             "OffsetTime",
             "SubSecTime",
             "Tile",
