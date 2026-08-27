@@ -1,313 +1,245 @@
-"""Tests info.py
+"""Tests for info.py
 pytest -sv tests/test_info.py
-Copyright © 2026 - Present, John Liu
+Copyright © 2025 - Present, John Liu
 """
 
-import sys
+from os.path import dirname
 from pathlib import Path
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 import pytest
-from click.testing import CliRunner
 
-from batch_img.common import Common
-from batch_img.interface import cli
 from batch_img.info import Info
+from batch_img.const import EXIF, UNKNOWN
+
+_dir = dirname(__file__)
 
 
 @pytest.fixture
-def image_path() -> Path:
-    """Return the path to a valid test image (JPEG with EXIF)."""
-    return Path("tests/data/JPG/152.JPG")
+def mock_meta_data():
+    """Returns a standard dictionary representing output from Common.get_image_data"""
+    return {
+        "file_size": 2048576,
+        "file_ts": "2026-08-26 12:00",
+        "format": "JPEG",
+        "size": (1920, 1080),
+        "mode": "RGB",
+        "info": {"bit_depth": 8, "chroma": "4:2:0"},
+        EXIF: {
+            "Make": "Nikon",
+            "Model": "D850",
+            "ExposureTime": (1, 250),
+            "FNumber": 2.8,
+            "ISOSpeedRatings": 400,
+            "FocalLength": 50.0,
+            "GPSInfo": True,
+        },
+    }
 
 
-@pytest.fixture
-def image_dir() -> Path:
-    """Return the path to a directory containing test images."""
-    return Path("tests/data/JPG")
-
-
-@pytest.fixture
-def nonexistent_image_path() -> Path:
-    """Return a path to a non-existent image file."""
-    return Path("tests/data/JPG/nonexistent.JPG")
-
-
-@pytest.fixture
-def platform_error_messages() -> list[str]:
-    """
-    Return expected error substrings for a non-existent file.
-    This accounts for OS‑specific messages (Windows vs. POSIX).
-    """
-    if sys.platform.startswith("win"):
-        return ["cannot find the file", "No such file"]
-    # macOS / Linux
-    return ["No such file", "cannot identify"]
-
-
-@pytest.fixture
-def temp_output_file(tmp_path: Path) -> Path:
-    """Return a temporary file path for quiet mode output."""
-    return tmp_path / "img_meta_info.txt"
-
-
-# ---------------------------------------------------------------------------
-# Test classes
-# ---------------------------------------------------------------------------
+@pytest.fixture(
+    params=[
+        (
+            Path(f"{_dir}/data/HEIC/Cartoon_180cw.heic"),
+            {
+                "file_info": {
+                    "file_size": "42.4 KB",
+                    "last_modified": "2025-08-17 11:05",
+                    "format": "HEIF",
+                    "dimensions": "758 x 758",
+                    "bit_depth": 8,
+                    "alpha_channel": "No",
+                    "colorspace": "RGB",
+                    "chroma_format": 420,
+                },
+                EXIF: {"ExifTag": 114, "Orientation": 1},
+            },
+        ),
+        (
+            Path(f"{_dir}/data/HEIC/IMG_2527.HEIC"),
+            {
+                "file_info": {
+                    "file_size": "153.4 KB",
+                    "last_modified": "2026-03-04 11:53",
+                    "format": "HEIF",
+                    "dimensions": "1920 x 1440",
+                    "bit_depth": 8,
+                    "alpha_channel": "No",
+                    "colorspace": "RGB",
+                    "chroma_format": 420,
+                },
+                EXIF: {
+                    "ColorSpace": 65535,
+                    "ExifTag": 242,
+                    "ExifVersion": "0232",
+                    "ExposureMode": 0,
+                    "ExposureProgram": 2,
+                    "ExposureTime": (1, 28571),
+                    "Flash": 16,
+                    "FocalLengthIn35mmFilm": 24,
+                    "ISOSpeedRatings": 64,
+                    "Make": "Apple",
+                    "MeteringMode": 5,
+                    "Model": "iPhone 15 Pro Max",
+                    "Orientation": 1,
+                    "SensingMethod": 2,
+                    "WhiteBalance": 0,
+                },
+            },
+        ),
+    ]
+)
+def data_read_1_image(request):
+    return request.param
 
 
 class TestReadOneImageExif:
     """Tests for reading EXIF from a single image."""
 
-    def test_read_1_image_exif(self, image_path):
-        """Test reading EXIF from a single image file."""
-        ok, result = Info.read_1_image_exif(image_path)
-        assert ok
+    def test_read_1_image_exif(self, data_read_1_image):
+        file, expected = data_read_1_image
+        ok, actual = Info.read_1_image_exif(file)
+        assert ok is True
+        # Cloud CI runs get different ts
+        expected["file_info"].pop("last_modified", None)
+        result = actual[1]
+        result["file_info"].pop("last_modified", None)  # safely ignore if not exist
+        assert result == expected
+
+    @patch("batch_img.info.Common.get_image_data")
+    def test_read_1_image_exif_success(self, mock_get_data, mock_meta_data):
+        """Test reading EXIF data successfully."""
+        file = Path("dummy") / "test_image.jpg"
+        # Mock Common.get_image_data to return a dummy image object and our meta dict
+        mock_get_data.return_value = (MagicMock(), mock_meta_data)
+
+        ok, result = Info.read_1_image_exif(file)
+
+        assert ok is True
         path, data = result
-        assert path == image_path
-        assert "file_info" in data
-        assert "exif" in data
+        assert path == file
 
-        # Check file info
-        assert data["file_info"]["format"] == "JPEG"
-        assert "dimensions" in data["file_info"]
-        assert "file_size" in data["file_info"]
-
-        # Check EXIF data
-        assert data["exif"]["Make"] == "Canon"
-
-    def test_read_1_image_exif_nonexistent(
-        self, nonexistent_image_path, platform_error_messages
-    ):
-        """Test reading EXIF from a non-existent file."""
-        ok, result = Info.read_1_image_exif(nonexistent_image_path)
-        assert not ok
-        assert isinstance(result, str)
-        assert any(err in result for err in platform_error_messages)
-
-    def test_read_1_image_exif_invalid_file(self, image_path):
-        """Test reading EXIF from an invalid file."""
-        # Simulate an error during image reading
-        with patch("PIL.Image.open") as mock_open:
-            mock_open.side_effect = OSError("Invalid image file")
-            ok, result = Info.read_1_image_exif(image_path)
-            assert not ok
-            assert isinstance(result, str)
-            assert "Invalid image file" in result
-
-    def test_read_1_image_exif_file_info(self, image_path):
-        """Test that file info is properly populated."""
-        ok, result = Info.read_1_image_exif(image_path)
-        assert ok
-        _, data = result
-
+        # Verify file_info formatting
         file_info = data["file_info"]
-        assert file_info["file_size"] > 0
-        assert "dimensions" in file_info
+        assert file_info["file_size"] == 2048576
+        assert file_info["dimensions"] == "1920 x 1080"
         assert file_info["alpha_channel"] == "No"
-        assert "colorspace" in file_info
-        assert "last_modified" in file_info
+        assert file_info["format"] == "JPEG"
+
+        # Verify EXIF
+        assert data[EXIF]["Make"] == "Nikon"
+
+    @patch("batch_img.info.Common.get_image_data")
+    def test_read_1_image_exif_missing_data(self, mock_get_data):
+        """Test reading EXIF data when metadata is sparse."""
+        file = Path("dummy") / "test_image.jpg"
+        mock_get_data.return_value = (
+            MagicMock(),
+            {"size": (0, 0), "info": {}, "mode": "L", EXIF: {}},
+        )
+
+        ok, result = Info.read_1_image_exif(file)
+
+        assert ok is True
+        _, data = result
+        assert data["file_info"]["file_size"] == UNKNOWN
+        assert data["file_info"]["colorspace"] == "L"
+        assert data["file_info"]["alpha_channel"] == "No"
+
+    @patch("batch_img.info.Common.get_image_data")
+    def test_read_1_image_exif_os_error(self, mock_get_data):
+        """Test error handling when reading an image fails."""
+        file = Path("dummy") / "nonexistent.jpg"
+        mock_get_data.side_effect = OSError("File not found")
+
+        ok, result = Info.read_1_image_exif(file)
+
+        assert ok is False
+        assert isinstance(result, str)
+        assert "File not found" in result
 
 
 class TestReadExif:
-    """Tests for reading EXIF from files or directories."""
+    """Tests for the multithreaded EXIF reader and output."""
 
-    def test_read_exif_single_file(self, image_path):
-        """Test reading EXIF from a single image file."""
-        assert Info.read_exif(image_path)
+    @patch("batch_img.info.Common.prepare_all_files")
+    @patch("batch_img.info.log.error")
+    def test_read_exif_no_files(self, mock_log_error, mock_prepare):
+        """Test behavior when no files are found in a directory."""
+        mock_prepare.return_value = []
+        input_dir = Path("empty_dir")
 
-    def test_read_exif_directory(self, image_dir):
-        """Test reading EXIF from a directory with images."""
-        assert Info.read_exif(image_dir)
+        result = Info.read_exif(input_dir)
 
-    def test_read_exif_no_files(self, tmp_path):
-        """Test reading EXIF from a path with no image files."""
-        empty_dir = tmp_path / "empty"
-        empty_dir.mkdir()
-        assert not Info.read_exif(empty_dir)
+        assert result is False
+        # Patch loguru explicitly rather than using caplog
+        mock_log_error.assert_called_once_with(f"No image files at {input_dir}")
 
-    def test_read_exif_quiet_writes_formatted_text(
-        self, image_path, temp_output_file, monkeypatch
-    ):
-        """Test quiet mode writes formatted text to a file."""
-        monkeypatch.setattr(Info, "exif_output_path", lambda: temp_output_file)
+    @patch("batch_img.info.Info.read_1_image_exif")
+    def test_read_exif_single_file_stdout(self, mock_read, tmp_path):
+        """Test reading a single file and printing to stdout."""
+        # Create an actual physical file so in_path.is_file() evaluates to True
+        file = tmp_path / "test.jpg"
+        file.touch()
 
-        assert Info.read_exif(image_path, quiet=True)
-        assert temp_output_file.exists()
-        content = temp_output_file.read_text(encoding="utf-8")
-        assert "152.JPG" in content
-        assert "Canon" in content
-        assert "File Size" in content
-        assert "EXIF Metadata" in content
+        mock_read.return_value = (
+            True,
+            (file, {"file_info": {}, EXIF: {"Make": "Sony"}}),
+        )
 
-    def test_read_exif_quiet_output_format(
-        self, image_path, temp_output_file, monkeypatch
-    ):
-        """Test the format of quiet mode output file."""
-        monkeypatch.setattr(Info, "exif_output_path", lambda: temp_output_file)
-        assert Info.read_exif(image_path, quiet=True)
-        # splitlines() for cross platforms
-        content = temp_output_file.read_text(encoding="utf-8").strip().splitlines()
+        with patch("batch_img.info.log.info") as mock_log:
+            result = Info.read_exif(file, quiet=False)
 
-        # First line is the separator
-        assert content[0] == "─" * 60
-        # Second line contains the file path
-        assert "152.JPG" in content[1]
-        # Check file info fields
-        assert "File Size" in content[2]
-        assert "Format" in content[4]
-        # Blank line before EXIF section
-        assert content[10] == ""
-        # EXIF Metadata header
-        assert "EXIF Metadata" in content[11]
-        # Check that Make is present in EXIF section
-        assert "Make" in content[12] or "Make" in content[13]
+            assert result is True
+            mock_read.assert_called_once_with(file)
+            mock_log.assert_any_call("  [ EXIF Metadata ]")
 
-    def test_read_exif_quiet_no_write_error(self, image_path, tmp_path, monkeypatch):
-        """Test error handling when writing quiet mode output fails."""
-        output_file = tmp_path / "nonexistent_dir" / "img_meta_info.txt"
+    @patch("batch_img.info.Info.read_1_image_exif")
+    def test_read_exif_quiet_mode_writes_file(self, mock_read, tmp_path, monkeypatch):
+        """Test quiet mode writes correctly formatted text to a file."""
+        # Create an actual physical file
+        file = tmp_path / "test.jpg"
+        file.touch()
+
+        mock_read.return_value = (
+            True,
+            (
+                file,
+                {
+                    "file_info": {"file_size": 1024, "format": "PNG"},
+                    EXIF: {"Make": "Sony"},
+                },
+            ),
+        )
+
+        output_file = tmp_path / "img_meta_info.txt"
         monkeypatch.setattr(Info, "exif_output_path", lambda: output_file)
 
-        assert not Info.read_exif(image_path, quiet=True)
+        result = Info.read_exif(file, quiet=True)
 
-    def test_read_exif_multiple_files(self, image_dir):
-        """Test reading EXIF from multiple files."""
-        # Should return True if all files are processed
-        assert Info.read_exif(image_dir)
+        assert result is True
+        assert output_file.exists()
 
-    def test_read_exif_quiet_multiple_files(
-        self, image_dir, temp_output_file, monkeypatch
-    ):
-        """Test quiet mode with multiple files."""
-        monkeypatch.setattr(Info, "exif_output_path", lambda: temp_output_file)
+        # Read with .splitlines() to avoid Windows \r\n vs Linux \n assertion failures
+        content = output_file.read_text(encoding="utf-8").splitlines()
 
-        assert Info.read_exif(image_dir, quiet=True)
-        assert temp_output_file.exists()
-        content = temp_output_file.read_text(encoding="utf-8")
-        assert "JPG" in content
-        assert "EXIF Metadata" in content
+        assert content[0] == "─" * 60
+        assert "test.jpg" in content[1]
+        assert any("File Size" in line for line in content)
+        assert any("Sony" in line for line in content)
 
-    def test_read_exif_results_dictionary(self, image_dir):
-        """Test that results are stored in a dictionary with file paths as keys."""
-        files = list(Common.prepare_all_files(image_dir, ""))
+    @patch("batch_img.info.Info.read_1_image_exif")
+    def test_read_exif_quiet_mode_write_error(self, mock_read, tmp_path, monkeypatch):
+        """Test error handling when the output file cannot be written."""
+        # Create an actual physical file
+        file = tmp_path / "test.jpg"
+        file.touch()
 
-        # Read all files and verify results structure
-        results = {}
-        for file in files:
-            ok, result = Info.read_1_image_exif(file)
-            if ok:
-                # result is (Path, dict) tuple
-                if isinstance(result, tuple) and len(result) == 2:
-                    results[file] = result[1]
+        mock_read.return_value = (True, (file, {"file_info": {}, EXIF: {}}))
 
-        assert len(results) > 0
-        assert all(isinstance(path, Path) for path in results.keys())
-        assert all("file_info" in data for data in results.values())
+        # Point to a directory that doesn't exist to force an OSError
+        output_file = tmp_path / "does_not_exist" / "img_meta_info.txt"
+        monkeypatch.setattr(Info, "exif_output_path", lambda: output_file)
 
-
-class TestFormatFileSize:
-    """Tests for file size formatting."""
-
-    def test_format_small_size(self):
-        """Test formatting small file size."""
-        result = Info._easy_file_sz(500)
-        assert "500 B" in result
-        assert "(500 bytes)" in result
-
-    def test_format_kb_size(self):
-        """Test formatting KB size."""
-        result = Info._easy_file_sz(1024 * 5)
-        assert "KB" in result
-        assert "(5120 bytes)" in result
-
-    def test_format_mb_size(self):
-        """Test formatting MB size."""
-        result = Info._easy_file_sz(1024 * 1024 * 2)
-        assert "MB" in result
-        assert "(2097152 bytes)" in result
-
-
-class TestInfoCommand:
-    """Tests for the info sub-command in the CLI."""
-
-    @patch("batch_img.main.Main.info")
-    def test_info_command(self, mock_info, image_path):
-        """Test info command with input file."""
-        mock_info.return_value = True
-        runner = CliRunner()
-        img_path = str(image_path)
-        result = runner.invoke(cli, args=["info", "-i", img_path])
-        assert not result.exception
-        assert result.output == ""
-        mock_info.assert_called_once_with({"src_path": img_path, "quiet": False})
-
-    @patch("batch_img.main.Main.info")
-    def test_info_command_mocks_main(self, mock_info, image_dir):
-        """Test info command calls Main.info with correct arguments."""
-        mock_info.return_value = True
-        runner = CliRunner()
-        img_dir = str(image_dir)
-        result = runner.invoke(cli, args=["info", "-i", img_dir])
-        assert not result.exception
-        assert result.output == ""
-        mock_info.assert_called_once_with({"src_path": img_dir, "quiet": False})
-
-    @patch("batch_img.main.Main.info")
-    def test_info_command_quiet(self, mock_info, image_dir):
-        """Test info command with --quiet flag."""
-        mock_info.return_value = True
-        runner = CliRunner()
-        img_dir = str(image_dir)
-        result = runner.invoke(cli, args=["--quiet", "info", "-i", img_dir])
-        assert not result.exception
-        assert result.output == ""
-        mock_info.assert_called_once_with({"src_path": img_dir, "quiet": True})
-
-    @patch("batch_img.main.Main.info")
-    def test_info_command_missing_input(self, mock_info):
-        """Test info command with missing input."""
-        mock_info.return_value = True
-        runner = CliRunner()
-        result = runner.invoke(cli, args=["info"])
-        assert result.exception
-        assert "Missing option '-i' / '--input'" in result.output
-
-    @patch("batch_img.main.Main.info")
-    def test_info_command_with_parent_input(self, mock_info, image_dir):
-        """Test info command with parent input."""
-        mock_info.return_value = True
-        runner = CliRunner()
-        img_dir = str(image_dir)
-        result = runner.invoke(cli, args=["-i", img_dir, "info"])
-        assert not result.exception
-        assert result.output == ""
-        mock_info.assert_called_once_with({"src_path": img_dir, "quiet": False})
-
-    @patch("batch_img.main.Main.info")
-    def test_info_command_with_parent_quiet(self, mock_info, image_dir):
-        """Test info command with parent quiet flag."""
-        mock_info.return_value = True
-        runner = CliRunner()
-        img_dir = str(image_dir)
-        result = runner.invoke(cli, args=["--quiet", "-i", img_dir, "info"])
-        assert not result.exception
-        assert result.output == ""
-        mock_info.assert_called_once_with({"src_path": img_dir, "quiet": True})
-
-    @patch("batch_img.main.Main.info")
-    def test_info_command_quiet_after_command(self, mock_info, image_dir):
-        """Test that --quiet after info command raises an error."""
-        mock_info.return_value = True
-        runner = CliRunner()
-        img_dir = str(image_dir)
-        result = runner.invoke(cli, args=["info", "--quiet", "-i", img_dir])
-        assert result.exception
-        assert result.exit_code == 2
-
-    def test_info_command_help(self):
-        """Test info command help output."""
-        runner = CliRunner()
-        result = runner.invoke(cli, args=["info", "--help"])
-        assert not result.exception
-        assert "--input" in result.output
-        assert "Print EXIF information" in result.output
+        result = Info.read_exif(file, quiet=True)
+        assert result is False

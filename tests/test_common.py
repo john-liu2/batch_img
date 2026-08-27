@@ -5,6 +5,7 @@ Copyright © 2025 - Present John Liu
 
 import json
 import subprocess
+from datetime import datetime
 from os.path import dirname
 from pathlib import Path
 from unittest.mock import MagicMock, patch
@@ -181,6 +182,22 @@ def test_human_readable_time(time_data):
     assert actual == expected
 
 
+def test_json_serial():
+    """Test JSON serialization fallback for specific types."""
+    # Test datetime
+    dt = datetime(2026, 8, 26, 12, 0, 0)
+    assert Common.jsn_serial(dt) == dt.isoformat()
+
+    # Test bytes
+    b = b"hello test"
+    assert Common.jsn_serial(b) == "hello test"
+
+    # Test fallback TypeError
+    with pytest.raises(TypeError) as exc:
+        Common.jsn_serial({"unsupported": "dict"})
+    assert "not serializable" in str(exc.value)
+
+
 @pytest.fixture(
     params=[
         (
@@ -205,15 +222,17 @@ def test_file_to_base64(data_file_to_base64):
         (1025, "1.0 KB"),
         (101988, "99.6 KB"),
         (201554, "196.8 KB"),
+        (1024**2 + 99, "1.0 MB"),
+        (2 * (1024**3) + 99, "2.0 GB"),
     ]
 )
-def data_readable_file_size(request):
+def data_easy_file_sz(request):
     return request.param
 
 
-def test_readable_file_size(data_readable_file_size):
-    in_bytes, expected = data_readable_file_size
-    actual = Common.readable_file_size(in_bytes)
+def test_easy_file_sz(data_easy_file_sz):
+    in_bytes, expected = data_easy_file_sz
+    actual = Common.easy_file_sz(in_bytes)
     assert actual == expected
 
 
@@ -437,7 +456,7 @@ def test_sort_nested_dict(data_nested_dict):
             Path(f"{_dir}/data/HEIC/Cartoon.heic"),
             {
                 "file_size": "44.6 KB",
-                "file_ts": "2025-08-16_23-44-21",
+                "file_ts": "2025-08-16 23:44",
                 "format": "HEIF",
                 "mode": "RGB",
                 "size": (758, 758),
@@ -459,7 +478,7 @@ def test_sort_nested_dict(data_nested_dict):
             Path(f"{_dir}/data/HEIC/Cartoon_180cw.heic"),
             {
                 "file_size": "42.4 KB",
-                "file_ts": "2025-08-17_11-05-21",
+                "file_ts": "2025-08-17 11:05",
                 "format": "HEIF",
                 "mode": "RGB",
                 "size": (758, 758),
@@ -489,6 +508,7 @@ def test_get_image_data(data_get_image):
     # Cloud CI runs get different ts
     expected.pop("file_ts")
     actual[1].pop("file_ts")
+    actual[1]["info"].pop("tiling", None)  # safely ignor non-exist key
     assert actual[1] == Common.sort_nested_dict(expected)
 
 

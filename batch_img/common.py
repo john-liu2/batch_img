@@ -198,7 +198,7 @@ class Common:
             return b64encode(data).decode("utf-8")
 
     @staticmethod
-    def readable_file_size(in_bytes: int) -> str:
+    def easy_file_sz(in_bytes: int) -> str:
         """Convert bytes to human-readable KB, MB, or GB
 
         Args:
@@ -315,7 +315,7 @@ class Common:
         with Image.open(file) as img:
             data = img.convert("RGB")
             d_info = {
-                "file_size": Common.readable_file_size(size),
+                "file_size": Common.easy_file_sz(size),
                 "file_ts": m_ts,
                 "format": img.format,
                 "mode": img.mode,
@@ -336,11 +336,11 @@ class Common:
         """JSON serializer for objects not serializable by default json code"""
         if isinstance(obj, IFDRational):
             return float(obj)
+        if isinstance(obj, datetime):
+            return obj.isoformat()
         if isinstance(obj, bytes):
-            return obj.decode()
-        raise TypeError(
-            f"Object of type {obj.__class__.__name__} is not JSON serializable"
-        )
+            return obj.decode("utf-8", errors="replace")
+        raise TypeError(f"Type {type(obj)} not serializable")
 
     @staticmethod
     def are_images_equal(path1: Path, path2: Path) -> bool:
