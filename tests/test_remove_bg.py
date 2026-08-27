@@ -5,7 +5,7 @@ Copyright © 2025 - Present, John Liu
 
 from pathlib import Path
 from unittest.mock import patch
-
+import sys
 import pytest
 
 from batch_img.remove_bg import RemoveBg
@@ -69,6 +69,7 @@ def data_remove_all_images_bg(request):
     return request.param
 
 
+@pytest.mark.skipif(sys.platform == "win32", reason="Does not run on Windows")
 def test_remove_all_images_bg(data_remove_all_images_bg):
     in_path, out_path, expected = data_remove_all_images_bg
     actual = RemoveBg.remove_all_images_bg(in_path, out_path)
