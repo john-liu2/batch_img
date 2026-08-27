@@ -8,9 +8,7 @@ ignore-paths=^(.*/)?tests?(/.*)?$
 [MESSAGES CONTROL]
 # Similar lines in 2 files
 # Module 'cv2' has no 'rotate' member (no-member)
-# R0912: too-many-branches
 disable=missing-function-docstring,
         missing-class-docstring,
-        R0912,
         R0801,
         E1101
