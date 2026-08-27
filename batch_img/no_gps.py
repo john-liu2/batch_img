@@ -1,5 +1,5 @@
 """class NoGps - Remove GPS location info in image file(s)
-Copyright © 2025 John Liu
+Copyright © 2025 - Present, John Liu
 """
 
 import os
@@ -56,12 +56,15 @@ class NoGps:
             return False, f"{in_path}:\n{e}"
 
     @staticmethod
-    def remove_all_images_gps(in_path: Path, out_path: Path | str) -> bool:
+    def remove_all_images_gps(
+        in_path: Path, out_path: Path | str, quiet: bool = False
+    ) -> bool:
         """Remove GPS info in all image files in the given dir
 
         Args:
             in_path: input dir path
             out_path: output dir path or REPLACE
+            quiet: suppress progress and error output
 
         Returns:
             bool: True - Success. False - Error
@@ -75,7 +78,7 @@ class NoGps:
 
         log.debug(f"Remove GPS info in {files_cnt} image files in multiprocess ...")
         success_cnt = Common.executor_progress(
-            NoGps.remove_1_image_gps, "Remove GPS in image files", tasks
+            NoGps.remove_1_image_gps, "Remove GPS in image files", tasks, quiet=quiet
         )
         log.info(f"\nSuccessfully removed GPS in {success_cnt}/{files_cnt} files")
         return True

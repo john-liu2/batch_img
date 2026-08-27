@@ -115,7 +115,11 @@ class Transparent:
 
     @staticmethod
     def all_images_transparency(
-        in_path: Path, out_path: Path | str, transparency: int, white: bool
+        in_path: Path,
+        out_path: Path | str,
+        transparency: int,
+        white: bool,
+        quiet: bool = False,
     ) -> bool:
         """Set transparency on all image files in a folder.
         If the input file is JPEG, it will be saved as PNG file because JPEG does
@@ -126,6 +130,7 @@ class Transparent:
             out_path: output dir path or REPLACE
             transparency: 0 (fully transparent) <= int <= 255 (completely opaque)
             white: flag to make white pixels full transparent
+            quiet: suppress progress and error output
 
         Returns:
             bool: True - Success. False - Error
@@ -139,7 +144,7 @@ class Transparent:
 
         log.debug(f"Set transparency on {files_cnt} image files in multiprocess ...")
         success_cnt = Common.executor_progress(
-            Transparent.do_1_image_transparency, "Set transparency", tasks
+            Transparent.do_1_image_transparency, "Set transparency", tasks, quiet=quiet
         )
         log.info(f"\nDone - set transparency on {success_cnt}/{files_cnt} files")
         return True

@@ -10,25 +10,100 @@ from batch_img.const import MSG_BAD, MSG_OK, PKG_NAME
 from batch_img.main import Main
 
 
+def input_option(func):
+    """Add the common input-source option to an image operation."""
+    return click.option(
+        "-i",
+        "--input",
+        "input_path",
+        type=click.Path(path_type=str),
+        help="Input image file or directory.",
+    )(func)
+
+
+def output_option(func):
+    """Add the common output option to an image operation."""
+    return click.option(
+        "-o",
+        "--output",
+        default="",
+        show_default=True,
+        type=str,
+        help="Output file path. If not specified, replace the input file.",
+    )(func)
+
+
+def common_cli_options(func):
+    """Apply common options to all image operations."""
+    func = input_option(func)
+    func = output_option(func)
+    return func
+
+
+def process_result(result: bool) -> None:
+    """Display the operation result message."""
+    msg = MSG_OK if result else MSG_BAD
+    click.secho(msg)
+
+
+def get_input_path(
+    ctx: click.Context, input_path: str | None, src_path: str | None
+) -> str:
+    """Resolve an operation's input source, including the legacy argument."""
+    source = input_path or (ctx.obj or {}).get("input_path") or src_path
+    if source:
+        return source
+    raise click.UsageError("Missing option '-i' / '--input'.", ctx)
+
+
 @click.group(invoke_without_command=True)
 @click.pass_context
+@click.option(
+    "-i",
+    "--input",
+    "input_path",
+    type=click.Path(path_type=str),
+    help="Input an image file or a directory.",
+)
+@click.option(
+    "--quiet",
+    is_flag=True,
+    help="Process image files with minimum stdout in quiet mode.",
+)
 @click.option("--update", is_flag=True, help="Update the tool to the latest version.")
 @click.option("--version", is_flag=True, help="Show the tool's version.")
-def cli(ctx, update, version):  # pragma: no cover
+def cli(  # noqa: PLR0913, PLR0917
+    ctx, input_path, quiet, update, version
+):
+    """Batch image processing tool."""
+    ctx.ensure_object(dict)
+    ctx.obj["input_path"] = input_path
+    ctx.obj["quiet"] = quiet
+
     if not ctx.invoked_subcommand:
         if update:
             Common.update_package(PKG_NAME)
         if version:
             click.secho(Common.get_version(PKG_NAME))
+        if not update and not version:
+            click.echo(ctx.get_help())
+
+
+@cli.command(help="Print EXIF information for the input image file(s).")
+@input_option
+@click.pass_context
+def info(ctx, input_path):
+    """Print image file information."""
+    source = get_input_path(ctx, input_path, None)
+    quiet = (ctx.obj or {}).get("quiet", False) if ctx.obj else False
+    Main.info({"src_path": source, "quiet": quiet})
 
 
 @cli.command(
     help="Auto process (resize to 1920-px, remove GPS, add border) image file(s)."
 )
-@click.argument(
-    "src_path",
-    required=True,
-)
+@common_cli_options
+@click.pass_context
 @click.option(
     "-ar",
     "--auto_rotate",
@@ -37,26 +112,19 @@ def cli(ctx, update, version):  # pragma: no cover
     show_default=True,
     help="Auto-rotate image (experimental)",
 )
-@click.option(
-    "-o",
-    "--output",
-    default="",
-    show_default=True,
-    type=str,
-    help="Output file path. If not specified, replace the input file.",
-)
-def auto(src_path, auto_rotate, output):
-    options = {"src_path": src_path, "auto_rotate": auto_rotate, "output": output}
-    res = Main.auto(options)
-    msg = MSG_OK if res else MSG_BAD
-    click.secho(msg)
+def auto(  # noqa: PLR0913, PLR0917
+    ctx, input_path, output, auto_rotate
+):
+    source = get_input_path(ctx, input_path, None)
+    options = {"src_path": source, "output": output, "auto_rotate": auto_rotate}
+    if (ctx.obj or {}).get("quiet"):
+        options["quiet"] = True
+    process_result(Main.auto(options))
 
 
 @cli.command(help="Add internal border to image file(s), not expand the size.")
-@click.argument(
-    "src_path",
-    required=True,
-)
+@common_cli_options
+@click.pass_context
 @click.option(
     "-bw",
     "--border_width",
@@ -72,31 +140,24 @@ def auto(src_path, auto_rotate, output):
     show_default=True,
     help="Add border to image file(s) with the border_color string.",
 )
-@click.option(
-    "-o",
-    "--output",
-    default="",
-    show_default=True,
-    type=str,
-    help="Output file path. If not specified, replace the input file.",
-)
-def border(src_path, border_width, border_color, output):
+def border(  # noqa: PLR0913, PLR0917
+    ctx, input_path, output, border_width, border_color
+):
+    source = get_input_path(ctx, input_path, None)
     options = {
-        "src_path": src_path,
+        "src_path": source,
+        "output": output,
         "border_width": border_width,
         "border_color": border_color,
-        "output": output,
     }
-    res = Main.border(options)
-    msg = MSG_OK if res else MSG_BAD
-    click.secho(msg)
+    if (ctx.obj or {}).get("quiet"):
+        options["quiet"] = True
+    process_result(Main.border(options))
 
 
 @cli.command(help="Do special effect to image file(s).")
-@click.argument(
-    "src_path",
-    required=True,
-)
+@common_cli_options
+@click.pass_context
 @click.option(
     "-e",
     "--effect",
@@ -106,68 +167,46 @@ def border(src_path, border_width, border_color, output):
     type=click.Choice(["blur", "hdr", "neon"]),
     help="Do special effect to image file(s): blur, hdr, neon.",
 )
-@click.option(
-    "-o",
-    "--output",
-    default="",
-    show_default=True,
-    type=str,
-    help="Output dir path. If not specified, add special effect image file(s)"
-    " to the same path as the input file(s).",
-)
-def do_effect(src_path, effect, output):
-    options = {"src_path": src_path, "effect": effect, "output": output}
-    res = Main.do_effect(options)
-    msg = MSG_OK if res else MSG_BAD
-    click.secho(msg)
+def do_effect(  # noqa: PLR0913, PLR0917
+    ctx, input_path, output, effect
+):
+    source = get_input_path(ctx, input_path, None)
+    options = {"src_path": source, "output": output, "effect": effect}
+    if (ctx.obj or {}).get("quiet"):
+        options["quiet"] = True
+    process_result(Main.do_effect(options))
 
 
 @cli.command(help="Remove background (make background transparent) in image file(s).")
-@click.argument(
-    "src_path",
-    required=True,
-)
-@click.option(
-    "-o",
-    "--output",
-    default="",
-    show_default=True,
-    type=str,
-    help="Output file path. If not specified, replace the input file.",
-)
-def remove_bg(src_path, output):
+@common_cli_options
+@click.pass_context
+def remove_bg(  # noqa: PLR0913, PLR0917
+    ctx, input_path, output
+):
     log.info("Loading u2net.onnx to identify the background... Please be patient.")
-    options = {"src_path": src_path, "output": output}
-    res = Main.remove_bg(options)
-    msg = MSG_OK if res else MSG_BAD
-    click.secho(msg)
+    source = get_input_path(ctx, input_path, None)
+    options = {"src_path": source, "output": output}
+    if (ctx.obj or {}).get("quiet"):
+        options["quiet"] = True
+    process_result(Main.remove_bg(options))
 
 
 @cli.command(help="Remove GPS location info in image file(s).")
-@click.argument(
-    "src_path",
-    required=True,
-)
-@click.option(
-    "-o",
-    "--output",
-    default="",
-    show_default=True,
-    type=str,
-    help="Output file path. If not specified, replace the input file.",
-)
-def remove_gps(src_path, output):
-    options = {"src_path": src_path, "output": output}
-    res = Main.remove_gps(options)
-    msg = MSG_OK if res else MSG_BAD
-    click.secho(msg)
+@common_cli_options
+@click.pass_context
+def remove_gps(  # noqa: PLR0913, PLR0917
+    ctx, input_path, output
+):
+    source = get_input_path(ctx, input_path, None)
+    options = {"src_path": source, "output": output}
+    if (ctx.obj or {}).get("quiet"):
+        options["quiet"] = True
+    process_result(Main.remove_gps(options))
 
 
 @cli.command(help="Resize image file(s).")
-@click.argument(
-    "src_path",
-    required=True,
-)
+@common_cli_options
+@click.pass_context
 @click.option(
     "-l",
     "--length",
@@ -178,26 +217,19 @@ def remove_gps(src_path, output):
     help="Resize image file(s) on original aspect ratio to"
     " the max side length. 0 - no resize.",
 )
-@click.option(
-    "-o",
-    "--output",
-    default="",
-    show_default=True,
-    type=str,
-    help="Output file path. If not specified, replace the input file.",
-)
-def resize(src_path, length, output):
-    options = {"src_path": src_path, "length": length, "output": output}
-    res = Main.resize(options)
-    msg = MSG_OK if res else MSG_BAD
-    click.secho(msg)
+def resize(  # noqa: PLR0913, PLR0917
+    ctx, input_path, output, length
+):
+    source = get_input_path(ctx, input_path, None)
+    options = {"src_path": source, "output": output, "length": length}
+    if (ctx.obj or {}).get("quiet"):
+        options["quiet"] = True
+    process_result(Main.resize(options))
 
 
 @cli.command(help="Rotate image file(s).")
-@click.argument(
-    "src_path",
-    required=True,
-)
+@common_cli_options
+@click.pass_context
 @click.option(
     "-a",
     "--angle",
@@ -207,40 +239,23 @@ def resize(src_path, length, output):
     type=click.Choice([0, 90, 180, 270]),
     help="Rotate image file(s) to the clockwise angle. 0 - no rotate.",
 )
-@click.option(
-    "-o",
-    "--output",
-    default="",
-    show_default=True,
-    type=str,
-    help="Output file path. If not specified, replace the input file.",
-)
-def rotate(src_path, angle, output):
+def rotate(  # noqa: PLR0913, PLR0917
+    ctx, input_path, output, angle
+):
+    source = get_input_path(ctx, input_path, None)
     options = {
-        "src_path": src_path,
-        "angle": angle,
+        "src_path": source,
         "output": output,
+        "angle": angle,
     }
-    res = Main.rotate(options)
-    msg = MSG_OK if res else MSG_BAD
-    click.secho(msg)
+    if (ctx.obj or {}).get("quiet"):
+        options["quiet"] = True
+    process_result(Main.rotate(options))
 
 
 @cli.command(help="Set transparency on image file(s).")
-@click.argument(
-    "src_path",
-    required=True,
-)
-@click.option(
-    "-o",
-    "--output",
-    default="",
-    show_default=True,
-    type=str,
-    help="Output file path. If not specified, replace the input file."
-    " If the input file is JPEG, it will be saved as PNG file because"
-    " JPEG does not support transparency",
-)
+@common_cli_options
+@click.pass_context
 @click.option(
     "-t",
     "--transparency",
@@ -257,13 +272,16 @@ def rotate(src_path, angle, output):
     is_flag=True,
     help="Make white pixels fully transparent.",
 )
-def transparent(src_path, output, transparency, white):
+def transparent(  # noqa: PLR0913, PLR0917
+    ctx, input_path, output, transparency, white
+):
+    source = get_input_path(ctx, input_path, None)
     options = {
-        "src_path": src_path,
+        "src_path": source,
         "output": output,
         "transparency": transparency,
         "white": white,
     }
-    res = Main.transparent(options)
-    msg = MSG_OK if res else MSG_BAD
-    click.secho(msg)
+    if (ctx.obj or {}).get("quiet"):
+        options["quiet"] = True
+    process_result(Main.transparent(options))

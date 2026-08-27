@@ -1,5 +1,5 @@
 """class Border: add border to the image file(s)
-Copyright © 2025 John Liu
+Copyright © 2025 - Present, John Liu
 """
 
 import os
@@ -60,7 +60,11 @@ class Border:
 
     @staticmethod
     def border_all_in_dir(
-        in_path: Path, out_path: Path | str, bd_width: int, bd_color: str
+        in_path: Path,
+        out_path: Path | str,
+        bd_width: int,
+        bd_color: str,
+        quiet: bool = False,
     ) -> bool:
         """Add border to all image files in the given dir
 
@@ -69,6 +73,7 @@ class Border:
             out_path: output dir path or REPLACE
             bd_width: border width int
             bd_color: border color str
+            quiet: suppress progress and error output
 
         Returns:
             bool: True - Success. False - Error
@@ -82,7 +87,7 @@ class Border:
 
         log.debug(f"Add border to {files_cnt} image files in multiprocess ...")
         success_cnt = Common.executor_progress(
-            Border.border_1_image, "Add border to image files", tasks
+            Border.border_1_image, "Add border to image files", tasks, quiet=quiet
         )
         log.info(f"\nSuccessfully added border to {success_cnt}/{files_cnt} files")
         return True

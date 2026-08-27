@@ -50,10 +50,12 @@ Install the Astral's [`uv`](https://github.com/astral-sh/uv) tool once to prepar
 ```
 # On macOS and Linux.
 curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# Create the Python virtualenv by uv command
+uv venv
 ```
 
-This will create a hidden virtualenv dir in the local project folder - `.venv` and
-install all dependencies defined in the `pyproject.toml` file in this virtualenv.
+This will create a hidden virtualenv dir in the local project folder - `.venv`.
 
 If the `.venv` exists, this command will update the project version and dependencies
 in the existing `.venv` virtualenv.
@@ -160,4 +162,36 @@ pytest --cov-report=term --cov=batch_img tests
 
 ```
 make test
+```
+
+#### Run local `batch_img`
+
+* Run the local built command
+```
+✗ batch_img --version
+0.4.0
+
+
+✗ batch_img --help
+Usage: batch_img [OPTIONS] COMMAND [ARGS]...
+
+  Batch image processing tool.
+
+Options:
+  -i, --input PATH  Input an image file or a directory.
+  --quiet           Process image files with minimum stdout in quiet mode.
+  --update          Update the tool to the latest version.
+  --version         Show the tool's version.
+  --help            Show this message and exit.
+
+Commands:
+  auto         Auto process (resize to 1920-px, remove GPS, add border)...
+  border       Add internal border to image file(s), not expand the size.
+  do-effect    Do special effect to image file(s).
+  info         Print EXIF information for the input image file(s).
+  remove-bg    Remove background (make background transparent) in image...
+  remove-gps   Remove GPS location info in image file(s).
+  resize       Resize image file(s).
+  rotate       Rotate image file(s).
+  transparent  Set transparency on image file(s).
 ```

@@ -13,6 +13,7 @@ from batch_img.border import Border
 from batch_img.common import Common
 from batch_img.const import PKG_NAME, REPLACE
 from batch_img.do_effect import DoEffect
+from batch_img.info import Info
 from batch_img.log import Log
 from batch_img.no_gps import NoGps
 from batch_img.remove_bg import RemoveBg
@@ -37,18 +38,20 @@ class Main:
         return time()
 
     @staticmethod
-    def _conclude(start_ts: float) -> str:
+    def _conclude(start_ts: float, log_elapsed: bool = True) -> str:
         """Conclude the end for all (internal helper)
 
         Args:
             start_ts: float
+            log_elapsed: whether to log the elapsed time
 
         Returns:
             str: human-readable elapsed time string
         """
         Common.check_latest_version(PKG_NAME)
         duration = Common.human_readable_time(time() - start_ts)
-        log.info(f"Elapsed time: {duration}")
+        if log_elapsed:
+            log.info(f"Elapsed time: {duration}")
         return duration
 
     @staticmethod
@@ -132,6 +135,24 @@ class Main:
         else:
             ok = DoEffect.apply_all_in_dir(in_path, out, effect)
         Main._conclude(start_ts)
+        return ok
+
+    @staticmethod
+    def info(options: dict) -> bool:
+        """Read and display EXIF information for image file(s).
+
+        Args:
+            options: input options dict
+
+        Returns:
+            bool: True when EXIF was read from every image, otherwise False
+        """
+        start_ts = Main._prepare(options)
+        quiet = options.get("quiet", False)
+        ok = Info.read_exif(Path(options["src_path"]), quiet)
+        duration = Main._conclude(start_ts, log_elapsed=not quiet)
+        if quiet:
+            print(f"Elapsed time: {duration}")
         return ok
 
     @staticmethod

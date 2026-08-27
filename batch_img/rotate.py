@@ -67,13 +67,16 @@ class Rotate:
             return False, f"{in_path}:\n{e}"
 
     @staticmethod
-    def rotate_all_in_dir(in_path: Path, out_path: Path | str, angle_cw: int) -> bool:
+    def rotate_all_in_dir(
+        in_path: Path, out_path: Path | str, angle_cw: int, quiet: bool = False
+    ) -> bool:
         """Rotate all image files in the given dir
 
         Args:
             in_path: input dir path
             out_path: output dir path or REPLACE
             angle_cw: rotation angle clockwise: 90, 180, or 270
+            quiet: suppress progress and error output
 
         Returns:
             bool: True - Success. False - Error
@@ -90,7 +93,7 @@ class Rotate:
 
         log.debug(f"Rotate {files_cnt} image files in multiprocess ...")
         success_cnt = Common.executor_progress(
-            Rotate.rotate_1_image, "Rotate image files", tasks
+            Rotate.rotate_1_image, "Rotate image files", tasks, quiet=quiet
         )
         log.info(f"\nSuccessfully rotated {success_cnt}/{files_cnt} files")
         return True

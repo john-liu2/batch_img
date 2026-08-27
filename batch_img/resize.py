@@ -60,7 +60,7 @@ class Resize:
 
     @staticmethod
     def resize_all_progress_bar(
-        in_path: Path, out_path: Path | str, length: int
+        in_path: Path, out_path: Path | str, length: int, quiet: bool = False
     ) -> bool:
         """Resize all image files in the given dir
 
@@ -68,6 +68,7 @@ class Resize:
             in_path: input dir path
             out_path: output dir path or REPLACE
             length: max length (width or height) in pixels
+            quiet: suppress progress and error output
 
         Returns:
             bool: True - Success. False - Error
@@ -81,7 +82,7 @@ class Resize:
 
         log.debug(f"Resize {files_cnt} image files in multiprocess ...")
         success_cnt = Common.executor_progress(
-            Resize.resize_an_image, "Resize image files", tasks
+            Resize.resize_an_image, "Resize image files", tasks, quiet=quiet
         )
         log.info(f"\nSuccessfully resized {success_cnt}/{files_cnt} files")
         return True

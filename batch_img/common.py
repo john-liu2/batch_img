@@ -12,7 +12,7 @@ import tomllib
 from base64 import b64encode
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timedelta
-from multiprocessing import Pool, cpu_count, current_process
+from multiprocessing import cpu_count, current_process
 from os.path import getmtime, getsize
 from pathlib import Path
 from time import time
@@ -32,7 +32,7 @@ from batch_img.const import (
     PATTERNS,
     PKG_NAME,
     REPLACE,
-    TS_FORMAT,
+    TS_2_MINUTE,
     UNKNOWN,
     VER,
 )
@@ -179,7 +179,9 @@ class Common:
         :param seconds: seconds float
         :return: duration string
         """
-        return str(timedelta(seconds=round(seconds)))
+        if seconds > 60.0:
+            return str(timedelta(seconds=round(seconds)))
+        return f"{str(round(seconds, 2))} s"
 
     @staticmethod
     def file_to_base64(file: Path) -> str:
@@ -198,7 +200,7 @@ class Common:
             return b64encode(data).decode("utf-8")
 
     @staticmethod
-    def readable_file_size(in_bytes: int) -> str:
+    def easy_file_sz(in_bytes: int) -> str:
         """Convert bytes to human-readable KB, MB, or GB
 
         Args:
@@ -255,8 +257,6 @@ class Common:
                 _dict[tag_name] = value
         # log.info(f"{_dict=}")
         for key in (
-            "FNumber",
-            "FocalLength",
             "MakerNote",
             "SceneType",
             "SubjectArea",
@@ -268,7 +268,6 @@ class Common:
                 _dict.pop(key)
         keys = list(_dict.keys())
         for keyword in (
-            "DateTime",
             "OffsetTime",
             "SubSecTime",
             "Tile",
@@ -287,6 +286,20 @@ class Common:
         return _res
 
     @staticmethod
+    def sort_nested_dict(data):
+        """Sort nested dict for deterministic output"""
+        # If it's a dictionary, sort its keys and recursively sort its values
+        if isinstance(data, dict):
+            return {k: Common.sort_nested_dict(v) for k, v in sorted(data.items())}
+
+        # If it's a list, check if there are dictionaries inside the list
+        if isinstance(data, list):
+            return [Common.sort_nested_dict(item) for item in data]
+
+        # Base case: return the value as-is if it's not a dict or list
+        return data
+
+    @staticmethod
     def get_image_data(file: Path) -> tuple:
         """Get image file data
 
@@ -297,11 +310,11 @@ class Common:
             tuple: data, info
         """
         size = getsize(file)
-        m_ts = datetime.fromtimestamp(getmtime(file)).strftime(TS_FORMAT)
+        m_ts = datetime.fromtimestamp(getmtime(file)).strftime(TS_2_MINUTE)
         with Image.open(file) as img:
             data = img.convert("RGB")
             d_info = {
-                "file_size": Common.readable_file_size(size),
+                "file_size": Common.easy_file_sz(size),
                 "file_ts": m_ts,
                 "format": img.format,
                 "mode": img.mode,
@@ -315,18 +328,18 @@ class Common:
                 exif_data = img.info.pop(EXIF)
                 d_info[EXIF] = Common.decode_exif(exif_data)
 
-        return data, d_info
+        return data, Common.sort_nested_dict(d_info)
 
     @staticmethod
     def jsn_serial(obj):
         """JSON serializer for objects not serializable by default json code"""
         if isinstance(obj, IFDRational):
             return float(obj)
+        if isinstance(obj, datetime):
+            return obj.isoformat()
         if isinstance(obj, bytes):
-            return obj.decode()
-        raise TypeError(
-            f"Object of type {obj.__class__.__name__} is not JSON serializable"
-        )
+            return obj.decode("utf-8", errors="replace")
+        raise TypeError(f"Type {type(obj)} not serializable")
 
     @staticmethod
     def are_images_equal(path1: Path, path2: Path) -> bool:
@@ -408,39 +421,17 @@ class Common:
         return _files
 
     @staticmethod
-    def multiprocess_progress_bar(func, desc: str, tasks: list) -> int:
-        """Run task in multiprocess with progress bar
-
-        Args:
-            func: function to be run in multiprocess
-            desc: description str
-            tasks: tasks list for multiprocess pool
-
-        Returns:
-            int: success_cnt
-        """
-        success_cnt = 0
-        all_cnt = len(tasks)
-        workers = min(max(cpu_count(), 4), all_cnt)
-
-        with Pool(workers) as pool:
-            with tqdm(total=all_cnt, desc=desc) as pbar:
-                for ok, res in pool.imap_unordered(func, tasks):
-                    if ok:
-                        success_cnt += 1
-                    else:
-                        tqdm.write(f"Error: {res}")
-                    pbar.update(1)
-        return success_cnt
-
-    @staticmethod
-    def executor_progress(func, desc: str, tasks: list) -> int:
+    def executor_progress(
+        func, desc: str, tasks: list, quiet: bool = False, results: list | None = None
+    ) -> int:
         """ProcessPoolExecutor / ThreadPoolExecutor + progress bar
 
         Args:
             func: function to be run in multiprocess
             desc: description str
             tasks: tasks list for multiprocess pool
+            quiet: suppress progress and error output
+            results: optional list to receive successful task results
 
         Returns:
             int: success_cnt
@@ -451,13 +442,15 @@ class Common:
 
         with ThreadPoolExecutor(max_workers=workers) as executor:
             futures = [executor.submit(func, task) for task in tasks]
-            with tqdm(total=len(futures), desc=desc) as pbar:
+            with tqdm(total=len(futures), desc=desc, disable=quiet) as pbar:
                 # as_completed to iterate over futures as they finish
                 for future in as_completed(futures):
                     ok, res = future.result()
                     if ok:
                         success_cnt += 1
-                    else:
+                        if results is not None:
+                            results.append(res)
+                    elif not quiet:
                         tqdm.write(f"error: {res}")
                     pbar.update(1)
         return success_cnt

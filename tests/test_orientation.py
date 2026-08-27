@@ -1,6 +1,6 @@
 """Test orientation.py
 pytest -sv tests/test_orientation.py
-Copyright © 2025 John Liu
+Copyright © 2025 - Present, John Liu
 """
 
 from os.path import dirname
