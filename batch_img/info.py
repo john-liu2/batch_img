@@ -184,13 +184,10 @@ class Info:
             "FNumber": "Aperture",
             "FocalLength": "Focal Length",
             "GPSLatitude": "GPS Data",
-            "GPSLongitude": "GPS Data",
         }
         for key, label in exif_map.items():
-            if key not in exif:
-                continue
-            value = exif[key]
-            if key in {"GPSLongitude", "GPSLatitude"}:
+            value = exif.get(key, None)
+            if key == "GPSLatitude":
                 value = "Present" if value else "None"
             elif key == "ExposureTime" and isinstance(value, tuple):
                 value = f"{value[0]}/{value[1]} s"
