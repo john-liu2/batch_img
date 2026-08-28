@@ -52,6 +52,39 @@ class Info:
         return Path.cwd() / INFO_TXT_FILE
 
     @staticmethod
+    def do_output(success_cnt: int, total: int, results: dict, quiet: bool) -> bool:
+        """
+        Output EXIF metadata
+
+        Args:
+            success_cnt: success readings count
+            total: total input files count
+            results: Dictionary of file paths to results
+            quiet: If True, write formatted results to a file instead of stdout
+
+        Returns:
+            bool: True if all images were processed successfully, False otherwise
+        """
+        if quiet:  # dump to a file if --quiet
+            output_file = Info.exif_output_path()
+            try:
+                with open(output_file, "w", encoding="utf-8") as output:
+                    Info._write_formatted_info(output, total, results)
+                log.info(f"EXIF information written to {output_file}")
+                return success_cnt == total
+            except OSError as exc:
+                log.error(f"Failed to write EXIF information to {output_file}: {exc}")
+                return False
+
+        # Print to stdout
+        idx = 1
+        for file, data in results.items():
+            Info._output_exif_info(file, data, idx, total)
+            idx += 1
+        log.info(f"\nRead meta info from {success_cnt}/{total} files")
+        return success_cnt == total
+
+    @staticmethod
     def read_exif(in_path: Path, quiet: bool = False) -> bool:
         """Read EXIF metadata for an image or all supported images in a directory.
 
@@ -96,38 +129,23 @@ class Info:
                     log.error(f"Error reading {file}: {exc}")
 
         success_count = len(results)
-
-        if quiet:
-            output_file = Info.exif_output_path()
-            try:
-                with open(output_file, "w", encoding="utf-8") as output:
-                    Info._write_formatted_info(output, files, results)
-                log.info(f"EXIF information written to {output_file}")
-                return success_count == len(files)
-            except OSError as exc:
-                log.error(f"Failed to write EXIF information to {output_file}: {exc}")
-                return False
-
-        # Print results in input order
-        for idx, file in enumerate(files, 1):
-            if file in results:
-                Info._output_exif_info(file, results[file], idx, len(files))
-
-        log.info(f"\nRead meta info from {success_count}/{len(files)} files")
-        return success_count == len(files)
+        total = len(files)
+        results = dict(sorted(results.items()))  # sort results for deterministic output
+        return Info.do_output(success_count, total, results, quiet)
 
     @staticmethod
-    def _write_formatted_info(output: TextIO, files: list, results: dict) -> None:
+    def _write_formatted_info(output: TextIO, total: int, results: dict) -> None:
         """Write formatted EXIF information to a file.
 
         Args:
             output: File object to write to
-            files: List of image files
+            total: total input files count
             results: Dictionary of file paths to results
         """
-        for idx, file in enumerate(files, 1):
-            if file in results:
-                Info._output_exif_info(file, results[file], idx, len(files), output)
+        idx = 1
+        for file, data in results.items():
+            Info._output_exif_info(file, data, idx, total, output)
+            idx += 1
 
     @staticmethod
     def _output_exif_info(
@@ -197,9 +215,9 @@ class Info:
                 else:
                     value = f"{value} s"
             elif key == "FNumber" and isinstance(value, tuple):
-                value = f"f/{value[0] / value[1]:.2f}"
+                value = f"f/{value[0] / value[1]:.1f}"
             elif key == "FNumber" and isinstance(value, (float, int)):
-                value = f"f/{value:.2f}"
+                value = f"f/{value:.1f}"
             elif key == "FocalLength" and isinstance(value, tuple):
                 value = f"{value[0] / value[1]:.2f} mm"
             elif key == "FocalLength" and isinstance(value, (float, int)):
