@@ -138,7 +138,7 @@ class Common:
         cmd = f"uv pip install --upgrade {pkg_name}"
         if sys.prefix != sys.base_prefix:
             # inside a venv or virtualenv
-            cmd = f"pip install --upgrade {pkg_name}"
+            cmd = [sys.executable, "-m", "pip", "install", "--upgrade", pkg_name]
         try:
             Common.run_cmd(cmd)
             msg = "✅ Update completed."
@@ -149,24 +149,23 @@ class Common:
         return msg
 
     @staticmethod
-    def run_cmd(cmd: str) -> tuple:
+    def run_cmd(cmd: list | str) -> tuple:
         """Run a command on the host and get the output
 
         Args:
-            cmd (str): a command line with options
+            cmd: a command line with options
 
         Returns:
             tuple: returnCode, StdOut, StdErr
         """
         log.debug(f"{cmd=}")
+        cmd_lst = cmd if isinstance(cmd, list) else cmd.split()
         try:
-            p = subprocess.run(
-                cmd, capture_output=True, text=True, shell=True, check=True
-            )
+            p = subprocess.run(cmd_lst, capture_output=True, text=True, check=True)
             r_code = p.returncode
             stdout = p.stdout
             stderr = p.stderr
-            log.debug(f"'{cmd}'\n {r_code=}\n {stdout=}\n {stderr=}")
+            log.debug(f"'{cmd=}'\n {r_code=}\n {stdout=}\n {stderr=}")
             return r_code, stdout, stderr
         except subprocess.CalledProcessError as e:
             log.exception(e)

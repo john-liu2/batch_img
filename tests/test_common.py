@@ -21,6 +21,18 @@ from .helper import DotDict
 _dir = dirname(__file__)
 
 
+@pytest.fixture(
+    params=[
+        ("win32", "Windows"),
+        ("linux", "Linux"),
+        ("darwin", "Darwin"),
+    ]
+)
+def os_platform(request):
+    """Simulate OS platforms for Option 2 cross-platform testing."""
+    return request.param
+
+
 @pytest.fixture(params=[(PKG_NAME, "0.4.1"), ("", "0.4.1")])
 def ver_data(request):
     return request.param
@@ -111,14 +123,23 @@ def data_update_package(request):
 
 @patch("batch_img.common.Common.check_latest_version")
 @patch("batch_img.common.Common.run_cmd")
-def test_update_package(mock_run_cmd, mock_check_latest_version, data_update_package):
+def test_update_package(
+    mock_run_cmd, mock_check_latest_version, data_update_package, os_platform
+):
+    sys_plat, plat_sys = os_platform
     v_1, v_2, pkg_name, expected = data_update_package
     if v_1:
         mock_run_cmd.return_value = v_1
     else:
         mock_run_cmd.side_effect = subprocess.CalledProcessError(1, "cmd")
+
     mock_check_latest_version.return_value = v_2
-    actual = Common.update_package(pkg_name)
+    with (
+        patch("sys.platform", sys_plat),
+        patch("platform.system", return_value=plat_sys),
+    ):
+        actual = Common.update_package(pkg_name)
+
     assert actual == expected
 
 
@@ -147,16 +168,21 @@ def run_cmd_data(request):
 
 
 @patch("subprocess.run")
-def test_run_cmd(mock_s_run, run_cmd_data):
+def test_run_cmd(mock_s_run, run_cmd_data, os_platform):
+    sys_plat, plat_sys = os_platform
     v_1, cmd, expected = run_cmd_data
-    if v_1:
-        mock_s_run.return_value = v_1
-        actual = Common.run_cmd(cmd)
-        assert actual == expected
-    else:
-        mock_s_run.side_effect = KeyError("KE")
-        with pytest.raises(KeyError):
-            Common.run_cmd(cmd)
+    with (
+        patch("sys.platform", sys_plat),
+        patch("platform.system", return_value=plat_sys),
+    ):
+        if v_1:
+            mock_s_run.return_value = v_1
+            actual = Common.run_cmd(cmd)
+            assert actual == expected
+        else:
+            mock_s_run.side_effect = KeyError("KE")
+            with pytest.raises(KeyError):
+                Common.run_cmd(cmd)
 
 
 @pytest.fixture(
