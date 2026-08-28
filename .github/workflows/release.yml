@@ -9,16 +9,15 @@ jobs:
   pypi-publish:
     name: Build and publish to PyPI
     runs-on: ubuntu-latest
-    environment:
-      name: pypi
-      url: https://pypi.org/p/batch-img
+#    environment:
+#      name: pypi
+#      url: https://pypi.org/p/batch-img
     permissions:
       id-token: write  # Mandatory for PyPI trusted publishing
-      contents: read
+#      contents: read
 
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v5
+      - uses: actions/checkout@v5
 
       - name: Set up Python
         uses: actions/setup-python@v5
