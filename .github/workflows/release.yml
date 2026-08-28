@@ -30,7 +30,7 @@ jobs:
 
       - name: Build source and wheel dist
         # Uses hatchling as defined in pyproject.toml
-        run: python -m build
+        run: python3 -m build
 
       - name: Validate dist files
         run: twine check dist/*
