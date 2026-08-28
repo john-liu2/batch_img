@@ -1,0 +1,41 @@
+name: Publish to PyPI
+
+on:
+  push:
+    tags:
+      - "v*.*.*"   # trigger on version tags: v1.0.0, v1.2.3, …
+
+jobs:
+  pypi-publish:
+    name: Build and publish to PyPI
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/batch-img
+    permissions:
+      id-token: write  # Mandatory for PyPI trusted publishing
+      contents: read
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install build tools
+        run: python3 -m pip install --upgrade pip hatchling twine build
+
+      - name: Build source and wheel dist
+        # Uses hatchling as defined in pyproject.toml
+        run: python3 -m build
+
+      - name: Validate dist files
+        run: twine check dist/*
+
+      - name: Publish dist to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: dist/
