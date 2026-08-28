@@ -33,7 +33,7 @@ def os_platform(request):
     return request.param
 
 
-@pytest.fixture(params=[(PKG_NAME, "0.4.1"), ("", "0.4.1")])
+@pytest.fixture(params=[(PKG_NAME, "1.4.1"), ("", "1.4.1")])
 def ver_data(request):
     return request.param
 
@@ -47,9 +47,9 @@ def test_get_version(ver_data):
 @pytest.fixture(
     params=[
         (
-            "0.9.9",
+            "1.9.9",
             PKG_NAME,
-            f"🔔 Update available: 0.4.1  →  0.9.9\nRun '{PKG_NAME} --update'",
+            f"🔔 Update available: 1.4.1  →  1.9.9\nRun '{PKG_NAME} --update'",
         ),
     ]
 )
