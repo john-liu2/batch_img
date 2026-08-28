@@ -3,6 +3,7 @@ Copyright © 2025 - Present, John Liu
 """
 
 import os
+import threading
 from pathlib import Path
 
 import piexif
@@ -18,6 +19,9 @@ pillow_heif.register_heif_opener()
 
 
 class RemoveBg:
+    # Restrict ONNX inference to one thread at a time to prevent OOM on CI runners
+    _inference_lock = threading.Lock()
+
     @staticmethod
     def remove_bg_image(args: tuple) -> tuple:
         """Remove background (make background transparent) in an image file
@@ -35,7 +39,11 @@ class RemoveBg:
         try:
             with Image.open(in_path) as img:
                 a_img = img.convert("RGBA")
-                a_img = remove(a_img)  # remove background
+
+                # Apply the lock to the memory-heavy ML operation
+                with RemoveBg._inference_lock:
+                    a_img = remove(a_img)  # remove background
+
                 file = Common.set_out_file(in_path, out_path, "NoBg")
                 i_format = img.format
                 if i_format == "JPEG":
