@@ -4,7 +4,7 @@ requires = ["hatchling"]
 
 [project]
 name = "batch_img"
-version = "1.4.1"
+version = "1.4.2"
 description = "Batch process (resize, rotate, remove background, remove GPS, add border, set transparency, auto do all) image files (HEIC, JPG, PNG)"
 readme = "README.md"
 authors = [{ name = "John Liu", email = "rim2rim@gmail.com" }]
@@ -27,7 +27,7 @@ dependencies = [
     "httpx",
     "loguru",
     "numpy",
-    "onnxruntime==1.24.4",
+    "onnxruntime",
     "opencv-python==4.13.0.92", # 4.x version has cv2.CascadeClassifier()
     "packaging",
     "piexif",

@@ -33,6 +33,7 @@ from batch_img.const import (
     PKG_NAME,
     REPLACE,
     TS_2_MINUTE,
+    TS_FORMAT2,
     UNKNOWN,
     VER,
 )
@@ -199,20 +200,20 @@ class Common:
             return b64encode(data).decode("utf-8")
 
     @staticmethod
-    def easy_file_sz(in_bytes: int) -> str:
+    def easy_file_sz(byte: int) -> str:
         """Convert bytes to human-readable KB, MB, or GB
 
         Args:
-            in_bytes: input bytes integer
+            byte: input bytes integer
 
         Returns:
             str
         """
         for _unit in ["B", "KB", "MB", "GB"]:
-            if in_bytes < 1024:
+            if byte < 1024:
                 break
-            in_bytes /= 1024
-        res = f"{in_bytes} B" if _unit == "B" else f"{in_bytes:.1f} {_unit}"
+            byte /= 1024.0
+        res = f"{int(byte)} {_unit}" if _unit in {"B", "KB"} else f"{byte:.1f} {_unit}"
         return res
 
     @staticmethod
@@ -326,6 +327,11 @@ class Common:
             if EXIF in img.info:
                 exif_data = img.info.pop(EXIF)
                 d_info[EXIF] = Common.decode_exif(exif_data)
+                # Convert "2025:05:29 12:00:48" to "2025-05-29 12:00"
+                if "DateTime" in d_info[EXIF]:
+                    dt_str = d_info[EXIF]["DateTime"]
+                    tmp = datetime.strptime(dt_str, TS_FORMAT2).strftime(TS_2_MINUTE)
+                    d_info[EXIF]["DateTime"] = tmp
 
         return data, Common.sort_nested_dict(d_info)
 

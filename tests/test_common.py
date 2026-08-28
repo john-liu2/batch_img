@@ -33,7 +33,7 @@ def os_platform(request):
     return request.param
 
 
-@pytest.fixture(params=[(PKG_NAME, "1.4.1"), ("", "1.4.1")])
+@pytest.fixture(params=[(PKG_NAME, "1.4.2"), ("", "1.4.2")])
 def ver_data(request):
     return request.param
 
@@ -49,7 +49,7 @@ def test_get_version(ver_data):
         (
             "1.9.9",
             PKG_NAME,
-            f"🔔 Update available: 1.4.1  →  1.9.9\nRun '{PKG_NAME} --update'",
+            f"🔔 Update available: 1.4.2  →  1.9.9\nRun '{PKG_NAME} --update'",
         ),
     ]
 )
@@ -67,7 +67,7 @@ def test_check_latest_version(mock_get_latest_pypi, data_check_latest_version):
 
 @pytest.fixture(
     params=[
-        (PKG_NAME, 0, "0.3.9"),
+        (PKG_NAME, 0, "1.4.1"),
         ("bad_bogus", 1, UNKNOWN),
     ]
 )
@@ -245,10 +245,10 @@ def test_file_to_base64(data_file_to_base64):
 @pytest.fixture(
     params=[
         (1023, "1023 B"),
-        (1025, "1.0 KB"),
-        (101988, "99.6 KB"),
-        (201554, "196.8 KB"),
-        (1024**2 + 99, "1.0 MB"),
+        (1025, "1 KB"),
+        (101988, "99 KB"),
+        (201554, "196 KB"),
+        (1024**2 + 1024 * 60, "1.1 MB"),
         (2 * (1024**3) + 99, "2.0 GB"),
     ]
 )
@@ -509,7 +509,7 @@ def test_sort_nested_dict(data_nested_dict):
         (
             Path(f"{_dir}/data/HEIC/Cartoon.heic"),
             {
-                "file_size": "44.6 KB",
+                "file_size": "44 KB",
                 "file_ts": "2025-08-16 23:44",
                 "format": "HEIF",
                 "mode": "RGB",
@@ -531,7 +531,7 @@ def test_sort_nested_dict(data_nested_dict):
         (
             Path(f"{_dir}/data/HEIC/Cartoon_180cw.heic"),
             {
-                "file_size": "42.4 KB",
+                "file_size": "42 KB",
                 "file_ts": "2025-08-17 11:05",
                 "format": "HEIF",
                 "mode": "RGB",
@@ -548,6 +548,58 @@ def test_sort_nested_dict(data_nested_dict):
                     "thumbnails": [],
                 },
                 "exif": {"ExifTag": 114, "Orientation": 1},
+            },
+        ),
+        (
+            Path(f"{_dir}/data/HEIC/IMG_2530.HEIC"),
+            {
+                "file_size": "143 KB",
+                "file_ts": "2025-08-17 11:05",
+                "format": "HEIF",
+                "mode": "RGB",
+                "size": (1920, 1440),
+                "info": {
+                    "aux": {},
+                    "bit_depth": 8,
+                    "chroma": 420,
+                    "depth_images": [],
+                    "icc_profile_type": "prof",
+                    "metadata": [],
+                    "original_orientation": None,
+                    "primary": True,
+                    "thumbnails": [],
+                },
+                "exif": {
+                    "ColorSpace": 65535,
+                    "DateTime": "2023-12-31 16:00",
+                    "DateTimeDigitized": "2023:12:31 16:00:41",
+                    "DateTimeOriginal": "2023:12:31 16:00:41",
+                    "ExifTag": 242,
+                    "ExifVersion": "0232",
+                    "ExposureMode": 0,
+                    "ExposureProgram": 2,
+                    "ExposureTime": (
+                        1,
+                        1689,
+                    ),
+                    "FNumber": (
+                        14,
+                        5,
+                    ),
+                    "Flash": 16,
+                    "FocalLength": (
+                        2052196,
+                        131047,
+                    ),
+                    "FocalLengthIn35mmFilm": 120,
+                    "ISOSpeedRatings": 50,
+                    "Make": "Apple",
+                    "MeteringMode": 3,
+                    "Model": "iPhone 15 Pro Max",
+                    "Orientation": 1,
+                    "SensingMethod": 2,
+                    "WhiteBalance": 0,
+                },
             },
         ),
     ]

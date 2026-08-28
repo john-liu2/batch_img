@@ -14,6 +14,7 @@ MSG_BAD = "❌ Failed to process image file(s)."
 
 TS_FORMAT = "%Y-%m-%d_%H-%M-%S"
 TS_2_MINUTE = "%Y-%m-%d %H:%M"
+TS_FORMAT2 = "%Y:%m:%d %H:%M:%S"
 PATTERNS = (
     "*.HEIC",
     "*.heic",

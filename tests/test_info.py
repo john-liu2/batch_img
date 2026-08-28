@@ -43,7 +43,7 @@ def mock_meta_data():
             Path(f"{_dir}/data/HEIC/Cartoon_180cw.heic"),
             {
                 "file_info": {
-                    "file_size": "42.4 KB",
+                    "file_size": "42 KB",
                     "last_modified": "2025-08-17 11:05",
                     "format": "HEIF",
                     "dimensions": "758 x 758",
@@ -59,7 +59,7 @@ def mock_meta_data():
             Path(f"{_dir}/data/HEIC/IMG_2527.HEIC"),
             {
                 "file_info": {
-                    "file_size": "153.4 KB",
+                    "file_size": "153 KB",
                     "last_modified": "2026-03-04 11:53",
                     "format": "HEIF",
                     "dimensions": "1920 x 1440",
@@ -70,7 +70,7 @@ def mock_meta_data():
                 },
                 EXIF: {
                     "ColorSpace": 65535,
-                    "DateTime": "2023:12:31 15:57:52",
+                    "DateTime": "2023-12-31 15:57",
                     "DateTimeDigitized": "2023:12:31 15:57:52",
                     "DateTimeOriginal": "2023:12:31 15:57:52",
                     "ExifTag": 242,
