@@ -226,3 +226,4 @@ class Info:
                 value = f"ISO {value}"
 
             _out(f"    {label:<15}: {value}")
+        _out("")
