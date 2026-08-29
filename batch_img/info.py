@@ -190,7 +190,9 @@ class Info:
         _out("  [ EXIF Metadata ]")
 
         if not exif:
-            _out("    None")
+            _out("    None (or unreadable EXIF header)")
+            _out("")
+            return
 
         # Map EXIF tags to friendly names
         exif_map = {
