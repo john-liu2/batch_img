@@ -50,7 +50,7 @@ def mock_meta_data():
                     "bit_depth": "8 bits/channel",
                     "alpha_channel": "No",
                     "colorspace": "RGB",
-                    "chroma_format": 420,
+                    "chroma_format": "4:2:0",
                 },
                 EXIF: {"ExifTag": 114, "Orientation": 1},
             },
@@ -66,7 +66,7 @@ def mock_meta_data():
                     "bit_depth": "8 bits/channel",
                     "alpha_channel": "No",
                     "colorspace": "RGB",
-                    "chroma_format": 420,
+                    "chroma_format": "4:2:0",
                 },
                 EXIF: {
                     "ColorSpace": 65535,

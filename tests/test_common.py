@@ -521,7 +521,7 @@ def test_sort_nested_dict(data_nested_dict):
                 "info": {
                     "aux": {},
                     "bit_depth": 8,
-                    "chroma": 420,
+                    "chroma": "4:2:0",
                     "depth_images": [],
                     "icc_profile_type": "prof",
                     "original_orientation": None,
@@ -542,7 +542,7 @@ def test_sort_nested_dict(data_nested_dict):
                 "info": {
                     "aux": {},
                     "bit_depth": 8,
-                    "chroma": 420,
+                    "chroma": "4:2:0",
                     "depth_images": [],
                     "icc_profile_type": "prof",
                     "original_orientation": None,
@@ -563,7 +563,7 @@ def test_sort_nested_dict(data_nested_dict):
                 "info": {
                     "aux": {},
                     "bit_depth": 8,
-                    "chroma": 420,
+                    "chroma": "4:2:0",
                     "depth_images": [],
                     "icc_profile_type": "prof",
                     "original_orientation": None,
@@ -614,7 +614,7 @@ def test_sort_nested_dict(data_nested_dict):
                 "info": {
                     "aux": {},
                     "bit_depth": 8,
-                    "chroma": 420,
+                    "chroma": "4:2:0",
                     "depth_images": [],
                     "icc_profile_type": "prof",
                     "original_orientation": None,
@@ -634,7 +634,7 @@ def test_sort_nested_dict(data_nested_dict):
                 "info": {
                     "aux": {},
                     "bit_depth": 8,
-                    "chroma": 420,
+                    "chroma": "4:2:0",
                     "depth_images": [],
                     "original_orientation": None,
                     "primary": True,

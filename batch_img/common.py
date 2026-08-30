@@ -328,6 +328,9 @@ class Common:
             for key in ("icc_profile", "xmp"):
                 if key in img.info:
                     img.info.pop(key)
+            val = img.info.get("chroma", None)
+            if val:  # Convert 420 to "4:2:0"
+                img.info["chroma"] = ":".join(str(val))
             exif_data = img.info.pop(EXIF, None)  # safely ignor non-exist key
             if exif_data:
                 d_info[EXIF] = Common.decode_exif(exif_data)
