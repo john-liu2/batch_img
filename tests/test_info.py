@@ -43,14 +43,14 @@ def mock_meta_data():
             Path(f"{_dir}/data/HEIC/Cartoon_180cw.heic"),
             {
                 "file_info": {
-                    "file_size": "42 KB",
+                    "file_size": "42 KB (43386 bytes)",
                     "last_modified": "2025-08-17 11:05",
                     "format": "HEIF",
-                    "dimensions": "758 x 758",
-                    "bit_depth": 8,
+                    "dimensions": "758 x 758 (0.6 MP)",
+                    "bit_depth": "8 bits/channel",
                     "alpha_channel": "No",
                     "colorspace": "RGB",
-                    "chroma_format": 420,
+                    "chroma_format": "4:2:0",
                 },
                 EXIF: {"ExifTag": 114, "Orientation": 1},
             },
@@ -59,14 +59,14 @@ def mock_meta_data():
             Path(f"{_dir}/data/HEIC/IMG_2527.HEIC"),
             {
                 "file_info": {
-                    "file_size": "153 KB",
+                    "file_size": "153 KB (157123 bytes)",
                     "last_modified": "2026-03-04 11:53",
                     "format": "HEIF",
-                    "dimensions": "1920 x 1440",
-                    "bit_depth": 8,
+                    "dimensions": "1920 x 1440 (2.8 MP)",
+                    "bit_depth": "8 bits/channel",
                     "alpha_channel": "No",
                     "colorspace": "RGB",
-                    "chroma_format": 420,
+                    "chroma_format": "4:2:0",
                 },
                 EXIF: {
                     "ColorSpace": 65535,
@@ -136,7 +136,7 @@ class TestReadOneImageExif:
         # Verify file_info formatting
         file_info = data["file_info"]
         assert file_info["file_size"] == 2048576
-        assert file_info["dimensions"] == "1920 x 1080"
+        assert file_info["dimensions"] == "1920 x 1080 (2.1 MP)"
         assert file_info["alpha_channel"] == "No"
         assert file_info["format"] == "JPEG"
 

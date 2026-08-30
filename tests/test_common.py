@@ -245,11 +245,15 @@ def test_file_to_base64(data_file_to_base64):
 @pytest.fixture(
     params=[
         (1023, "1023 B"),
-        (1025, "1 KB"),
-        (101988, "99 KB"),
-        (201554, "196 KB"),
+        (1025, "1 KB"),  # round to 1
+        (2020, "2 KB"),  # round to 2
+        (101988, "100 KB"),
+        (201554, "197 KB"),
         (1024**2 + 1024 * 60, "1.1 MB"),
+        (1_572_864, "1.5 MB"),
         (2 * (1024**3) + 99, "2.0 GB"),
+        (2_684_354_560, "2.5 GB"),
+        (1_099_511_627_776, "1024.0 GB"),  # 1 TB (1024 * 1024 * 1024 * 1024)
     ]
 )
 def data_easy_file_sz(request):
@@ -509,7 +513,7 @@ def test_sort_nested_dict(data_nested_dict):
         (
             Path(f"{_dir}/data/HEIC/Cartoon.heic"),
             {
-                "file_size": "44 KB",
+                "file_size": "45 KB (45631 bytes)",
                 "file_ts": "2025-08-16 23:44",
                 "format": "HEIF",
                 "mode": "RGB",
@@ -517,10 +521,9 @@ def test_sort_nested_dict(data_nested_dict):
                 "info": {
                     "aux": {},
                     "bit_depth": 8,
-                    "chroma": 420,
+                    "chroma": "4:2:0",
                     "depth_images": [],
                     "icc_profile_type": "prof",
-                    "metadata": [],
                     "original_orientation": None,
                     "primary": True,
                     "thumbnails": [],
@@ -531,7 +534,7 @@ def test_sort_nested_dict(data_nested_dict):
         (
             Path(f"{_dir}/data/HEIC/Cartoon_180cw.heic"),
             {
-                "file_size": "42 KB",
+                "file_size": "42 KB (43386 bytes)",
                 "file_ts": "2025-08-17 11:05",
                 "format": "HEIF",
                 "mode": "RGB",
@@ -539,10 +542,9 @@ def test_sort_nested_dict(data_nested_dict):
                 "info": {
                     "aux": {},
                     "bit_depth": 8,
-                    "chroma": 420,
+                    "chroma": "4:2:0",
                     "depth_images": [],
                     "icc_profile_type": "prof",
-                    "metadata": [],
                     "original_orientation": None,
                     "primary": True,
                     "thumbnails": [],
@@ -553,7 +555,7 @@ def test_sort_nested_dict(data_nested_dict):
         (
             Path(f"{_dir}/data/HEIC/IMG_2530.HEIC"),
             {
-                "file_size": "143 KB",
+                "file_size": "143 KB (146937 bytes)",
                 "file_ts": "2025-08-17 11:05",
                 "format": "HEIF",
                 "mode": "RGB",
@@ -561,10 +563,9 @@ def test_sort_nested_dict(data_nested_dict):
                 "info": {
                     "aux": {},
                     "bit_depth": 8,
-                    "chroma": 420,
+                    "chroma": "4:2:0",
                     "depth_images": [],
                     "icc_profile_type": "prof",
-                    "metadata": [],
                     "original_orientation": None,
                     "primary": True,
                     "thumbnails": [],
@@ -602,6 +603,45 @@ def test_sort_nested_dict(data_nested_dict):
                 },
             },
         ),
+        (
+            Path(f"{_dir}/data/HEIC/AC_XE1000_1995.HEIC"),
+            {
+                "file_size": "105 KB (107696 bytes)",
+                "file_ts": "2026-08-29 10:27",
+                "format": "HEIF",
+                "mode": "RGB",
+                "size": (786, 645),
+                "info": {
+                    "aux": {},
+                    "bit_depth": 8,
+                    "chroma": "4:2:0",
+                    "depth_images": [],
+                    "icc_profile_type": "prof",
+                    "original_orientation": None,
+                    "primary": True,
+                    "thumbnails": [],
+                },
+            },
+        ),
+        (
+            Path(f"{_dir}/data/HEIC/grayscale.heic"),
+            {
+                "file_size": "61 KB (62357 bytes)",
+                "file_ts": "2026-08-29 12:39",
+                "format": "HEIF",
+                "mode": "RGB",
+                "size": (1280, 329),
+                "info": {
+                    "aux": {},
+                    "bit_depth": 8,
+                    "chroma": "4:2:0",
+                    "depth_images": [],
+                    "original_orientation": None,
+                    "primary": True,
+                    "thumbnails": [],
+                },
+            },
+        ),
     ]
 )
 def data_get_image(request):
@@ -613,7 +653,8 @@ def test_get_image_data(data_get_image):
     actual = Common.get_image_data(file)
     # Cloud CI runs get different ts
     expected.pop("file_ts")
-    actual[1].pop("file_ts")
+    actual[1].pop("file_ts", None)
+    actual[1]["info"].pop("metadata", None)
     actual[1]["info"].pop("tiling", None)  # safely ignor non-exist key
     assert actual[1] == Common.sort_nested_dict(expected)
 

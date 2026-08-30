@@ -200,21 +200,25 @@ class Common:
             return b64encode(data).decode("utf-8")
 
     @staticmethod
-    def easy_file_sz(byte: int) -> str:
+    def easy_file_sz(sz: int) -> str:
         """Convert bytes to human-readable KB, MB, or GB
 
         Args:
-            byte: input bytes integer
+            sz: bytes integer
 
         Returns:
             str
         """
-        for _unit in ["B", "KB", "MB", "GB"]:
-            if byte < 1024:
-                break
-            byte /= 1024.0
-        res = f"{int(byte)} {_unit}" if _unit in {"B", "KB"} else f"{byte:.1f} {_unit}"
-        return res
+        units = ["B", "KB", "MB", "GB"]
+        unit_index = 0
+        while sz > 1024.0 and unit_index < len(units) - 1:
+            # Stop if under 1024, OR if reached the last available unit ("GB")
+            sz /= 1024.0
+            unit_index += 1
+
+        unit = units[unit_index]
+        s = f"{round(sz)} {unit}" if unit in {"B", "KB"} else f"{sz:.1f} {unit}"
+        return s
 
     @staticmethod
     def remove_exif_gps(exif_data: bytes) -> tuple:
@@ -314,7 +318,7 @@ class Common:
         with Image.open(file) as img:
             data = img.convert("RGB")
             d_info = {
-                "file_size": Common.easy_file_sz(size),
+                "file_size": f"{Common.easy_file_sz(size)} ({size} bytes)",
                 "file_ts": m_ts,
                 "format": img.format,
                 "mode": img.mode,
@@ -324,8 +328,11 @@ class Common:
             for key in ("icc_profile", "xmp"):
                 if key in img.info:
                     img.info.pop(key)
-            if EXIF in img.info:
-                exif_data = img.info.pop(EXIF)
+            val = img.info.get("chroma", None)
+            if val:  # Convert 420 to "4:2:0"
+                img.info["chroma"] = ":".join(str(val))
+            exif_data = img.info.pop(EXIF, None)  # safely ignor non-exist key
+            if exif_data:
                 d_info[EXIF] = Common.decode_exif(exif_data)
                 # Convert "2025:05:29 12:00:48" to "2025-05-29 12:00"
                 if "DateTime" in d_info[EXIF]:

@@ -29,13 +29,19 @@ class Info:
         """
         try:
             _, meta = Common.get_image_data(file)
+            w = meta["size"][0]
+            h = meta["size"][1]
+            mp = round(w * h / 1_000_000.0, 1)
+            bit_depth = meta["info"].get("bit_depth", UNKNOWN)
+            if bit_depth != UNKNOWN:
+                bit_depth = f"{bit_depth} bits/channel"
             result = {
                 "file_info": {
                     "file_size": meta.get("file_size", UNKNOWN),
                     "last_modified": meta.get("file_ts", UNKNOWN),
                     "format": meta.get("format", UNKNOWN),
-                    "dimensions": f"{meta['size'][0]} x {meta['size'][1]}",
-                    "bit_depth": meta["info"].get("bit_depth", UNKNOWN),
+                    "dimensions": f"{w} x {h} ({mp} MP)",
+                    "bit_depth": bit_depth,
                     "alpha_channel": "Yes" if meta["mode"] in {"RGBA", "LA"} else "No",
                     "colorspace": meta.get("mode", UNKNOWN),
                     "chroma_format": meta["info"].get("chroma", UNKNOWN),
@@ -43,7 +49,7 @@ class Info:
                 EXIF: meta.get(EXIF, {}),
             }
             return True, (file, result)
-        except (OSError, ValueError) as exc:
+        except (OSError, ValueError, TypeError, KeyError) as exc:
             return False, f"{file}: {exc}"
 
     @staticmethod
@@ -190,7 +196,9 @@ class Info:
         _out("  [ EXIF Metadata ]")
 
         if not exif:
-            _out("    None")
+            _out("    None (or unreadable EXIF header)")
+            _out("")
+            return
 
         # Map EXIF tags to friendly names
         exif_map = {
@@ -215,9 +223,9 @@ class Info:
                 else:
                     value = f"{value} s"
             elif key == "FNumber" and isinstance(value, tuple):
-                value = f"f/{value[0] / value[1]:.1f}"
+                value = f"f/{value[0] / value[1]:.2f}".rstrip("0").rstrip(".")
             elif key == "FNumber" and isinstance(value, (float, int)):
-                value = f"f/{value:.1f}"
+                value = f"f/{value:.2f}".rstrip("0").rstrip(".")
             elif key == "FocalLength" and isinstance(value, tuple):
                 value = f"{value[0] / value[1]:.2f} mm"
             elif key == "FocalLength" and isinstance(value, (float, int)):
