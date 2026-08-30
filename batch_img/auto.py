@@ -51,12 +51,12 @@ class Auto:
                 bd_img.paste(cropped_img, (Conf.bd_width, Conf.bd_width))
 
                 file = Common.set_out_file(in_path, out_path, f"bw{Conf.bd_width}")
-
-                if EXIF not in img.info:
+                exif_data = img.info.get(EXIF, None)  # safely ignor non-exist key
+                if not exif_data:
                     log.debug(f"No EXIF in {in_path}")
                     bd_img.save(file, img.format, optimize=True)
                 else:
-                    _, exif_bytes = Common.remove_exif_gps(img.info[EXIF])
+                    _, exif_bytes = Common.remove_exif_gps(exif_data)
                     log.debug(f"Purge GPS in EXIF in {in_path}")
                     bd_img.save(file, img.format, optimize=True, exif=exif_bytes)
             log.debug(f"Saved the processed image to {file}")

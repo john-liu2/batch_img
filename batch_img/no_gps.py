@@ -32,11 +32,12 @@ class NoGps:
         Common.set_log_by_process()
         try:
             with Image.open(in_path) as img:
-                if EXIF not in img.info:
+                exif_data = img.info.get(EXIF, None)  # safely ignor non-exist key
+                if not exif_data:
                     msg = f"Skip as no EXIF in {in_path}"
                     log.debug(msg)
                     return True, f"Skip as no EXIF in {in_path}"
-                removed, exif_bytes = Common.remove_exif_gps(img.info[EXIF])
+                removed, exif_bytes = Common.remove_exif_gps(exif_data)
                 if removed:
                     file = Common.set_out_file(in_path, out_path, "NoGPS")
                     img.save(file, img.format, optimize=True, exif=exif_bytes)
