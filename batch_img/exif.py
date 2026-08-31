@@ -210,13 +210,12 @@ class Exif:
         """
         if not data:
             return {}
-
         parsers = (
-            Exif._parse_png,
+            Exif._parse_heic,
             Exif._parse_jpeg,
+            Exif._parse_png,
             Exif._parse_tiff,
             Exif._parse_webp,
-            Exif._parse_heic,
         )
         for parser in parsers:
             meta = parser(data)
