@@ -642,6 +642,35 @@ def test_sort_nested_dict(data_nested_dict):
                 },
             },
         ),
+        (
+            Path(f"{_dir}/data/JPG/IMG_4412.jpeg"),
+            {
+                "exif": {
+                    "ColorSpace": 1,
+                    "ComponentsConfiguration": "\x01\x02\x03\x00",
+                    "ExifTag": 102,
+                    "ExifVersion": "0221",
+                    "FlashpixVersion": "0100",
+                    "Orientation": 1,
+                    "SceneCaptureType": 0,
+                    "YCbCrPositioning": 1,
+                },
+                "file_size": "33 KB (34272 bytes)",
+                "file_ts": "2026-08-31 11:25",
+                "format": "JPEG",
+                "info": {
+                    "dpi": (
+                        72.0,
+                        72.0,
+                    ),
+                },
+                "mode": "RGB",
+                "size": (
+                    320,
+                    240,
+                ),
+            },
+        ),
     ]
 )
 def data_get_image(request):
@@ -725,7 +754,7 @@ def test_calculate_new_size(data_calculate_new_size):
 
 @pytest.fixture(
     params=[
-        (Path(f"{_dir}/data/JPG"), REPLACE, 6),
+        (Path(f"{_dir}/data/JPG"), REPLACE, 7),
         (Path(f"{_dir}/data/PNG"), Path(f"{_dir}/.out/"), 2),
     ]
 )
