@@ -75,7 +75,7 @@ class Info:
             output_file = Info.exif_output_path()
             try:
                 with open(output_file, "w", encoding="utf-8") as output:
-                    Info._write_formatted_info(output, total, results)
+                    Info.write_formatted_info(output, total, results)
                 log.info(f"EXIF information written to {output_file}")
                 return success_cnt == total
             except OSError as exc:
@@ -83,11 +83,8 @@ class Info:
                 return False
 
         # Print to stdout
-        idx = 1
-        for file, data in results.items():
-            Info._output_exif_info(file, data, idx, total)
-            idx += 1
-        log.info(f"\nRead meta info from {success_cnt}/{total} files")
+        Info.write_formatted_info(None, total, results)
+        log.info(f"Read meta info from {success_cnt}/{total} files")
         return success_cnt == total
 
     @staticmethod
@@ -140,68 +137,82 @@ class Info:
         return Info.do_output(success_count, total, results, quiet)
 
     @staticmethod
-    def _write_formatted_info(output: TextIO, total: int, results: dict) -> None:
+    def write_formatted_info(obj: TextIO | None, total: int, results: dict) -> None:
         """Write formatted EXIF information to a file.
 
         Args:
-            output: File object to write to
+            obj: File object to write to. If None, prints to logger.
             total: total input files count
             results: Dictionary of file paths to results
         """
         idx = 1
         for file, data in results.items():
-            Info._output_exif_info(file, data, idx, total, output)
+            Info.out_meta_info(file, data, idx, total, obj)
             idx += 1
 
     @staticmethod
-    def _output_exif_info(
-        file: Path, data: dict, index: int, total: int, output: TextIO | None = None
+    def _out(text: str, obj: TextIO | None = None) -> None:
+        """Helper to route string output dynamically.
+
+        Args:
+            text: Text to write
+            obj: File object to write to. If None, prints to logger.
+        """
+        if obj:
+            obj.write(text + "\n")
+        else:
+            log.info(text)
+
+    @staticmethod
+    def out_meta_info(
+        file: Path, data: dict, index: int, total: int, obj: TextIO | None
     ) -> None:
-        """Format and output EXIF information to either a file or stdout.
+        """Format and output meta information to a file or stdout.
 
         Args:
             file: Image file path
             data: Dictionary containing file_info and exif data
             index: Current file index (1-based)
             total: Total number of files
-            output: File object to write to. If None, prints to logger.
+            obj: File object to write to. If None, prints to logger.
         """
-
-        def _out(text: str) -> None:
-            """Helper to route string output dynamically."""
-            if output:
-                output.write(text + "\n")
-            else:
-                log.info(text)
-
         file_info = data.get("file_info", {})
         exif = data.get(EXIF, {})
 
         # Output separator and file header
-        _out("─" * 60)
-        _out(f"{file} [{index}/{total}]")
+        Info._out("─" * 60, obj)
+        Info._out(f"{file} [{index}/{total}]", obj)
 
         # Output file info
-        _out(f"  File Size       : {file_info.get('file_size', UNKNOWN)}")
-        _out(f"  Last Modified   : {file_info.get('last_modified', UNKNOWN)}")
-        _out(f"  Format          : {file_info.get('format', UNKNOWN)}")
-        _out(f"  Dimensions      : {file_info.get('dimensions', UNKNOWN)}")
-        _out(f"  Bit Depth       : {file_info.get('bit_depth', UNKNOWN)}")
-        _out(f"  Alpha Channel   : {file_info.get('alpha_channel', UNKNOWN)}")
-        _out(f"  Colorspace      : {file_info.get('colorspace', UNKNOWN)}")
-        _out(f"  Chroma Format   : {file_info.get('chroma_format', UNKNOWN)}")
+        Info._out(f"  File Size       : {file_info.get('file_size', UNKNOWN)}", obj)
+        Info._out(f"  Last Modified   : {file_info.get('last_modified', UNKNOWN)}", obj)
+        Info._out(f"  Format          : {file_info.get('format', UNKNOWN)}", obj)
+        Info._out(f"  Dimensions      : {file_info.get('dimensions', UNKNOWN)}", obj)
+        Info._out(f"  Bit Depth       : {file_info.get('bit_depth', UNKNOWN)}", obj)
+        Info._out(f"  Alpha Channel   : {file_info.get('alpha_channel', UNKNOWN)}", obj)
+        Info._out(f"  Colorspace      : {file_info.get('colorspace', UNKNOWN)}", obj)
+        Info._out(f"  Chroma Format   : {file_info.get('chroma_format', UNKNOWN)}", obj)
 
         # Output EXIF metadata
-        _out("")
-        _out("  [ EXIF Metadata ]")
+        Info._out("", obj)
+        Info._out("  [ EXIF Metadata ]", obj)
 
         if not exif:
-            _out("    None (or unreadable EXIF header)")
-            _out("")
+            Info._out("    None (or unreadable EXIF header)", obj)
+            Info._out("", obj)
             return
+        Info.print_exif(exif, obj)
 
+    @staticmethod
+    def print_exif(exif: dict, obj: TextIO | None = None) -> None:
+        """Print EXIF data
+
+        Args:
+            exif: exif data in dict
+            obj: File object to write to. If None, prints to logger.
+        """
         # Map EXIF tags to friendly names
-        exif_map = {
+        label_map = {
             "Make": "Make",
             "Model": "Model",
             "DateTime": "Date/Time",
@@ -211,27 +222,38 @@ class Info:
             "FocalLength": "Focal Length",
             "GPSLatitude": "GPS Data",
         }
-        for key, label in exif_map.items():
+        found_any = False
+        for key, label in label_map.items():
             value = exif.get(key, None)
             if key == "GPSLatitude":
-                value = "Present" if value else "None"
+                value = "Present" if value else "Absent"
             elif key == "ExposureTime" and isinstance(value, tuple):
                 value = f"{value[0]}/{value[1]} s"
+                found_any = True
             elif key == "ExposureTime" and isinstance(value, float):
+                found_any = True
                 if value < 1:
                     value = f"1/{int(1 / value)} s"
                 else:
                     value = f"{value} s"
             elif key == "FNumber" and isinstance(value, tuple):
                 value = f"f/{value[0] / value[1]:.2f}".rstrip("0").rstrip(".")
+                found_any = True
             elif key == "FNumber" and isinstance(value, (float, int)):
                 value = f"f/{value:.2f}".rstrip("0").rstrip(".")
+                found_any = True
             elif key == "FocalLength" and isinstance(value, tuple):
                 value = f"{value[0] / value[1]:.2f} mm"
+                found_any = True
             elif key == "FocalLength" and isinstance(value, (float, int)):
                 value = f"{value:.2f} mm"
+                found_any = True
             elif key == "ISOSpeedRatings" and isinstance(value, (int, str)):
                 value = f"ISO {value}"
+                found_any = True
 
-            _out(f"    {label:<15}: {value}")
-        _out("")
+            if value:
+                Info._out(f"    {label:<15}: {value}", obj)
+        if not found_any:
+            Info._out("    No standard camera tags found in EXIF", obj)
+        Info._out("", obj)

@@ -26,7 +26,14 @@ jobs:
 
       - name: Build source and wheel dist
         # Uses hatchling as defined in pyproject.toml
-        run: python3 -m build
+        run: |
+          echo "==> Set prod logging"
+          mv batch_img/config.json batch_img/config_bk.json
+          cp -p batch_img/config_prod.json batch_img/config.json
+          echo "Build by hatchling defined in pyproject.toml"
+          python3 -m build
+          echo "==> Restore config.json"
+          mv batch_img/config_bk.json batch_img/config.json
 
       - name: Validate dist files
         run: twine check dist/*

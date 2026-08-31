@@ -1,6 +1,6 @@
-"""Tests for info.py
+"""Test info.py
 pytest -sv tests/test_info.py
-Copyright © 2025 - Present, John Liu
+Copyright © 2026 - Present, John Liu
 """
 
 from os.path import dirname
@@ -9,7 +9,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from batch_img.info import Info
+from batch_img.info import Info, INFO_TXT_FILE
 from batch_img.const import EXIF, UNKNOWN
 
 _dir = dirname(__file__)
@@ -257,3 +257,56 @@ class TestReadExif:
 
         result = Info.read_exif(file, quiet=True)
         assert result is False
+
+
+@pytest.fixture(
+    params=[
+        (
+            Path(f"{_dir}/data/JPG/IMG_4412.jpeg"),
+            {
+                "exif": {
+                    "ColorSpace": 1,
+                    "ComponentsConfiguration": "\x01\x02\x03\x00",
+                    "ExifTag": 102,
+                    "ExifVersion": "0221",
+                    "FlashpixVersion": "0100",
+                    "Orientation": 1,
+                    "SceneCaptureType": 0,
+                    "YCbCrPositioning": 1,
+                },
+                "file_info": {
+                    "file_size": "33 KB (34272 bytes)",
+                    "last_modified": "2026-08-31 11:25",
+                    "format": "JPEG",
+                    "dimensions": "320 x 240 (0.1 MP)",
+                    "bit_depth": "8 bits/channel",
+                    "alpha_channel": "No",
+                    "colorspace": "RGB",
+                    "chroma_format": "4:2:0",
+                },
+            },
+            Path(f"{_dir}/data/JPG/meta_no_gps.txt"),
+        )
+    ]
+)
+def data_out_meta_info(request):
+    return request.param
+
+
+def test_out_meta_info(data_out_meta_info, tmp_path, monkeypatch):
+    img_file, data, truth_file = data_out_meta_info
+
+    output_file = tmp_path / INFO_TXT_FILE
+    monkeypatch.setattr(Info, "exif_output_path", lambda: output_file)
+
+    with open(output_file, "w", encoding="utf-8") as output:
+        Info.out_meta_info(img_file, data, 1, 1, output)
+
+    assert output_file.exists()
+    # Read with .splitlines() to avoid Windows \r\n vs Linux \n assertion failures
+    content = output_file.read_text(encoding="utf-8").splitlines()
+    expected = truth_file.read_text(encoding="utf-8").splitlines()
+    for idx, line in enumerate(content):
+        if idx == 1:
+            continue
+        assert content[idx] == expected[idx]

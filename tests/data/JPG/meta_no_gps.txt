@@ -1,0 +1,15 @@
+────────────────────────────────────────────────────────────
+/Users/john_j_liu/Downloads/IMG_4412.jpeg [1/1]
+  File Size       : 33 KB (34272 bytes)
+  Last Modified   : 2026-08-31 11:25
+  Format          : JPEG
+  Dimensions      : 320 x 240 (0.1 MP)
+  Bit Depth       : 8 bits/channel
+  Alpha Channel   : No
+  Colorspace      : RGB
+  Chroma Format   : 4:2:0
+
+  [ EXIF Metadata ]
+    GPS Data       : Absent
+    No standard camera tags found in EXIF
+
