@@ -659,6 +659,8 @@ def test_sort_nested_dict(data_nested_dict):
                 "file_ts": "2026-08-31 11:25",
                 "format": "JPEG",
                 "info": {
+                    "bit_depth": 8,
+                    "chroma": "4:2:0",
                     "dpi": (
                         72.0,
                         72.0,

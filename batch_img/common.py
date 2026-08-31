@@ -37,6 +37,7 @@ from batch_img.const import (
     UNKNOWN,
     VER,
 )
+from batch_img.exif import Exif
 from batch_img.log import Log
 
 pillow_heif.register_heif_opener()
@@ -305,7 +306,7 @@ class Common:
 
     @staticmethod
     def get_image_data(file: Path) -> tuple:
-        """Get image file data
+        """Get image file data combining raw byte header parsing and Pillow
 
         Args:
             file: image file path
@@ -315,21 +316,31 @@ class Common:
         """
         size = getsize(file)
         m_ts = datetime.fromtimestamp(getmtime(file)).strftime(TS_2_MINUTE)
+        with open(file, "rb") as f:
+            raw_bytes = f.read(65536)
+        raw_meta = Exif.parse_raw_header(raw_bytes)
+
         with Image.open(file) as img:
             data = img.convert("RGB")
             d_info = {
                 "file_size": f"{Common.easy_file_sz(size)} ({size} bytes)",
                 "file_ts": m_ts,
                 "format": img.format,
-                "mode": img.mode,
+                "mode": raw_meta.get("mode") or img.mode,
                 "size": img.size,
                 "info": img.info,
             }
+            if "bit_depth" in raw_meta:
+                d_info["info"]["bit_depth"] = raw_meta["bit_depth"]
+            if "chroma" in raw_meta:
+                d_info["info"]["chroma"] = raw_meta["chroma"]
+
             for key in ("icc_profile", "xmp"):
                 if key in img.info:
                     img.info.pop(key)
+
             val = img.info.get("chroma", None)
-            if val:  # Convert 420 to "4:2:0"
+            if val and isinstance(val, int):  # Convert 420 to "4:2:0"
                 img.info["chroma"] = ":".join(str(val))
             exif_data = img.info.pop(EXIF, None)  # safely ignor non-exist key
             if exif_data:

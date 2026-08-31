@@ -1,6 +1,6 @@
-"""Tests for info.py
+"""Test info.py
 pytest -sv tests/test_info.py
-Copyright © 2025 - Present, John Liu
+Copyright © 2026 - Present, John Liu
 """
 
 from os.path import dirname
@@ -279,10 +279,10 @@ class TestReadExif:
                     "last_modified": "2026-08-31 11:25",
                     "format": "JPEG",
                     "dimensions": "320 x 240 (0.1 MP)",
-                    "bit_depth": UNKNOWN,
+                    "bit_depth": "8 bits/channel",
                     "alpha_channel": "No",
                     "colorspace": "RGB",
-                    "chroma_format": UNKNOWN,
+                    "chroma_format": "4:2:0",
                 },
             },
             Path(f"{_dir}/data/JPG/meta_no_gps.txt"),

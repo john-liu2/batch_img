@@ -4,10 +4,10 @@
   Last Modified   : 2026-08-31 11:25
   Format          : JPEG
   Dimensions      : 320 x 240 (0.1 MP)
-  Bit Depth       : unknown
+  Bit Depth       : 8 bits/channel
   Alpha Channel   : No
   Colorspace      : RGB
-  Chroma Format   : unknown
+  Chroma Format   : 4:2:0
 
   [ EXIF Metadata ]
     GPS Data       : Absent
