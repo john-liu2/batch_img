@@ -4,7 +4,7 @@ requires = ["hatchling"]
 
 [project]
 name = "batch_img"
-version = "1.4.2"
+version = "1.4.3"
 description = "Batch process (resize, rotate, remove background, remove GPS, add border, set transparency, auto do all) image files (HEIC, JPG, PNG)"
 readme = "README.md"
 authors = [{ name = "John Liu", email = "rim2rim@gmail.com" }]
