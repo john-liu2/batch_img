@@ -169,7 +169,7 @@ make test
 * Run the local built command
 ```
 ✗ batch_img --version
-0.4.0
+1.4.3
 
 
 ✗ batch_img --help
