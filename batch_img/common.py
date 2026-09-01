@@ -354,10 +354,11 @@ class Common:
                 if dt_str:
                     tmp = datetime.strptime(dt_str, TS_FORMAT2).strftime(TS_2_MINUTE)
                     d_info[EXIF]["DateTime"] = tmp
-
+                # Conver ColorSpace to Color Profile
                 val = d_info[EXIF].get("ColorSpace")
                 if val == 1 and d_info["c_profile"] == UNKNOWN:
                     d_info["c_profile"] = "sRGB IEC61966-2.1"
+
             if d_info["c_profile"] == UNKNOWN:
                 d_info["c_profile"] = "sRGB"
         return data, Common.sort_nested_dict(d_info)
