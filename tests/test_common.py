@@ -33,7 +33,7 @@ def os_platform(request):
     return request.param
 
 
-@pytest.fixture(params=[(PKG_NAME, "1.4.3"), ("", "1.4.3")])
+@pytest.fixture(params=[(PKG_NAME, "1.4.4"), ("", "1.4.4")])
 def ver_data(request):
     return request.param
 
@@ -49,7 +49,7 @@ def test_get_version(ver_data):
         (
             "1.9.9",
             PKG_NAME,
-            f"🔔 Update available: 1.4.3  →  1.9.9\nRun '{PKG_NAME} --update'",
+            f"🔔 Update available: 1.4.4  →  1.9.9\nRun '{PKG_NAME} --update'",
         ),
     ]
 )
@@ -67,7 +67,7 @@ def test_check_latest_version(mock_get_latest_pypi, data_check_latest_version):
 
 @pytest.fixture(
     params=[
-        (PKG_NAME, 0, "1.4.2"),
+        (PKG_NAME, 0, "1.4.3"),
         ("bad_bogus", 1, UNKNOWN),
     ]
 )
@@ -513,6 +513,7 @@ def test_sort_nested_dict(data_nested_dict):
         (
             Path(f"{_dir}/data/HEIC/Cartoon.heic"),
             {
+                "c_profile": "LG UltraFine",
                 "file_size": "45 KB (45631 bytes)",
                 "file_ts": "2025-08-16 23:44",
                 "format": "HEIF",
@@ -534,6 +535,7 @@ def test_sort_nested_dict(data_nested_dict):
         (
             Path(f"{_dir}/data/HEIC/Cartoon_180cw.heic"),
             {
+                "c_profile": "LG UltraFine",
                 "file_size": "42 KB (43386 bytes)",
                 "file_ts": "2025-08-17 11:05",
                 "format": "HEIF",
@@ -555,6 +557,7 @@ def test_sort_nested_dict(data_nested_dict):
         (
             Path(f"{_dir}/data/HEIC/IMG_2530.HEIC"),
             {
+                "c_profile": "Display P3",
                 "file_size": "143 KB (146937 bytes)",
                 "file_ts": "2025-08-17 11:05",
                 "format": "HEIF",
@@ -606,6 +609,7 @@ def test_sort_nested_dict(data_nested_dict):
         (
             Path(f"{_dir}/data/HEIC/AC_XE1000_1995.HEIC"),
             {
+                "c_profile": "Display P3",
                 "file_size": "105 KB (107696 bytes)",
                 "file_ts": "2026-08-29 10:27",
                 "format": "HEIF",
@@ -626,6 +630,7 @@ def test_sort_nested_dict(data_nested_dict):
         (
             Path(f"{_dir}/data/HEIC/grayscale.heic"),
             {
+                "c_profile": "sRGB",
                 "file_size": "61 KB (62357 bytes)",
                 "file_ts": "2026-08-29 12:39",
                 "format": "HEIF",
@@ -645,6 +650,7 @@ def test_sort_nested_dict(data_nested_dict):
         (
             Path(f"{_dir}/data/JPG/IMG_4412.jpeg"),
             {
+                "c_profile": "sRGB IEC61966-2.1",
                 "exif": {
                     "ColorSpace": 1,
                     "ComponentsConfiguration": "\x01\x02\x03\x00",

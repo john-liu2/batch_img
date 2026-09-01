@@ -9,12 +9,12 @@ folder / directory. Tested working on **macOS** and **Windows**.
 ### Installation
 
 The `Remove background (make background transparent)` feature depends on `onnxruntime`
-library. It's yet to support `Python 3.14`.
+library. The 1.24.x and later versions support `Python 3.14`.
 
 #### Requirements
 
 ```
-python: >=3.12, <3.14
+python: >=3.12, <3.15
 ```
 
 #### One-time Setup
@@ -66,7 +66,7 @@ uv pip install --upgrade batch_img
 
 ```
 ✗ batch_img --version
-0.4.0
+1.4.3
 
 
 ✗ batch_img auto ~/Documents

@@ -6,7 +6,8 @@
   Dimensions      : 320 x 240 (0.1 MP)
   Bit Depth       : 8 bits/channel
   Alpha Channel   : No
-  Colorspace      : RGB
+  Color Space     : RGB
+  Color Profile   : sRGB IEC61966-2.1
   Chroma Format   : 4:2:0
 
   [ EXIF Metadata ]

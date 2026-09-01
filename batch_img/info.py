@@ -43,7 +43,8 @@ class Info:
                     "dimensions": f"{w} x {h} ({mp} MP)",
                     "bit_depth": bit_depth,
                     "alpha_channel": "Yes" if meta["mode"] in {"RGBA", "LA"} else "No",
-                    "colorspace": meta.get("mode", UNKNOWN),
+                    "c_space": meta.get("mode", UNKNOWN),
+                    "c_profile": meta.get("c_profile", UNKNOWN),
                     "chroma_format": meta["info"].get("chroma", UNKNOWN),
                 },
                 EXIF: meta.get(EXIF, {}),
@@ -190,7 +191,8 @@ class Info:
         Info._out(f"  Dimensions      : {file_info.get('dimensions', UNKNOWN)}", obj)
         Info._out(f"  Bit Depth       : {file_info.get('bit_depth', UNKNOWN)}", obj)
         Info._out(f"  Alpha Channel   : {file_info.get('alpha_channel', UNKNOWN)}", obj)
-        Info._out(f"  Colorspace      : {file_info.get('colorspace', UNKNOWN)}", obj)
+        Info._out(f"  Color Space     : {file_info.get('c_space', UNKNOWN)}", obj)
+        Info._out(f"  Color Profile   : {file_info.get('c_profile', UNKNOWN)}", obj)
         Info._out(f"  Chroma Format   : {file_info.get('chroma_format', UNKNOWN)}", obj)
 
         # Output EXIF metadata
@@ -204,24 +206,14 @@ class Info:
         Info.print_exif(exif, obj)
 
     @staticmethod
-    def print_exif(exif: dict, obj: TextIO | None = None) -> None:
-        """Print EXIF data
+    def out_pairs(exif: dict, label_map: dict, obj: TextIO | None) -> bool:
+        """Output metadata key value pairs
 
         Args:
             exif: exif data in dict
+            label_map: key to output label mapping
             obj: File object to write to. If None, prints to logger.
         """
-        # Map EXIF tags to friendly names
-        label_map = {
-            "Make": "Make",
-            "Model": "Model",
-            "DateTime": "Date/Time",
-            "ISOSpeedRatings": "ISO Speed",
-            "ExposureTime": "Exposure",
-            "FNumber": "Aperture",
-            "FocalLength": "Focal Length",
-            "GPSLatitude": "GPS Data",
-        }
         found_any = False
         for key, label in label_map.items():
             value = exif.get(key, None)
@@ -232,10 +224,7 @@ class Info:
                 found_any = True
             elif key == "ExposureTime" and isinstance(value, float):
                 found_any = True
-                if value < 1:
-                    value = f"1/{int(1 / value)} s"
-                else:
-                    value = f"{value} s"
+                value = f"1/{int(1 / value)} s" if value < 1 else f"{value} s"
             elif key == "FNumber" and isinstance(value, tuple):
                 value = f"f/{value[0] / value[1]:.2f}".rstrip("0").rstrip(".")
                 found_any = True
@@ -254,6 +243,27 @@ class Info:
 
             if value:
                 Info._out(f"    {label:<15}: {value}", obj)
+        return found_any
+
+    @staticmethod
+    def print_exif(exif: dict, obj: TextIO | None) -> None:
+        """Print EXIF data
+
+        Args:
+            exif: exif data in dict
+            obj: File object to write to. If None, prints to logger.
+        """
+        label_map = {
+            "Make": "Make",
+            "Model": "Model",
+            "DateTime": "Date/Time",
+            "ISOSpeedRatings": "ISO Speed",
+            "ExposureTime": "Exposure",
+            "FNumber": "Aperture",
+            "FocalLength": "Focal Length",
+            "GPSLatitude": "GPS Data",
+        }
+        found_any = Info.out_pairs(exif, label_map, obj)
         if not found_any:
             Info._out("    No standard camera tags found in EXIF", obj)
         Info._out("", obj)

@@ -327,6 +327,7 @@ class Common:
                 "file_ts": m_ts,
                 "format": img.format,
                 "mode": raw_meta.get("mode") or img.mode,
+                "c_profile": UNKNOWN,
                 "size": img.size,
                 "info": img.info,
             }
@@ -334,10 +335,13 @@ class Common:
                 d_info["info"]["bit_depth"] = raw_meta["bit_depth"]
             if "chroma" in raw_meta:
                 d_info["info"]["chroma"] = raw_meta["chroma"]
+            # Extract and parse ICC Profile Name
+            raw_icc = img.info.get("icc_profile")
+            if raw_icc:
+                d_info["c_profile"] = Exif.get_icc_profile(raw_icc)
 
-            for key in ("icc_profile", "xmp"):
-                if key in img.info:
-                    img.info.pop(key)
+            for key in ("xmp", "icc_profile"):  # clean up
+                img.info.pop(key, None)  # safely ignor non-exist key
 
             val = img.info.get("chroma", None)
             if val and isinstance(val, int):  # Convert 420 to "4:2:0"
@@ -346,11 +350,17 @@ class Common:
             if exif_data:
                 d_info[EXIF] = Common.decode_exif(exif_data)
                 # Convert "2025:05:29 12:00:48" to "2025-05-29 12:00"
-                if "DateTime" in d_info[EXIF]:
-                    dt_str = d_info[EXIF]["DateTime"]
+                dt_str = d_info[EXIF].get("DateTime")
+                if dt_str:
                     tmp = datetime.strptime(dt_str, TS_FORMAT2).strftime(TS_2_MINUTE)
                     d_info[EXIF]["DateTime"] = tmp
+                # Conver ColorSpace to Color Profile
+                val = d_info[EXIF].get("ColorSpace")
+                if val == 1 and d_info["c_profile"] == UNKNOWN:
+                    d_info["c_profile"] = "sRGB IEC61966-2.1"
 
+            if d_info["c_profile"] == UNKNOWN:
+                d_info["c_profile"] = "sRGB"
         return data, Common.sort_nested_dict(d_info)
 
     @staticmethod
