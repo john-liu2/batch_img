@@ -33,7 +33,7 @@ def os_platform(request):
     return request.param
 
 
-@pytest.fixture(params=[(PKG_NAME, "1.4.3"), ("", "1.4.3")])
+@pytest.fixture(params=[(PKG_NAME, "1.4.4"), ("", "1.4.4")])
 def ver_data(request):
     return request.param
 
@@ -49,7 +49,7 @@ def test_get_version(ver_data):
         (
             "1.9.9",
             PKG_NAME,
-            f"🔔 Update available: 1.4.3  →  1.9.9\nRun '{PKG_NAME} --update'",
+            f"🔔 Update available: 1.4.4  →  1.9.9\nRun '{PKG_NAME} --update'",
         ),
     ]
 )
@@ -67,7 +67,7 @@ def test_check_latest_version(mock_get_latest_pypi, data_check_latest_version):
 
 @pytest.fixture(
     params=[
-        (PKG_NAME, 0, "1.4.2"),
+        (PKG_NAME, 0, "1.4.3"),
         ("bad_bogus", 1, UNKNOWN),
     ]
 )

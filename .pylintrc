@@ -11,5 +11,4 @@ ignore-paths=^(.*/)?tests?(/.*)?$
 disable=missing-function-docstring,
         missing-class-docstring,
         R0801,
-        E1101,
-        too-many-branches
+        E1101

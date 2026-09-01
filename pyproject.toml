@@ -4,7 +4,7 @@ requires = ["hatchling"]
 
 [project]
 name = "batch_img"
-version = "1.4.3"
+version = "1.4.4"
 description = "Batch process (resize, rotate, remove background, remove GPS, add border, set transparency, auto do all) image files (HEIC, JPG, PNG)"
 readme = "README.md"
 authors = [{ name = "John Liu", email = "rim2rim@gmail.com" }]
@@ -81,7 +81,6 @@ lint.ignore = [
     "RET504",
     "PLR2004", # Magic value used in comparison, consider replacing `3` with a constant variable
     "PLW0717", # too-many-statements-in-try-clause
-    "PLR0912", # too-many-branches
 ]
 lint.fixable = ["E", "F", "I", "UP"]
 exclude = [
