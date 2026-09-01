@@ -7,7 +7,6 @@ import struct
 from batch_img.const import UNKNOWN
 
 
-# pylint: disable=too-few-public-methods
 class Exif:
     """Extract metadata directly from raw image header bytes."""
 
@@ -223,3 +222,95 @@ class Exif:
                 return meta
 
         return {}
+
+    # --- Parse color profile ---#
+
+    @staticmethod
+    def _parse_mluc_block(data_block: bytes, mluc_idx: int) -> str | None:
+        """Parse multi-localized unicode (mluc) structures within an ICC block."""
+        count, entry_size = struct.unpack(
+            ">II", data_block[mluc_idx + 8 : mluc_idx + 16]
+        )
+        for i in range(count):
+            rec_off = mluc_idx + 16 + (i * entry_size)
+            if rec_off + 12 > len(data_block):
+                break
+            str_len, str_off = struct.unpack(
+                ">II", data_block[rec_off + 4 : rec_off + 12]
+            )
+            raw_str = data_block[str_off : str_off + str_len]
+            decoded = raw_str.decode("utf-16be", errors="ignore").strip()
+            if decoded:
+                return decoded
+        return None
+
+    @staticmethod
+    def _parse_icc_tag_desc(data: bytes, offset: int) -> str | None:
+        """Parse the 'desc' or 'mluc' tag in an ICC profile block.
+
+        Args:
+            data: Raw image or ICC profile bytes.
+            offset: Byte offset in `data` where the target tag table entry starts.
+
+        Returns:
+            str | None: The decoded ICC profile description name if valid, or None.
+        """
+        # Unpack tag_offset (4 bytes) and tag_size (4 bytes) from the 12-byte tag entry
+        tag_offset = struct.unpack(">I", data[offset + 4 : offset + 8])[0]
+        tag_size = struct.unpack(">I", data[offset + 8 : offset + 12])[0]
+        data_block = data[tag_offset : tag_offset + tag_size]
+
+        # Priority 1: Multi-localized unicode ('mluc') structure
+        mluc_idx = data_block.find(b"mluc")
+        if mluc_idx != -1 and mluc_idx + 16 <= len(data_block):
+            parsed_mluc = Exif._parse_mluc_block(data_block, mluc_idx)
+            if parsed_mluc:
+                return parsed_mluc
+
+        # Priority 2: Standard ASCII 'desc' structure
+        if data_block.startswith(b"desc") and len(data_block) >= 12:
+            str_len = struct.unpack(">I", data_block[8:12])[0]
+            if 12 + str_len - 1 <= len(data_block):
+                profile_name = data_block[12 : 12 + str_len - 1].decode(
+                    "utf-8", errors="ignore"
+                )
+                if profile_name.strip():
+                    return profile_name.strip()
+
+        return None
+
+    @staticmethod
+    def get_icc_profile(data: bytes) -> str:
+        """Extract ICC profile from raw image bytes
+
+        Args:
+            data: Raw image or ICC profile bytes.
+        """
+        if not data or len(data) < 128:
+            return UNKNOWN
+        try:
+            tag_count = struct.unpack(">I", data[128:132])[0]
+            tags = {}
+
+            # Collect tag signatures and their offsets first
+            for i in range(tag_count):
+                offset = 132 + (i * 12)
+                if offset + 4 > len(data):
+                    break
+                tag_sig = data[offset : offset + 4].decode("latin1", errors="ignore")
+                tags[tag_sig] = offset
+
+            # Check order: 'dscm' (description media) before generic 'desc'
+            for tag in ("dscm", "desc"):
+                if tag in tags:
+                    profile = Exif._parse_icc_tag_desc(data, tags[tag])
+                    if profile:
+                        return profile
+
+            for target in [b"sRGB", b"Adobe RGB", b"Display P3", b"ProPhoto"]:
+                if target in data[:1000]:
+                    return target.decode("utf-8").strip()
+
+            return UNKNOWN
+        except (struct.error, UnicodeDecodeError, IndexError, ValueError):
+            return "Error getting ICC profile name"

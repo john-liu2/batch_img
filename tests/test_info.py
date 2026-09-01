@@ -49,7 +49,8 @@ def mock_meta_data():
                     "dimensions": "758 x 758 (0.6 MP)",
                     "bit_depth": "8 bits/channel",
                     "alpha_channel": "No",
-                    "colorspace": "RGB",
+                    "c_profile": "LG UltraFine",
+                    "c_space": "RGB",
                     "chroma_format": "4:2:0",
                 },
                 EXIF: {"ExifTag": 114, "Orientation": 1},
@@ -65,7 +66,8 @@ def mock_meta_data():
                     "dimensions": "1920 x 1440 (2.8 MP)",
                     "bit_depth": "8 bits/channel",
                     "alpha_channel": "No",
-                    "colorspace": "RGB",
+                    "c_profile": "Display P3",
+                    "c_space": "RGB",
                     "chroma_format": "4:2:0",
                 },
                 EXIF: {
@@ -157,7 +159,7 @@ class TestReadOneImageExif:
         assert ok is True
         _, data = result
         assert data["file_info"]["file_size"] == UNKNOWN
-        assert data["file_info"]["colorspace"] == "L"
+        assert data["file_info"]["c_space"] == "L"
         assert data["file_info"]["alpha_channel"] == "No"
 
     @patch("batch_img.info.Common.get_image_data")
@@ -281,7 +283,8 @@ class TestReadExif:
                     "dimensions": "320 x 240 (0.1 MP)",
                     "bit_depth": "8 bits/channel",
                     "alpha_channel": "No",
-                    "colorspace": "RGB",
+                    "c_space": "RGB",
+                    "c_profile": "sRGB IEC61966-2.1",
                     "chroma_format": "4:2:0",
                 },
             },

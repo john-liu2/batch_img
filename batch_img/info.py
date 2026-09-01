@@ -43,7 +43,8 @@ class Info:
                     "dimensions": f"{w} x {h} ({mp} MP)",
                     "bit_depth": bit_depth,
                     "alpha_channel": "Yes" if meta["mode"] in {"RGBA", "LA"} else "No",
-                    "colorspace": meta.get("mode", UNKNOWN),
+                    "c_space": meta.get("mode", UNKNOWN),
+                    "c_profile": meta.get("c_profile", UNKNOWN),
                     "chroma_format": meta["info"].get("chroma", UNKNOWN),
                 },
                 EXIF: meta.get(EXIF, {}),
@@ -190,7 +191,8 @@ class Info:
         Info._out(f"  Dimensions      : {file_info.get('dimensions', UNKNOWN)}", obj)
         Info._out(f"  Bit Depth       : {file_info.get('bit_depth', UNKNOWN)}", obj)
         Info._out(f"  Alpha Channel   : {file_info.get('alpha_channel', UNKNOWN)}", obj)
-        Info._out(f"  Colorspace      : {file_info.get('colorspace', UNKNOWN)}", obj)
+        Info._out(f"  Color Space     : {file_info.get('c_space', UNKNOWN)}", obj)
+        Info._out(f"  Color Profile   : {file_info.get('c_profile', UNKNOWN)}", obj)
         Info._out(f"  Chroma Format   : {file_info.get('chroma_format', UNKNOWN)}", obj)
 
         # Output EXIF metadata
