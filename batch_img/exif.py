@@ -280,6 +280,13 @@ class Exif:
         return None
 
     @staticmethod
+    def clean_name(s: str | bytes) -> str | None:
+        """Remove the padding null byte '\x00' in a string or bytes"""
+        if isinstance(s, bytes):
+            s = s.decode("utf-8", errors="ignore")
+        return s.split("\x00")[0]
+
+    @staticmethod
     def get_icc_profile(data: bytes) -> str:
         """Extract ICC profile from raw image bytes
 
@@ -305,7 +312,7 @@ class Exif:
                 if tag in tags:
                     profile = Exif._parse_icc_tag_desc(data, tags[tag])
                     if profile:
-                        return profile
+                        return Exif.clean_name(profile)
 
             for target in [b"sRGB", b"Adobe RGB", b"Display P3", b"ProPhoto"]:
                 if target in data[:1000]:

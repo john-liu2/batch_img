@@ -1,5 +1,6 @@
 """Test common.py
 pytest -sv tests/test_common.py
+pytest -sv tests/test_common.py -k test_get_image_data -vv
 Copyright © 2025 - Present John Liu
 """
 
@@ -33,7 +34,7 @@ def os_platform(request):
     return request.param
 
 
-@pytest.fixture(params=[(PKG_NAME, "1.4.4"), ("", "1.4.4")])
+@pytest.fixture(params=[(PKG_NAME, "1.4.5"), ("", "1.4.5")])
 def ver_data(request):
     return request.param
 
@@ -49,7 +50,7 @@ def test_get_version(ver_data):
         (
             "1.9.9",
             PKG_NAME,
-            f"🔔 Update available: 1.4.4  →  1.9.9\nRun '{PKG_NAME} --update'",
+            f"🔔 Update available: 1.4.5  →  1.9.9\nRun '{PKG_NAME} --update'",
         ),
     ]
 )
@@ -67,7 +68,7 @@ def test_check_latest_version(mock_get_latest_pypi, data_check_latest_version):
 
 @pytest.fixture(
     params=[
-        (PKG_NAME, 0, "1.4.3"),
+        (PKG_NAME, 0, "1.4.4"),
         ("bad_bogus", 1, UNKNOWN),
     ]
 )
@@ -511,6 +512,32 @@ def test_sort_nested_dict(data_nested_dict):
 @pytest.fixture(
     params=[
         (
+            Path(f"{_dir}/data/JPG/AC_SideYard.jpg"),
+            {
+                "c_profile": "sRGB",
+                "exif": {
+                    "ColorSpace": 1,
+                    "ComponentsConfiguration": "\x01\x02\x03\x00",
+                    "ExifTag": 102,
+                    "ExifVersion": "0221",
+                    "FlashpixVersion": "0100",
+                    "Orientation": 1,
+                    "SceneCaptureType": 0,
+                    "YCbCrPositioning": 1,
+                },
+                "file_size": "37 KB (37765 bytes)",
+                "file_ts": "2026-08-29 12:39",
+                "format": "JPEG",
+                "mode": "RGB",
+                "size": (240, 320),
+                "info": {
+                    "bit_depth": 8,
+                    "chroma": "4:2:0",
+                    "dpi": (72.0, 72.0),
+                },
+            },
+        ),
+        (
             Path(f"{_dir}/data/HEIC/Cartoon.heic"),
             {
                 "c_profile": "LG UltraFine",
@@ -762,7 +789,7 @@ def test_calculate_new_size(data_calculate_new_size):
 
 @pytest.fixture(
     params=[
-        (Path(f"{_dir}/data/JPG"), REPLACE, 7),
+        (Path(f"{_dir}/data/JPG"), REPLACE, 8),
         (Path(f"{_dir}/data/PNG"), Path(f"{_dir}/.out/"), 2),
     ]
 )
