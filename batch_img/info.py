@@ -218,7 +218,7 @@ class Info:
         for key, label in label_map.items():
             value = exif.get(key, None)
             if key == "GPSLatitude":
-                value = "Present" if value else "Absent"
+                value = "Yes" if value else "No"
             elif key == "ExposureTime" and isinstance(value, tuple):
                 value = f"{value[0]}/{value[1]} s"
                 found_any = True
