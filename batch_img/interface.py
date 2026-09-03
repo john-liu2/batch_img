@@ -68,13 +68,11 @@ def get_input_path(
 @click.option(
     "--quiet",
     is_flag=True,
-    help="Process image files with minimum stdout in quiet mode.",
+    help="Process image(s) with minimum stdout in quiet mode.",
 )
 @click.option("--update", is_flag=True, help="Update the tool to the latest version.")
 @click.option("--version", is_flag=True, help="Show the tool's version.")
-def cli(  # noqa: PLR0913, PLR0917
-    ctx, input_path, quiet, update, version
-):
+def cli(ctx, input_path, quiet, update, version):  # noqa: PLR0913, PLR0917
     """Batch image processing tool."""
     ctx.ensure_object(dict)
     ctx.obj["input_path"] = input_path
@@ -99,9 +97,7 @@ def info(ctx, input_path):
     Main.info({"src_path": source, "quiet": quiet})
 
 
-@cli.command(
-    help="Auto process (resize to 1920-px, remove GPS, add border) image file(s)."
-)
+@cli.command(help="Auto process (resize to 1920-px, remove GPS, add border) image(s).")
 @common_cli_options
 @click.pass_context
 @click.option(
@@ -112,9 +108,7 @@ def info(ctx, input_path):
     show_default=True,
     help="Auto-rotate image (experimental)",
 )
-def auto(  # noqa: PLR0913, PLR0917
-    ctx, input_path, output, auto_rotate
-):
+def auto(ctx, input_path, output, auto_rotate):  # noqa: PLR0913, PLR0917
     source = get_input_path(ctx, input_path, None)
     options = {"src_path": source, "output": output, "auto_rotate": auto_rotate}
     if (ctx.obj or {}).get("quiet"):
@@ -122,7 +116,7 @@ def auto(  # noqa: PLR0913, PLR0917
     process_result(Main.auto(options))
 
 
-@cli.command(help="Add internal border to image file(s), not expand the size.")
+@cli.command(help="Add internal border to image(s), not expand the size.")
 @common_cli_options
 @click.pass_context
 @click.option(
@@ -131,14 +125,14 @@ def auto(  # noqa: PLR0913, PLR0917
     default=5,
     show_default=True,
     type=click.IntRange(min=0, max=30),
-    help="Add border to image file(s) with the border_width. 0 - no border.",
+    help="Add border to image(s) with the border_width. 0 - no border.",
 )
 @click.option(
     "-bc",
     "--border_color",
     default="gray",
     show_default=True,
-    help="Add border to image file(s) with the border_color string.",
+    help="Add border to image(s) with the border_color string.",
 )
 def border(  # noqa: PLR0913, PLR0917
     ctx, input_path, output, border_width, border_color
@@ -155,7 +149,7 @@ def border(  # noqa: PLR0913, PLR0917
     process_result(Main.border(options))
 
 
-@cli.command(help="Do special effect to image file(s).")
+@cli.command(help="Do special effect to image(s).")
 @common_cli_options
 @click.pass_context
 @click.option(
@@ -167,9 +161,7 @@ def border(  # noqa: PLR0913, PLR0917
     type=click.Choice(["blur", "hdr", "neon"]),
     help="Do special effect to image file(s): blur, hdr, neon.",
 )
-def do_effect(  # noqa: PLR0913, PLR0917
-    ctx, input_path, output, effect
-):
+def do_effect(ctx, input_path, output, effect):  # noqa: PLR0913, PLR0917
     source = get_input_path(ctx, input_path, None)
     options = {"src_path": source, "output": output, "effect": effect}
     if (ctx.obj or {}).get("quiet"):
@@ -177,12 +169,21 @@ def do_effect(  # noqa: PLR0913, PLR0917
     process_result(Main.do_effect(options))
 
 
-@cli.command(help="Remove background (make background transparent) in image file(s).")
+@cli.command(help="Convert to grayscale image(s).")
 @common_cli_options
 @click.pass_context
-def remove_bg(  # noqa: PLR0913, PLR0917
-    ctx, input_path, output
-):
+def grayscale(ctx, input_path, output):  # noqa: PLR0913, PLR0917
+    source = get_input_path(ctx, input_path, None)
+    options = {"src_path": source, "output": output}
+    if (ctx.obj or {}).get("quiet"):
+        options["quiet"] = True
+    process_result(Main.grayscale(options))
+
+
+@cli.command(help="Remove background (make background transparent) in image(s).")
+@common_cli_options
+@click.pass_context
+def remove_bg(ctx, input_path, output):  # noqa: PLR0913, PLR0917
     log.info("Loading u2net.onnx to identify the background... Please be patient.")
     source = get_input_path(ctx, input_path, None)
     options = {"src_path": source, "output": output}
@@ -191,12 +192,10 @@ def remove_bg(  # noqa: PLR0913, PLR0917
     process_result(Main.remove_bg(options))
 
 
-@cli.command(help="Remove GPS location info in image file(s).")
+@cli.command(help="Remove GPS location info in image(s).")
 @common_cli_options
 @click.pass_context
-def remove_gps(  # noqa: PLR0913, PLR0917
-    ctx, input_path, output
-):
+def remove_gps(ctx, input_path, output):  # noqa: PLR0913, PLR0917
     source = get_input_path(ctx, input_path, None)
     options = {"src_path": source, "output": output}
     if (ctx.obj or {}).get("quiet"):
@@ -204,7 +203,7 @@ def remove_gps(  # noqa: PLR0913, PLR0917
     process_result(Main.remove_gps(options))
 
 
-@cli.command(help="Resize image file(s).")
+@cli.command(help="Resize image(s).")
 @common_cli_options
 @click.pass_context
 @click.option(
@@ -217,9 +216,7 @@ def remove_gps(  # noqa: PLR0913, PLR0917
     help="Resize image file(s) on original aspect ratio to"
     " the max side length. 0 - no resize.",
 )
-def resize(  # noqa: PLR0913, PLR0917
-    ctx, input_path, output, length
-):
+def resize(ctx, input_path, output, length):  # noqa: PLR0913, PLR0917
     source = get_input_path(ctx, input_path, None)
     options = {"src_path": source, "output": output, "length": length}
     if (ctx.obj or {}).get("quiet"):
@@ -227,7 +224,7 @@ def resize(  # noqa: PLR0913, PLR0917
     process_result(Main.resize(options))
 
 
-@cli.command(help="Rotate image file(s).")
+@cli.command(help="Rotate image(s).")
 @common_cli_options
 @click.pass_context
 @click.option(
@@ -239,9 +236,7 @@ def resize(  # noqa: PLR0913, PLR0917
     type=click.Choice([0, 90, 180, 270]),
     help="Rotate image file(s) to the clockwise angle. 0 - no rotate.",
 )
-def rotate(  # noqa: PLR0913, PLR0917
-    ctx, input_path, output, angle
-):
+def rotate(ctx, input_path, output, angle):  # noqa: PLR0913, PLR0917
     source = get_input_path(ctx, input_path, None)
     options = {
         "src_path": source,
@@ -253,7 +248,7 @@ def rotate(  # noqa: PLR0913, PLR0917
     process_result(Main.rotate(options))
 
 
-@cli.command(help="Set transparency on image file(s).")
+@cli.command(help="Set transparency on image(s).")
 @common_cli_options
 @click.pass_context
 @click.option(
@@ -272,9 +267,7 @@ def rotate(  # noqa: PLR0913, PLR0917
     is_flag=True,
     help="Make white pixels fully transparent.",
 )
-def transparent(  # noqa: PLR0913, PLR0917
-    ctx, input_path, output, transparency, white
-):
+def transparent(ctx, input_path, output, transparency, white):  # noqa: PLR0913, PLR0917
     source = get_input_path(ctx, input_path, None)
     options = {
         "src_path": source,

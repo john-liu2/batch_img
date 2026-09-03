@@ -340,7 +340,7 @@ class Common:
             if raw_icc:
                 d_info["c_profile"] = Exif.get_icc_profile(raw_icc)
 
-            for key in ("xmp", "icc_profile"):  # clean up
+            for key in ("xmp", "XML:com.adobe.xmp", "icc_profile"):  # clean up
                 img.info.pop(key, None)  # safely ignor non-exist key
 
             val = img.info.get("chroma", None)

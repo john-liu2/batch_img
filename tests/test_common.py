@@ -34,7 +34,7 @@ def os_platform(request):
     return request.param
 
 
-@pytest.fixture(params=[(PKG_NAME, "1.4.5"), ("", "1.4.5")])
+@pytest.fixture(params=[(PKG_NAME, "1.4.6"), ("", "1.4.6")])
 def ver_data(request):
     return request.param
 
@@ -50,7 +50,7 @@ def test_get_version(ver_data):
         (
             "1.9.9",
             PKG_NAME,
-            f"🔔 Update available: 1.4.5  →  1.9.9\nRun '{PKG_NAME} --update'",
+            f"🔔 Update available: 1.4.6  →  1.9.9\nRun '{PKG_NAME} --update'",
         ),
     ]
 )
@@ -68,7 +68,7 @@ def test_check_latest_version(mock_get_latest_pypi, data_check_latest_version):
 
 @pytest.fixture(
     params=[
-        (PKG_NAME, 0, "1.4.4"),
+        (PKG_NAME, 0, "1.4.5"),
         ("bad_bogus", 1, UNKNOWN),
     ]
 )
@@ -706,6 +706,25 @@ def test_sort_nested_dict(data_nested_dict):
                 ),
             },
         ),
+        (
+            Path(f"{_dir}/data/PNG/Cute.png"),
+            {
+                "c_profile": "LG UltraFine",
+                "exif": {
+                    "ExifTag": 78,
+                },
+                "file_size": "17 KB (17797 bytes)",
+                "file_ts": "2026-09-02 12:05",
+                "format": "PNG",
+                "mode": "RGBA",
+                "size": (264, 136),
+                "info": {
+                    "bit_depth": 8,
+                    "chroma": "4:4:4:4",
+                    "dpi": (143.99259999999998, 143.99259999999998),
+                },
+            },
+        ),
     ]
 )
 def data_get_image(request):
@@ -790,7 +809,7 @@ def test_calculate_new_size(data_calculate_new_size):
 @pytest.fixture(
     params=[
         (Path(f"{_dir}/data/JPG"), REPLACE, 8),
-        (Path(f"{_dir}/data/PNG"), Path(f"{_dir}/.out/"), 2),
+        (Path(f"{_dir}/data/PNG"), Path(f"{_dir}/.out/"), 3),
     ]
 )
 def data_prepare_all_files(request):

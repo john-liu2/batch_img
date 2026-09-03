@@ -16,11 +16,15 @@ class Exif:
             return {}
         w, h, bit_depth, color_type = struct.unpack(">IIBB", data[16:26])
         color_modes = {0: "L", 2: "RGB", 3: "P", 4: "LA", 6: "RGBA"}
+        # PNG files do not use chroma subsampling (like 4:2:2 or 4:2:0)
+        # PNG store full-color on each pixel, equal to 4:4:4 (RGB) or 4:4:4:4 (RGBA)
+        mode = color_modes.get(color_type, UNKNOWN)
         return {
-            "format": "PNG",
-            "size": (w, h),
             "bit_depth": bit_depth,
-            "mode": color_modes.get(color_type, UNKNOWN),
+            "chroma": "4:4:4:4" if mode == "RGBA" else "4:4:4",
+            "format": "PNG",
+            "mode": mode,
+            "size": (w, h),
         }
 
     @staticmethod
@@ -227,7 +231,7 @@ class Exif:
 
     @staticmethod
     def _parse_mluc_block(data_block: bytes, mluc_idx: int) -> str | None:
-        """Parse multi-localized unicode (mluc) structures within an ICC block."""
+        """Parse multi-localized Unicode (mluc) structures within an ICC block."""
         count, entry_size = struct.unpack(
             ">II", data_block[mluc_idx + 8 : mluc_idx + 16]
         )
