@@ -6,13 +6,14 @@ import hashlib
 import importlib.metadata
 import itertools
 import json
+import os
 import subprocess
 import sys
 import tomllib
 from base64 import b64encode
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timedelta
-from multiprocessing import cpu_count, current_process
+from multiprocessing import current_process
 from os.path import getmtime, getsize
 from pathlib import Path
 from time import time
@@ -524,8 +525,8 @@ class Common:
         """
         success_cnt = 0
         all_cnt = len(tasks)
-        workers = min(max(cpu_count(), 4), all_cnt)
-
+        workers = min((os.process_cpu_count() or 1) + 4, all_cnt)
+        log.info(f"workers: {workers}")
         with ThreadPoolExecutor(max_workers=workers) as executor:
             futures = [executor.submit(func, task) for task in tasks]
             with tqdm(total=len(futures), desc=desc, disable=quiet) as pbar:

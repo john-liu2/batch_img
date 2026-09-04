@@ -29,6 +29,7 @@ PATTERNS = (
 )
 REPLACE = "replace"
 EXIF = "exif"
+SOFTWARE = "batch_img CLI tool"
 
 
 # Resize to 1920-pixel max length
