@@ -45,7 +45,7 @@ def test_do_one_image(tmp_path, filename, img_format, overwrite):
     img.save(in_path, format=img_format, exif=exif)
 
     # Call the method
-    args = (Path(in_path), Path(out_path))
+    args = (Path(in_path), out_path)
     ok, out_file = Grayscale.do_one_image(args)
 
     assert out_file.exists(), f"Output file for {img_format} was not created."
