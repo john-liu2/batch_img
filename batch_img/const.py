@@ -24,6 +24,8 @@ PATTERNS = (
     "*.jpeg",
     "*.PNG",
     "*.png",
+    "*.TIFF",
+    "*.tiff",
 )
 REPLACE = "replace"
 EXIF = "exif"
