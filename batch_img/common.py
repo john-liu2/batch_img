@@ -364,7 +364,10 @@ class Common:
 
         val = d_info[EXIF].get("ColorSpace")
         if val == 1 and d_info["c_profile"] == UNKNOWN:
-            d_info["c_profile"] = "sRGB IEC61966-2.1"
+            if d_info.get("mode") == "L":
+                d_info["c_profile"] = "Generic Gray Gamma 2.2 Profile"
+            else:
+                d_info["c_profile"] = "sRGB IEC61966-2.1"
 
     @staticmethod
     def get_image_data(file: Path) -> tuple:
@@ -413,8 +416,10 @@ class Common:
 
             Common._process_exif_data(img, d_info)
 
-            if d_info["c_profile"] == UNKNOWN:
-                d_info["c_profile"] = "sRGB"
+        if d_info["c_profile"] == UNKNOWN:
+            d_info["c_profile"] = (
+                "Generic Gray Gamma 2.2 Profile" if d_info["mode"] == "L" else "sRGB"
+            )
         return data, Common.sort_nested_dict(d_info)
 
     @staticmethod

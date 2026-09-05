@@ -13,7 +13,7 @@ from unittest.mock import MagicMock, patch
 import piexif
 import httpx
 import pytest
-
+from PIL import Image
 from batch_img.common import Common
 from batch_img.const import EXIF, PKG_NAME, REPLACE, UNKNOWN
 
@@ -103,6 +103,149 @@ def test_get_image_data_real_tiff():
     }
     actual[1]["info"].pop("tiling", None)  # safely ignor non-exist key
     assert actual[1] == Common.sort_nested_dict(expected)
+
+
+@pytest.fixture(
+    params=[
+        (
+            Path(f"{_dir}/data/grayscale/g_AC_SideYard.jpg"),
+            {
+                "c_profile": "Generic Gray Gamma 2.2 Profile",
+                EXIF: {
+                    "ColorSpace": 1,
+                    "ComponentsConfiguration": (
+                        1,
+                        2,
+                        3,
+                        0,
+                    ),
+                    "ExifTag": 146,
+                    "ExifVersion": "0221",
+                    "FlashpixVersion": "0100",
+                    "Orientation": 1,
+                    "SceneCaptureType": 0,
+                    "YCbCrPositioning": 1,
+                },
+                "file_size": "14 KB (14354 bytes)",
+                "format": "JPEG",
+                "info": {
+                    "bit_depth": 8,
+                    "dpi": (
+                        72.0,
+                        72.0,
+                    ),
+                    "jfif": 257,
+                    "jfif_density": (
+                        1,
+                        1,
+                    ),
+                    "jfif_unit": 0,
+                    "jfif_version": (
+                        1,
+                        1,
+                    ),
+                },
+                "mode": "L",
+                "size": (
+                    240,
+                    320,
+                ),
+            },
+        ),
+        (
+            Path(f"{_dir}/data/grayscale/g_AC_XE1000_1995.heic"),
+            {
+                "c_profile": "Display P3",
+                EXIF: {
+                    "ColorSpace": 65535,
+                    "DateTime": "2024-05-26 13:18",
+                    "DateTimeDigitized": "2024:05:26 13:18:27",
+                    "DateTimeOriginal": "2024:05:26 13:18:27",
+                    "DigitalZoomRatio": (
+                        42983,
+                        24207,
+                    ),
+                    "ExifTag": 268,
+                    "ExifVersion": "0232",
+                    "ExposureMode": 0,
+                    "ExposureProgram": 2,
+                    "ExposureTime": (
+                        1,
+                        135,
+                    ),
+                    "FNumber": (
+                        11,
+                        5,
+                    ),
+                    "Flash": 16,
+                    "FocalLength": (
+                        111,
+                        50,
+                    ),
+                    "FocalLengthIn35mmFilm": 24,
+                    "ISOSpeedRatings": 32,
+                    "Make": "Apple",
+                    "MeteringMode": 5,
+                    "Model": "iPhone 14 Pro Max",
+                    "Orientation": 1,
+                    "SensingMethod": 2,
+                    "WhiteBalance": 0,
+                },
+                "file_size": "15 KB (15666 bytes)",
+                "format": "HEIF",
+                "info": {
+                    "aux": {},
+                    "bit_depth": 8,
+                    "chroma": "4:0:0",
+                    "content_light_level": {
+                        "max_content_light_level": 203,
+                        "max_pic_average_light_level": 64,
+                    },
+                    "depth_images": [],
+                    "icc_profile_type": "prof",
+                    "original_orientation": None,
+                    "primary": True,
+                    "thumbnails": [],
+                },
+                "mode": "L",
+                "size": (
+                    320,
+                    263,
+                ),
+            },
+        ),
+    ]
+)
+def data_get_image_grayscale(request):
+    return request.param
+
+
+def test_get_image_data_grayscale(data_get_image_grayscale):
+    file, expected = data_get_image_grayscale
+    actual = Common.get_image_data(file)
+    # Cloud CI runs get different ts
+    expected.pop("file_ts", None)  # safely ignor non-exist key
+    actual[1].pop("file_ts", None)
+    actual[1]["info"].pop("metadata", None)
+    actual[1]["info"].pop("tiling", None)  # safely ignor non-exist key
+    assert actual[1] == Common.sort_nested_dict(expected)
+
+
+@pytest.fixture
+def grayscale_jpg(tmp_path):
+    img_path = tmp_path / "g_AC_SideYard.jpg"
+    # Create a pure grayscale image (Luminance) with no embedded ICC
+    img = Image.new("L", (100, 100), color=128)
+    img.save(img_path, format="JPEG")
+    return img_path
+
+
+def test_grayscale_gets_correct_profile_and_no_chroma(grayscale_jpg):
+    data, info = Common.get_image_data(grayscale_jpg)
+
+    assert info["mode"] == "L"
+    assert info["c_profile"] == "Generic Gray Gamma 2.2 Profile"
+    assert "chroma" not in info["info"]
 
 
 def test_get_image_data_tiff():

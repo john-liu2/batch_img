@@ -2,6 +2,7 @@
 Copyright © 2026 - Present, John Liu
 """
 
+import os
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from typing import TextIO
@@ -35,7 +36,7 @@ class Info:
             bit_depth = meta["info"].get("bit_depth", UNKNOWN)
             if bit_depth != UNKNOWN:
                 bit_depth = f"{bit_depth} bits/channel"
-            result = {
+            res = {
                 "file_info": {
                     "file_size": meta.get("file_size", UNKNOWN),
                     "last_modified": meta.get("file_ts", UNKNOWN),
@@ -45,11 +46,19 @@ class Info:
                     "alpha_channel": "Yes" if meta["mode"] in {"RGBA", "LA"} else "No",
                     "c_space": meta.get("mode", UNKNOWN),
                     "c_profile": meta.get("c_profile", UNKNOWN),
-                    "chroma_format": meta["info"].get("chroma", UNKNOWN),
+                    "chroma": meta["info"].get("chroma", UNKNOWN),
                 },
                 EXIF: meta.get(EXIF, {}),
             }
-            return True, (file, result)
+            if res["file_info"]["c_space"] == "L":  # grayscale image
+                res["file_info"]["c_space"] = "Gray"
+            # Grayscale JPG has luminance (Y channel) only. no chroma subsampling
+            if (
+                res["file_info"]["format"] == "JPEG"
+                and res["file_info"]["c_space"] == "Gray"
+            ):
+                res["file_info"]["chroma"] = "No"
+            return True, (file, res)
         except (OSError, ValueError, TypeError, KeyError) as exc:
             return False, f"{file}: {exc}"
 
@@ -112,9 +121,10 @@ class Info:
             log.error(f"No image files at {in_path}")
             return False
 
-        # Use threading to read EXIF from multiple files
+        workers = min((os.process_cpu_count() or 1) + 4, len(files))
+        log.info(f"workers: {workers}")
         results = {}
-        with ThreadPoolExecutor(max_workers=min(10, len(files))) as executor:
+        with ThreadPoolExecutor(max_workers=workers) as executor:
             future_to_file = {
                 executor.submit(Info.read_1_image_exif, file): file for file in files
             }
@@ -193,7 +203,7 @@ class Info:
         Info._out(f"  Alpha Channel   : {file_info.get('alpha_channel', UNKNOWN)}", obj)
         Info._out(f"  Color Space     : {file_info.get('c_space', UNKNOWN)}", obj)
         Info._out(f"  Color Profile   : {file_info.get('c_profile', UNKNOWN)}", obj)
-        Info._out(f"  Chroma Format   : {file_info.get('chroma_format', UNKNOWN)}", obj)
+        Info._out(f"  Chroma          : {file_info.get('chroma', UNKNOWN)}", obj)
 
         # Output EXIF metadata
         Info._out("", obj)

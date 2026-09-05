@@ -193,10 +193,27 @@ class Exif:
             return {}
 
         meta = {"format": "HEIC", "bit_depth": 8, "mode": "RGB"}
+        # Image Spatial Extents (ispe) for dimensions
         ispe_idx = data.find(b"ispe")
         if ispe_idx != -1 and ispe_idx + 16 <= len(data):
             w, h = struct.unpack(">II", data[ispe_idx + 8 : ispe_idx + 16])
             meta["size"] = (w, h)
+
+        # HEVC Decoder Configuration Record (hvcC) for chroma and BitDepth
+        hvc_idx = data.find(b"hvcC")
+        if hvc_idx != -1 and hvc_idx + 22 <= len(data):
+            # chromaFormat is stored in the lower 2 bits at offset 20
+            chroma_idc = data[hvc_idx + 20] & 0x03
+            chroma_map = {0: "4:0:0", 1: "4:2:0", 2: "4:2:2", 3: "4:4:4"}
+
+            if chroma_idc in chroma_map:
+                meta["chroma"] = chroma_map[chroma_idc]
+                if chroma_idc == 0:
+                    meta["mode"] = "L"
+
+            # bitDepthLumaMinus8 is stored in the lower 3 bits at offset 21
+            bit_depth_luma_minus8 = data[hvc_idx + 21] & 0x07
+            meta["bit_depth"] = bit_depth_luma_minus8 + 8
         return meta
 
     @staticmethod
@@ -318,7 +335,13 @@ class Exif:
                     if profile:
                         return Exif.clean_name(profile)
 
-            for target in [b"sRGB", b"Adobe RGB", b"Display P3", b"ProPhoto"]:
+            for target in [
+                b"sRGB",
+                b"Adobe RGB",
+                b"Display P3",
+                b"ProPhoto",
+                b"Generic Gray Gamma 2.2 Profile",
+            ]:
                 if target in data[:1000]:
                     return target.decode("utf-8").strip()
 
