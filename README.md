@@ -1,8 +1,8 @@
 ## batch_img
 
 Batch process (**resize, rotate, remove background, remove GPS, add border,
-set transparency, auto do all, get meta info**) image files (**HEIC, JPG, PNG**) by
-utilizing **[Pillow / PIL](https://github.com/python-pillow/Pillow)** library.
+set transparency, auto do all, get meta info**) image files (**HEIC, JPG, PNG, TIFF**)
+by utilizing **[Pillow / PIL](https://github.com/python-pillow/Pillow)** library.
 It can apply the action(s) on a single image file or all image files in the input
 folder / directory. Tested working on **macOS** and **Windows**.
 
@@ -66,7 +66,7 @@ uv pip install --upgrade batch_img
 
 ```
 ✗ batch_img --version
-1.4.3
+1.4.5
 
 
 ✗ batch_img auto ~/Documents
@@ -107,21 +107,22 @@ Usage: batch_img [OPTIONS] COMMAND [ARGS]...
 
 Options:
   -i, --input PATH  Input an image file or a directory.
-  --quiet           Process image files with minimum stdout in quiet mode.
+  --quiet           Process image(s) with minimum stdout in quiet mode.
   --update          Update the tool to the latest version.
   --version         Show the tool's version.
   --help            Show this message and exit.
 
 Commands:
   auto         Auto process (resize to 1920-px, remove GPS, add border)...
-  border       Add internal border to image file(s), not expand the size.
-  do-effect    Do special effect to image file(s).
+  border       Add internal border to image(s), not expand the size.
+  do-effect    Do special effect to image(s).
+  grayscale    Convert to grayscale image(s).
   info         Print EXIF information for the input image file(s).
-  remove-bg    Remove background (make background transparent) in image...
-  remove-gps   Remove GPS location info in image file(s).
-  resize       Resize image file(s).
-  rotate       Rotate image file(s).
-  transparent  Set transparency on image file(s).
+  remove-bg    Remove background (make background transparent) in image(s).
+  remove-gps   Remove GPS location info in image(s).
+  resize       Resize image(s).
+  rotate       Rotate image(s).
+  transparent  Set transparency on image(s).
 ```
 
 #### The `auto` sub-command CLI options:

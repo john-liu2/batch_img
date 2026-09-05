@@ -51,7 +51,7 @@ def mock_meta_data():
                     "alpha_channel": "No",
                     "c_profile": "LG UltraFine",
                     "c_space": "RGB",
-                    "chroma_format": "4:2:0",
+                    "chroma": "4:2:0",
                 },
                 EXIF: {"ExifTag": 114, "Orientation": 1},
             },
@@ -68,7 +68,7 @@ def mock_meta_data():
                     "alpha_channel": "No",
                     "c_profile": "Display P3",
                     "c_space": "RGB",
-                    "chroma_format": "4:2:0",
+                    "chroma": "4:2:0",
                 },
                 EXIF: {
                     "ColorSpace": 65535,
@@ -100,6 +100,88 @@ def mock_meta_data():
                     "Orientation": 1,
                     "SensingMethod": 2,
                     "WhiteBalance": 0,
+                },
+            },
+        ),
+        (
+            Path(f"{_dir}/data/grayscale/g_AC_SideYard.jpg"),
+            {
+                EXIF: {
+                    "ColorSpace": 1,
+                    "ComponentsConfiguration": (
+                        1,
+                        2,
+                        3,
+                        0,
+                    ),
+                    "ExifTag": 146,
+                    "ExifVersion": "0221",
+                    "FlashpixVersion": "0100",
+                    "Orientation": 1,
+                    "SceneCaptureType": 0,
+                    "YCbCrPositioning": 1,
+                },
+                "file_info": {
+                    "file_size": "14 KB (14354 bytes)",
+                    "last_modified": "2026-09-04 19:34",
+                    "format": "JPEG",
+                    "dimensions": "240 x 320 (0.1 MP)",
+                    "bit_depth": "8 bits/channel",
+                    "alpha_channel": "No",
+                    "c_profile": "Generic Gray Gamma 2.2 Profile",
+                    "c_space": "Gray",
+                    "chroma": "No",
+                },
+            },
+        ),
+        (
+            Path(f"{_dir}/data/grayscale/g_AC_XE1000_1995.heic"),
+            {
+                EXIF: {
+                    "ColorSpace": 65535,
+                    "DateTime": "2024-05-26 13:18",
+                    "DateTimeDigitized": "2024:05:26 13:18:27",
+                    "DateTimeOriginal": "2024:05:26 13:18:27",
+                    "DigitalZoomRatio": (
+                        42983,
+                        24207,
+                    ),
+                    "ExifTag": 268,
+                    "ExifVersion": "0232",
+                    "ExposureMode": 0,
+                    "ExposureProgram": 2,
+                    "ExposureTime": (
+                        1,
+                        135,
+                    ),
+                    "FNumber": (
+                        11,
+                        5,
+                    ),
+                    "Flash": 16,
+                    "FocalLength": (
+                        111,
+                        50,
+                    ),
+                    "FocalLengthIn35mmFilm": 24,
+                    "ISOSpeedRatings": 32,
+                    "Make": "Apple",
+                    "MeteringMode": 5,
+                    "Model": "iPhone 14 Pro Max",
+                    "Orientation": 1,
+                    "SensingMethod": 2,
+                    "WhiteBalance": 0,
+                },
+                "file_info": {
+                    "file_size": "15 KB (15666 bytes)",
+                    "last_modified": "2026-09-04 19:34",
+                    "format": "HEIF",
+                    "dimensions": "320 x 263 (0.1 MP)",
+                    "bit_depth": "8 bits/channel",
+                    "alpha_channel": "No",
+                    "c_profile": "Display P3",
+                    "c_space": "Gray",
+                    "chroma": "4:0:0",
                 },
             },
         ),
@@ -159,7 +241,7 @@ class TestReadOneImageExif:
         assert ok is True
         _, data = result
         assert data["file_info"]["file_size"] == UNKNOWN
-        assert data["file_info"]["c_space"] == "L"
+        assert data["file_info"]["c_space"] == "Gray"
         assert data["file_info"]["alpha_channel"] == "No"
 
     @patch("batch_img.info.Common.get_image_data")
@@ -285,7 +367,7 @@ class TestReadExif:
                     "alpha_channel": "No",
                     "c_space": "RGB",
                     "c_profile": "sRGB IEC61966-2.1",
-                    "chroma_format": "4:2:0",
+                    "chroma": "4:2:0",
                 },
             },
             Path(f"{_dir}/data/JPG/meta_no_gps.txt"),

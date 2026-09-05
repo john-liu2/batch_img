@@ -10,16 +10,279 @@ from datetime import datetime
 from os.path import dirname
 from pathlib import Path
 from unittest.mock import MagicMock, patch
-
+import piexif
 import httpx
 import pytest
-
+from PIL import Image
 from batch_img.common import Common
-from batch_img.const import PKG_NAME, REPLACE, UNKNOWN
+from batch_img.const import EXIF, PKG_NAME, REPLACE, UNKNOWN
 
 from .helper import DotDict
 
 _dir = dirname(__file__)
+
+
+@pytest.mark.slow(reason="This test is not ready.")
+def test_get_image_data_real_tiff():
+    file = Path(f"~/Downloads/IMG_0962.tiff").expanduser()
+    actual = Common.get_image_data(file)
+    expected = {
+        "c_profile": "Display P3",
+        "exif": {
+            "BitsPerSample": (
+                8,
+                8,
+                8,
+            ),
+            "ColorSpace": 65535,
+            "Compression": 1,
+            "DateTime": "2026-07-27 11:33",
+            "DateTimeDigitized": "2026:07:27 11:33:54",
+            "DateTimeOriginal": "2026:07:27 11:33:54",
+            "ExifTag": 1238,
+            "ExifVersion": "0232",
+            "ExposureMode": 0,
+            "ExposureProgram": 2,
+            "ExposureTime": (
+                1,
+                911,
+            ),
+            "FNumber": (
+                9,
+                5,
+            ),
+            "FillOrder": 1,
+            "Flash": 16,
+            "FocalLength": (
+                17,
+                4,
+            ),
+            "FocalLengthIn35mmFilm": 26,
+            "GPSDateStamp": "2026:07:27",
+            "GPSDestBearing": (429337, 1667),
+            "GPSDestBearingRef": "T",
+            "GPSHPositioningError": (2332310, 267),
+            "GPSImgDirection": (429337, 1667),
+            "GPSImgDirectionRef": "T",
+            "GPSLatitude": ((37, 1), (26, 1), (99, 100)),
+            "GPSLatitudeRef": "N",
+            "GPSLongitude": ((122, 1), (19, 1), (769, 50)),
+            "GPSLongitudeRef": "W",
+            "GPSSpeed": (0, 1),
+            "GPSSpeedRef": "K",
+            "GPSTag": 3876,
+            "GPSTimeStamp": ((18, 1), (33, 1), (31, 1)),
+            "ISOSpeedRatings": 25,
+            "ImageLength": 1360,
+            "ImageWidth": 927,
+            "Make": "Apple",
+            "MeteringMode": 5,
+            "Model": "iPhone XR",
+            "Orientation": 1,
+            "PhotometricInterpretation": 2,
+            "PlanarConfiguration": 1,
+            "SampleFormat": (
+                1,
+                1,
+                1,
+            ),
+            "SensingMethod": 2,
+            "WhiteBalance": 0,
+        },
+        "file_size": "4.5 MB (4722740 bytes)",
+        "file_ts": "2026-09-03 12:14",
+        "format": "TIFF",
+        "mode": "RGB",
+        "size": (927, 1360),
+        "info": {
+            "bit_depth": 8,
+            "chroma": "4:4:4",
+            "compression": "raw",
+            "dpi": (72.0, 72.0),
+        },
+    }
+    actual[1]["info"].pop("tiling", None)  # safely ignor non-exist key
+    assert actual[1] == Common.sort_nested_dict(expected)
+
+
+@pytest.fixture(
+    params=[
+        (
+            Path(f"{_dir}/data/grayscale/g_AC_SideYard.jpg"),
+            {
+                "c_profile": "Generic Gray Gamma 2.2 Profile",
+                EXIF: {
+                    "ColorSpace": 1,
+                    "ComponentsConfiguration": (
+                        1,
+                        2,
+                        3,
+                        0,
+                    ),
+                    "ExifTag": 146,
+                    "ExifVersion": "0221",
+                    "FlashpixVersion": "0100",
+                    "Orientation": 1,
+                    "SceneCaptureType": 0,
+                    "YCbCrPositioning": 1,
+                },
+                "file_size": "14 KB (14354 bytes)",
+                "format": "JPEG",
+                "info": {
+                    "bit_depth": 8,
+                    "dpi": (
+                        72.0,
+                        72.0,
+                    ),
+                    "jfif": 257,
+                    "jfif_density": (
+                        1,
+                        1,
+                    ),
+                    "jfif_unit": 0,
+                    "jfif_version": (
+                        1,
+                        1,
+                    ),
+                },
+                "mode": "L",
+                "size": (
+                    240,
+                    320,
+                ),
+            },
+        ),
+        (
+            Path(f"{_dir}/data/grayscale/g_AC_XE1000_1995.heic"),
+            {
+                "c_profile": "Display P3",
+                EXIF: {
+                    "ColorSpace": 65535,
+                    "DateTime": "2024-05-26 13:18",
+                    "DateTimeDigitized": "2024:05:26 13:18:27",
+                    "DateTimeOriginal": "2024:05:26 13:18:27",
+                    "DigitalZoomRatio": (
+                        42983,
+                        24207,
+                    ),
+                    "ExifTag": 268,
+                    "ExifVersion": "0232",
+                    "ExposureMode": 0,
+                    "ExposureProgram": 2,
+                    "ExposureTime": (
+                        1,
+                        135,
+                    ),
+                    "FNumber": (
+                        11,
+                        5,
+                    ),
+                    "Flash": 16,
+                    "FocalLength": (
+                        111,
+                        50,
+                    ),
+                    "FocalLengthIn35mmFilm": 24,
+                    "ISOSpeedRatings": 32,
+                    "Make": "Apple",
+                    "MeteringMode": 5,
+                    "Model": "iPhone 14 Pro Max",
+                    "Orientation": 1,
+                    "SensingMethod": 2,
+                    "WhiteBalance": 0,
+                },
+                "file_size": "15 KB (15666 bytes)",
+                "format": "HEIF",
+                "info": {
+                    "aux": {},
+                    "bit_depth": 8,
+                    "chroma": "4:0:0",
+                    "content_light_level": {
+                        "max_content_light_level": 203,
+                        "max_pic_average_light_level": 64,
+                    },
+                    "depth_images": [],
+                    "icc_profile_type": "prof",
+                    "original_orientation": None,
+                    "primary": True,
+                    "thumbnails": [],
+                },
+                "mode": "L",
+                "size": (
+                    320,
+                    263,
+                ),
+            },
+        ),
+    ]
+)
+def data_get_image_grayscale(request):
+    return request.param
+
+
+def test_get_image_data_grayscale(data_get_image_grayscale):
+    file, expected = data_get_image_grayscale
+    actual = Common.get_image_data(file)
+    # Cloud CI runs get different ts
+    expected.pop("file_ts", None)  # safely ignor non-exist key
+    actual[1].pop("file_ts", None)
+    actual[1]["info"].pop("metadata", None)
+    actual[1]["info"].pop("tiling", None)  # safely ignor non-exist key
+    assert actual[1] == Common.sort_nested_dict(expected)
+
+
+@pytest.fixture
+def grayscale_jpg(tmp_path):
+    img_path = tmp_path / "g_AC_SideYard.jpg"
+    # Create a pure grayscale image (Luminance) with no embedded ICC
+    img = Image.new("L", (100, 100), color=128)
+    img.save(img_path, format="JPEG")
+    return img_path
+
+
+def test_grayscale_gets_correct_profile_and_no_chroma(grayscale_jpg):
+    data, info = Common.get_image_data(grayscale_jpg)
+
+    assert info["mode"] == "L"
+    assert info["c_profile"] == "Generic Gray Gamma 2.2 Profile"
+    assert "chroma" not in info["info"]
+
+
+def test_get_image_data_tiff():
+    file_path = Path("mock_test.tiff")
+    mock_raw_meta = {}
+
+    exif_dict = {"0th": {piexif.ImageIFD.DateTime: b"2025:05:29 12:00:48"}}
+    exif_bytes = piexif.dump(exif_dict)
+
+    mock_img = MagicMock()
+    mock_img.format = "TIFF"
+    mock_img.mode = "RGB"
+    mock_img.size = (100, 100)
+    mock_img.info = {EXIF: exif_bytes}  # Provide EXIF bytes directly in img.info
+    mock_img.convert.return_value = "mock_rgb_data"
+
+    # Mock TIFF specific Tags: 258 (bit_depth) and 530 (chroma subsampling)
+    mock_img.tag_v2 = {258: (16, 16, 16), 530: (2, 2)}  # Maps to 4:2:0
+
+    with (
+        patch("batch_img.common.getsize", return_value=1024),
+        patch("batch_img.common.getmtime", return_value=1700000000),
+        patch("builtins.open", MagicMock()),
+        patch("batch_img.exif.Exif.parse_raw_header", return_value=mock_raw_meta),
+        patch(
+            "PIL.Image.open",
+            return_value=MagicMock(__enter__=MagicMock(return_value=mock_img)),
+        ),
+    ):
+
+        data, d_info = Common.get_image_data(file_path)
+
+        assert data == "mock_rgb_data"
+        assert d_info["info"]["bit_depth"] == 16
+        assert d_info["info"]["chroma"] == "4:2:0"
+        assert EXIF in d_info
+        assert d_info[EXIF]["DateTime"] == "2025-05-29 12:00"
 
 
 @pytest.fixture(
@@ -34,7 +297,7 @@ def os_platform(request):
     return request.param
 
 
-@pytest.fixture(params=[(PKG_NAME, "1.4.5"), ("", "1.4.5")])
+@pytest.fixture(params=[(PKG_NAME, "1.4.6"), ("", "1.4.6")])
 def ver_data(request):
     return request.param
 
@@ -50,7 +313,7 @@ def test_get_version(ver_data):
         (
             "1.9.9",
             PKG_NAME,
-            f"🔔 Update available: 1.4.5  →  1.9.9\nRun '{PKG_NAME} --update'",
+            f"🔔 Update available: 1.4.6  →  1.9.9\nRun '{PKG_NAME} --update'",
         ),
     ]
 )
@@ -68,7 +331,7 @@ def test_check_latest_version(mock_get_latest_pypi, data_check_latest_version):
 
 @pytest.fixture(
     params=[
-        (PKG_NAME, 0, "1.4.4"),
+        (PKG_NAME, 0, "1.4.5"),
         ("bad_bogus", 1, UNKNOWN),
     ]
 )
@@ -706,6 +969,25 @@ def test_sort_nested_dict(data_nested_dict):
                 ),
             },
         ),
+        (
+            Path(f"{_dir}/data/PNG/Cute.png"),
+            {
+                "c_profile": "LG UltraFine",
+                "exif": {
+                    "ExifTag": 78,
+                },
+                "file_size": "17 KB (17797 bytes)",
+                "file_ts": "2026-09-02 12:05",
+                "format": "PNG",
+                "mode": "RGBA",
+                "size": (264, 136),
+                "info": {
+                    "bit_depth": 8,
+                    "chroma": "4:4:4:4",
+                    "dpi": (143.99259999999998, 143.99259999999998),
+                },
+            },
+        ),
     ]
 )
 def data_get_image(request):
@@ -790,7 +1072,7 @@ def test_calculate_new_size(data_calculate_new_size):
 @pytest.fixture(
     params=[
         (Path(f"{_dir}/data/JPG"), REPLACE, 8),
-        (Path(f"{_dir}/data/PNG"), Path(f"{_dir}/.out/"), 2),
+        (Path(f"{_dir}/data/PNG"), Path(f"{_dir}/.out/"), 3),
     ]
 )
 def data_prepare_all_files(request):

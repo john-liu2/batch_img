@@ -6,13 +6,14 @@ import hashlib
 import importlib.metadata
 import itertools
 import json
+import os
 import subprocess
 import sys
 import tomllib
 from base64 import b64encode
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timedelta
-from multiprocessing import cpu_count, current_process
+from multiprocessing import current_process
 from os.path import getmtime, getsize
 from pathlib import Path
 from time import time
@@ -262,15 +263,16 @@ class Common:
                 _dict[tag_name] = value
         # log.info(f"{_dict=}")
         for key in (
+            "HostComputer",
+            "InterColorProfile",
             "MakerNote",
             "SceneType",
-            "SubjectArea",
             "Software",
-            "HostComputer",
+            "SubjectArea",
             "UserComment",
+            "XMLPacket",
         ):
-            if key in _dict:
-                _dict.pop(key)
+            _dict.pop(key, None)  # safely ignor non-exist key
         keys = list(_dict.keys())
         for keyword in (
             "OffsetTime",
@@ -284,9 +286,11 @@ class Common:
             for key in keys:
                 if key.startswith(keyword) or key.endswith(keyword):
                     _dict.pop(key)
-        _res = {
-            k: (v.decode() if isinstance(v, bytes) else v) for k, v in _dict.items()
-        }
+            # Use errors="replace" to prevent UnicodeDecodeError on raw binary bytes
+            _res = {
+                k: (v.decode("utf-8", errors="replace") if isinstance(v, bytes) else v)
+                for k, v in _dict.items()
+            }
         log.debug(f"{_res=}")
         return _res
 
@@ -303,6 +307,67 @@ class Common:
 
         # Base case: return the value as-is if it's not a dict or list
         return data
+
+    @staticmethod
+    def _extract_tiff_metadata(img, d_info: dict) -> None:
+        """Extract missing bit_depth and chroma natively for TIFF format"""
+        if img.format != "TIFF" or not hasattr(img, "tag_v2"):
+            return
+        if "bit_depth" not in d_info["info"]:
+            bps = img.tag_v2.get(258)
+            if bps:
+                d_info["info"]["bit_depth"] = bps[0] if isinstance(bps, tuple) else bps
+        if "chroma" not in d_info["info"]:
+            subs = img.tag_v2.get(530)
+            if subs and isinstance(subs, tuple):
+                chroma_map = {
+                    (1, 1): "4:4:4",
+                    (2, 1): "4:2:2",
+                    (2, 2): "4:2:0",
+                    (1, 2): "4:4:0",
+                    (4, 1): "4:1:1",
+                }
+                if subs in chroma_map:
+                    d_info["info"]["chroma"] = chroma_map[subs]
+            elif img.mode in {"RGB", "RGBA"}:
+                d_info["info"]["chroma"] = "4:4:4:4" if img.mode == "RGBA" else "4:4:4"
+
+    @staticmethod
+    def _process_exif_data(img, d_info: dict) -> None:
+        """Extract and decode EXIF data with fallback support"""
+        exif_data = img.info.pop(EXIF, None)
+        if not exif_data and hasattr(img, "getexif"):
+            try:
+                exif_obj = img.getexif()
+                if exif_obj:
+                    exif_data = exif_obj.tobytes()
+            except (AttributeError, NotImplementedError, ValueError) as e:
+                log.debug(f"Failed to get exif via getexif(): {e}")
+
+        if not exif_data:
+            return
+        try:
+            d_info[EXIF] = Common.decode_exif(exif_data)
+        except (
+            ValueError,
+            KeyError,
+            IndexError,
+            UnicodeDecodeError,
+        ) as e:
+            log.debug(f"Failed to decode exif data: {e}")
+            return
+
+        dt_str = d_info[EXIF].get("DateTime")
+        if dt_str:
+            tmp = datetime.strptime(dt_str, TS_FORMAT2).strftime(TS_2_MINUTE)
+            d_info[EXIF]["DateTime"] = tmp
+
+        val = d_info[EXIF].get("ColorSpace")
+        if val == 1 and d_info["c_profile"] == UNKNOWN:
+            if d_info.get("mode") == "L":
+                d_info["c_profile"] = "Generic Gray Gamma 2.2 Profile"
+            else:
+                d_info["c_profile"] = "sRGB IEC61966-2.1"
 
     @staticmethod
     def get_image_data(file: Path) -> tuple:
@@ -335,32 +400,26 @@ class Common:
                 d_info["info"]["bit_depth"] = raw_meta["bit_depth"]
             if "chroma" in raw_meta:
                 d_info["info"]["chroma"] = raw_meta["chroma"]
+
+            Common._extract_tiff_metadata(img, d_info)
             # Extract and parse ICC Profile Name
             raw_icc = img.info.get("icc_profile")
             if raw_icc:
                 d_info["c_profile"] = Exif.get_icc_profile(raw_icc)
 
-            for key in ("xmp", "icc_profile"):  # clean up
+            for key in ("xmp", "XML:com.adobe.xmp", "icc_profile"):  # clean up
                 img.info.pop(key, None)  # safely ignor non-exist key
 
             val = img.info.get("chroma", None)
             if val and isinstance(val, int):  # Convert 420 to "4:2:0"
                 img.info["chroma"] = ":".join(str(val))
-            exif_data = img.info.pop(EXIF, None)  # safely ignor non-exist key
-            if exif_data:
-                d_info[EXIF] = Common.decode_exif(exif_data)
-                # Convert "2025:05:29 12:00:48" to "2025-05-29 12:00"
-                dt_str = d_info[EXIF].get("DateTime")
-                if dt_str:
-                    tmp = datetime.strptime(dt_str, TS_FORMAT2).strftime(TS_2_MINUTE)
-                    d_info[EXIF]["DateTime"] = tmp
-                # Conver ColorSpace to Color Profile
-                val = d_info[EXIF].get("ColorSpace")
-                if val == 1 and d_info["c_profile"] == UNKNOWN:
-                    d_info["c_profile"] = "sRGB IEC61966-2.1"
 
-            if d_info["c_profile"] == UNKNOWN:
-                d_info["c_profile"] = "sRGB"
+            Common._process_exif_data(img, d_info)
+
+        if d_info["c_profile"] == UNKNOWN:
+            d_info["c_profile"] = (
+                "Generic Gray Gamma 2.2 Profile" if d_info["mode"] == "L" else "sRGB"
+            )
         return data, Common.sort_nested_dict(d_info)
 
     @staticmethod
@@ -471,8 +530,8 @@ class Common:
         """
         success_cnt = 0
         all_cnt = len(tasks)
-        workers = min(max(cpu_count(), 4), all_cnt)
-
+        workers = min((os.process_cpu_count() or 1) + 4, all_cnt)
+        log.info(f"workers: {workers}")
         with ThreadPoolExecutor(max_workers=workers) as executor:
             futures = [executor.submit(func, task) for task in tasks]
             with tqdm(total=len(futures), desc=desc, disable=quiet) as pbar:

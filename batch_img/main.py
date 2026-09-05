@@ -13,6 +13,7 @@ from batch_img.border import Border
 from batch_img.common import Common
 from batch_img.const import PKG_NAME, REPLACE
 from batch_img.do_effect import DoEffect
+from batch_img.grayscale import Grayscale
 from batch_img.info import Info
 from batch_img.log import Log
 from batch_img.no_gps import NoGps
@@ -134,6 +135,27 @@ class Main:
             ok, _ = DoEffect.apply_1_image((in_path, out, effect))
         else:
             ok = DoEffect.apply_all_in_dir(in_path, out, effect)
+        Main._conclude(start_ts)
+        return ok
+
+    @staticmethod
+    def grayscale(options) -> bool:
+        """Convert to grayscale image(s)
+
+        Args:
+            options: input options dict
+
+        Returns:
+            bool: True - Success. False - Error
+        """
+        start_ts = Main._prepare(options)
+        in_path = Path(options["src_path"])
+        output = options.get("output")
+        out = Path(output) if output else REPLACE
+        if in_path.is_file():
+            ok, _ = Grayscale.do_one_image((in_path, out))
+        else:
+            ok = Grayscale.do_all_images(in_path, out)
         Main._conclude(start_ts)
         return ok
 
