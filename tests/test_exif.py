@@ -64,10 +64,11 @@ def test_parse_png(temp_images):
     data = temp_images["PNG"].read_bytes()
     meta = Exif._parse_png(data)
     assert meta == {
-        "format": "PNG",
-        "size": (100, 50),
         "bit_depth": 8,
+        "chroma": "4:4:4:4",
+        "format": "PNG",
         "mode": "RGBA",
+        "size": (100, 50),
     }
     assert Exif._parse_png(b"invalid_png") == {}
 

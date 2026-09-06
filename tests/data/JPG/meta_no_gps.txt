@@ -8,9 +8,9 @@
   Alpha Channel   : No
   Color Space     : RGB
   Color Profile   : sRGB IEC61966-2.1
-  Chroma Format   : 4:2:0
+  Chroma          : 4:2:0
 
   [ EXIF Metadata ]
-    GPS Data       : Absent
+    GPS Data       : No
     No standard camera tags found in EXIF
 

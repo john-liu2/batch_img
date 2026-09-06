@@ -1,6 +1,6 @@
 """Test no_gps.py
 pytest -sv tests/test_no_gps.py
-Copyright © 2025 John Liu
+Copyright © 2025 - Present, John Liu
 """
 
 from os.path import dirname
