@@ -261,13 +261,12 @@ class Common:
             for tag_id, value in val.items():
                 tag_name = piexif.TAGS[ifd_name].get(tag_id, {}).get("name", tag_id)
                 _dict[tag_name] = value
-        # log.info(f"{_dict=}")
+        # log.debug(f"{_dict=}")
         for key in (
             "HostComputer",
             "InterColorProfile",
             "MakerNote",
             "SceneType",
-            "Software",
             "SubjectArea",
             "UserComment",
             "XMLPacket",

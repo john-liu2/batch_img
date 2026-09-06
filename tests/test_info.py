@@ -99,6 +99,7 @@ def mock_meta_data():
                     "Model": "iPhone 15 Pro Max",
                     "Orientation": 1,
                     "SensingMethod": 2,
+                    "Software": "17.4",
                     "WhiteBalance": 0,
                 },
             },
@@ -119,6 +120,7 @@ def mock_meta_data():
                     "FlashpixVersion": "0100",
                     "Orientation": 1,
                     "SceneCaptureType": 0,
+                    "Software": "batch_img CLI tool",
                     "YCbCrPositioning": 1,
                 },
                 "file_info": {
@@ -170,6 +172,7 @@ def mock_meta_data():
                     "Model": "iPhone 14 Pro Max",
                     "Orientation": 1,
                     "SensingMethod": 2,
+                    "Software": "batch_img CLI tool",
                     "WhiteBalance": 0,
                 },
                 "file_info": {

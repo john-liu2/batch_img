@@ -22,7 +22,40 @@ from .helper import DotDict
 _dir = dirname(__file__)
 
 
-@pytest.mark.slow(reason="This test is not ready.")
+@pytest.mark.slow(reason="The test is for manual run only")
+def test_get_image_data_real_jpg():
+    file = Path(f"~/Downloads/AC_SideYard.jpg").expanduser()
+    actual = Common.get_image_data(file)
+    expected = {
+        "c_profile": "Generic Gray Gamma 2.2 Profile",
+        "exif": {
+            "Software": "batch_img CLI tool",
+        },
+        "file_size": "619 KB (633881 bytes)",
+        "file_ts": "2026-09-04 12:48",
+        "format": "JPEG",
+        "mode": "L",
+        "size": (2250, 3000),
+        "info": {
+            "bit_depth": 8,
+            "dpi": (72, 72),
+            "jfif": 257,
+            "jfif_density": (
+                1,
+                1,
+            ),
+            "jfif_unit": 0,
+            "jfif_version": (
+                1,
+                1,
+            ),
+        },
+    }
+    actual[1]["info"].pop("tiling", None)  # safely ignor non-exist key
+    assert actual[1] == Common.sort_nested_dict(expected)
+
+
+@pytest.mark.slow(reason="The test is for manual run only")
 def test_get_image_data_real_tiff():
     file = Path(f"~/Downloads/IMG_0962.tiff").expanduser()
     actual = Common.get_image_data(file)
@@ -124,6 +157,7 @@ def test_get_image_data_real_tiff():
                     "FlashpixVersion": "0100",
                     "Orientation": 1,
                     "SceneCaptureType": 0,
+                    "Software": "batch_img CLI tool",
                     "YCbCrPositioning": 1,
                 },
                 "file_size": "14 KB (14354 bytes)",
@@ -189,6 +223,7 @@ def test_get_image_data_real_tiff():
                     "Model": "iPhone 14 Pro Max",
                     "Orientation": 1,
                     "SensingMethod": 2,
+                    "Software": "batch_img CLI tool",
                     "WhiteBalance": 0,
                 },
                 "file_size": "15 KB (15666 bytes)",
@@ -697,6 +732,7 @@ def test_remove_exif_gps(data_remove_exif_gps):
                 "Model": "iPhone 16 Pro Max",
                 "Orientation": 1,
                 "SensingMethod": 2,
+                "Software": "18.4.1",
                 "WhiteBalance": 0,
             },
         ),
@@ -731,6 +767,7 @@ def test_remove_exif_gps(data_remove_exif_gps):
                 "Model": "iPhone 16 Pro Max",
                 "Orientation": 1,
                 "SensingMethod": 2,
+                "Software": "18.4.1",
                 "WhiteBalance": 0,
             },
         ),
@@ -892,6 +929,7 @@ def test_sort_nested_dict(data_nested_dict):
                     "Model": "iPhone 15 Pro Max",
                     "Orientation": 1,
                     "SensingMethod": 2,
+                    "Software": "17.4",
                     "WhiteBalance": 0,
                 },
             },

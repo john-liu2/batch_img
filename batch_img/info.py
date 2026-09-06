@@ -187,13 +187,10 @@ class Info:
             total: Total number of files
             obj: File object to write to. If None, prints to logger.
         """
-        file_info = data.get("file_info", {})
-        exif = data.get(EXIF, {})
-
-        # Output separator and file header
         Info._out("─" * 60, obj)
         Info._out(f"{file} [{index}/{total}]", obj)
 
+        file_info = data.get("file_info", {})
         # Output file info
         Info._out(f"  File Size       : {file_info.get('file_size', UNKNOWN)}", obj)
         Info._out(f"  Last Modified   : {file_info.get('last_modified', UNKNOWN)}", obj)
@@ -209,6 +206,7 @@ class Info:
         Info._out("", obj)
         Info._out("  [ EXIF Metadata ]", obj)
 
+        exif = data.get(EXIF)
         if not exif:
             Info._out("    None (or unreadable EXIF header)", obj)
             Info._out("", obj)
