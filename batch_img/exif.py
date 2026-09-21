@@ -162,6 +162,7 @@ class Exif:
                 "mode": "RGB",
                 "chroma": "4:2:0",
             }
+        # No chroma subsampling for WEBP in Lossless Mode (VP8L-based)
         if chunk_type == b"VP8L" and len(data) >= 25:
             b0, b1, b2, b3 = data[21:25]
             val = b0 | (b1 << 8) | (b2 << 16) | (b3 << 24)
@@ -170,6 +171,7 @@ class Exif:
                 "size": ((val & 0x3FFF) + 1, ((val >> 14) & 0x3FFF) + 1),
                 "bit_depth": 8,
                 "mode": "RGBA" if (val & 0x10000000) else "RGB",
+                "chroma": "No",
             }
         if chunk_type == b"VP8X" and len(data) >= 30:
             has_alpha = bool(data[20] & 0x10)
@@ -180,6 +182,7 @@ class Exif:
                 "size": (w, h),
                 "bit_depth": 8,
                 "mode": "RGBA" if has_alpha else "RGB",
+                "chroma": "No",
             }
         return {"format": "WEBP"}
 
