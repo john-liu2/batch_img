@@ -58,12 +58,6 @@ class Info:
                 and res["file_info"]["c_space"] == "Gray"
             ):
                 res["file_info"]["chroma"] = "No"
-            # No chroma subsampling for WEBP in RGBA / RGB
-            if res["file_info"]["format"] == "WEBP" and res["file_info"]["c_space"] in {
-                "RGB",
-                "RGBA",
-            }:
-                res["file_info"]["chroma"] = "No"
             return True, (file, res)
         except (OSError, ValueError, TypeError, KeyError) as exc:
             return False, f"{file}: {exc}"
